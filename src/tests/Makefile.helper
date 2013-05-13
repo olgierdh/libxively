@@ -1,0 +1,43 @@
+XI_BINDIR ?= $(CURDIR)
+
+ifndef XI_OBJDIR
+  XI_TEST_OBJDIR := $(CURDIR)
+  XI := ../../libxively/libxively.a
+else
+  XI_TEST_OBJDIR := $(XI_OBJDIR)/tests/$(TARGET_BIN)
+endif
+
+ifndef XI_BINDIR
+  XI_BINDIR := $(CURDIR)
+endif
+
+include ../../../Makefile.include
+
+INCLUDE_DIRS 	+= ../../ext/tinytest
+INCLUDE_DIRS 	+= ../../libxively
+INCLUDE_DIRS 	+= ../../libxively/comm_layers/posix
+#LIBRARIES 		+= $(XI)
+
+CFLAGS  += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
+
+SOURCES := $(wildcard *.c)
+HEADERS := $(wildcard *.h)
+
+SOURCES += $(TEST_SOURCES)
+HEADERS += $(TEST_HEADERS)
+
+OBJECTS := $(SOURCES:.c=.o)
+OBJS    := $(addprefix $(XI_TEST_OBJDIR)/,$(OBJECTS))
+
+all: $(XI_BINDIR)/$(TARGET_BIN)
+
+$(XI_TEST_OBJDIR)/%.o : %.c
+	mkdir -p $(dir $@)
+	$(CC) -c $(XI_CFLAGS) $(CFLAGS) $< -o $@
+
+$(XI_BINDIR)/$(TARGET_BIN): $(OBJS) $(LIBRARIES)
+	$(CC) -o $@ $(LDFLAGS) $^
+
+clean:
+	$(RM) $(XI_BINDIR)/$(TARGET_BIN) $(OBJS)

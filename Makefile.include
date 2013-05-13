@@ -1,0 +1,34 @@
+SHELL := /bin/sh
+
+CC ?= gcc
+AR ?= ar
+
+XI_BUILD_TYPE ?= debug
+
+ifndef XI_OVERRIDE_CFLAGS
+  XI_CFLAGS += -c -std=gnu99 -Iinclude
+  XI_CFLAGS += -Wall -Wextra $(XI_EXTRA_CFLAGS)
+  ifeq ($(XI_BUILD_TYPE),release)
+    XI_CFLAGS += -O2 -combine -fwhole-program
+  endif
+  ifeq ($(XI_BUILD_TYPE),debug)
+    XI_CFLAGS += -O0 -D XI_DEBUG_OUTPUT
+
+  endif
+  XI_CFLAGS += $(foreach constant,$(XI_OVERRIDE_CONSTANTS),-D$(constant))
+else
+  XI_CFLAGS := $(XI_OVERRIDE_CFLAGS)
+  $(warning "Overriden XI_CFLAGS with $(XI_OVERRIDE_CFLAGS)")
+endif # XI_OVERRIDE_CFLAGS
+
+ifndef XI_OVERRIDE_ARFLAGS
+  XI_ARFLAGS := -rs
+else
+  XI_ARFLAGS := $(XI_OVERRIDE_ARFLAGS)
+  $(warning "Overriden XI_ARFLAGS with $(XI_OVERRIDE_ARFLAGS)")
+endif # XI_OVERRIDE_ARFLAGS
+
+XI_OBJDIR ?= $(CURDIR)/obj
+XI_BINDIR ?= $(CURDIR)/bin
+
+XI ?= $(XI_OBJDIR)/libxively.a

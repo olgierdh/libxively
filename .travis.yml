@@ -1,0 +1,11 @@
+language: c
+compiler:
+  - clang
+  - gcc
+before_install:
+  - "git submodule update --init --recursive"
+  - "sudo apt-get -qq update"
+  - "sudo apt-get -qq install doxygen"
+script:
+  - "make all"
+  - "src/bin/libxively_unit_test_suite"
