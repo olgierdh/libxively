@@ -78,9 +78,4 @@
 #define XI_PORT                            80
 #endif
 
-
-#ifndef XI_USER_AGENT
-#define XI_USER_AGENT                      "libxively/0.1.x"
-#endif
-
 #endif // __XI_CONSTST_H__
