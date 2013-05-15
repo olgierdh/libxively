@@ -113,3 +113,5 @@ A few more:
 [pricing]: https://xively.com/pricing/#support
 [newissue]: https://github.com/xively/libxively/issues/new
 [atxively]: https://tweetter.com/errordeveloper
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/ac9aa22a4a17f673e8988c5037946a4a "githalytics.com")](http://githalytics.com/xively/libxively)
