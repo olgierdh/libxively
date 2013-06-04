@@ -1,0 +1,5 @@
+#ifndef __LAYER_CONFIGURATION_H__
+#define __LAYER_CONFIGURATION_H__
+
+
+#endif // __LAYER_CONFIGURATION_H__

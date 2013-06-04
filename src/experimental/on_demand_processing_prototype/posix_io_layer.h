@@ -1,0 +1,42 @@
+#ifndef __POSIX_IO_LAYER_H__
+#define __POSIX_IO_LAYER_H__
+
+// local
+#include "layer.h"
+
+/**
+ * \file   posix_io_layer.h
+ * \author Olgierd Humenczuk
+ * \brief  File that containes the declaration of the posix io layer functions
+ */
+
+/**
+ * \brief  see the layer_interface for details
+ */
+layer_state_t posix_io_layer_on_demand(
+      layer_connectivity_t* context
+    , char* buffer
+    , size_t size );
+
+/**
+ * \brief  see the layer_interface for details
+ */
+layer_state_t posix_io_layer_on_data_ready(
+      layer_connectivity_t* context
+    , const char* buffer
+    , size_t size );
+
+/**
+ * \brief  see the layer_interface for details
+ */
+layer_state_t posix_io_layer_close(
+    layer_connectivity_t* context );
+
+/**
+ * \brief  see the layer_interface for details
+ */
+layer_state_t posix_io_layer_on_close(
+    layer_connectivity_t* context );
+
+
+#endif

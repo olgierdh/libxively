@@ -11,6 +11,7 @@
 #define __XI_MACROS_H__
 
 #include <string.h>
+#include "xi_err.h"
 
 #define XI_STR_EXPAND(tok) #tok
 #define XI_STR(tok) XI_STR_EXPAND(tok)
