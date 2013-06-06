@@ -5,7 +5,12 @@ XI_COMM_LAYER ?= posix
 
 XI_LAYER_DIRS := comm_layers/$(XI_COMM_LAYER)
 
-XI_LAYERS_CFLAGS := -I./ $(foreach layerdir,$(XI_LAYER_DIRS),-I./$(layerdir))
+XI_USER_AGENT ?= '"libxively-$(XI_COMM_LAYER)/0.1.x-$(shell git rev-parse --short HEAD)"'
+
+XI_LAYERS_CFLAGS := -I./ \
+	-DXI_USER_AGENT=$(XI_USER_AGENT) \
+	$(foreach layerdir,$(XI_LAYER_DIRS),-I./$(layerdir))
+
 
 XI_SOURCES = $(wildcard *.c) \
   $(wildcard comm_layers/$(XI_COMM_LAYER)/*.c)

@@ -21,6 +21,10 @@ INCLUDE_DIRS 	+= ../../libxively/comm_layers/posix
 CFLAGS  += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
 
+XI_USER_AGENT ?= '"libxively-test/$(shell git rev-parse --short HEAD)"'
+
+CFLAGS += -DXI_USER_AGENT=$(XI_USER_AGENT)
+
 SOURCES := $(wildcard *.c)
 HEADERS := $(wildcard *.h)
 
