@@ -260,11 +260,20 @@ const char* csv_encode_create_datastream(
     // PRECONDITIONS
     assert( data != 0 );
 
-    int s = snprintf( XI_CSV_LOCAL_BUFFER, sizeof( XI_CSV_LOCAL_BUFFER )
-            , "%s,%d\n", datastream_id, data->value.i32_value );
-    int size = XI_CSV_BUFFER_SIZE;
+    int s       = 0;
+    int size    = sizeof( XI_CSV_LOCAL_BUFFER );
+    int offset  = 0;
 
-    XI_CHECK_SIZE( s, size, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
+    s = snprintf( XI_CSV_LOCAL_BUFFER + offset, size - offset
+            , "%s,", datastream_id );
+    XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
+
+    s = csv_encode_value( XI_CSV_LOCAL_BUFFER + offset, size - offset, data );
+    XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
+
+    s = snprintf( XI_CSV_LOCAL_BUFFER + offset, size - offset
+            , "\n", datastream_id );
+    XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
 
     return XI_CSV_LOCAL_BUFFER;
 
