@@ -271,8 +271,7 @@ const char* csv_encode_create_datastream(
     s = csv_encode_value( XI_CSV_LOCAL_BUFFER + offset, size - offset, data );
     XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
 
-    s = snprintf( XI_CSV_LOCAL_BUFFER + offset, size - offset
-            , "\n", datastream_id );
+    s = snprintf( XI_CSV_LOCAL_BUFFER + offset, size - offset, "\n" );
     XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
 
     return XI_CSV_LOCAL_BUFFER;
