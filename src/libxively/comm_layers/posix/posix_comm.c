@@ -74,7 +74,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
                   sizeof( timeout ) ) < 0 )
         {
             xi_set_err( XI_SOCKET_INITIALIZATION_ERROR );
-            return 0;
+            goto err_handling;
         }
 
         if ( setsockopt( pos_comm_data->socket_fd, SOL_SOCKET
@@ -82,7 +82,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
                   sizeof( timeout ) ) < 0 )
         {
             xi_set_err( XI_SOCKET_INITIALIZATION_ERROR );
-            return 0;
+            goto err_handling;
         }
     }
 
@@ -101,7 +101,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
     if( hostinfo == NULL )
     {
         xi_set_err( XI_SOCKET_GETHOSTBYNAME_ERROR );
-        return 0;
+        goto err_handling;
     }
 
     // set the address and the port for further connection attempt
@@ -113,7 +113,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
     if( connect( pos_comm_data->socket_fd, ( struct sockaddr* ) &name, sizeof( struct sockaddr ) ) == -1 )
     {
         xi_set_err( XI_SOCKET_CONNECTION_ERROR );
-        return 0;
+        goto err_handling;
     }
 
     // POSTCONDITIONS
