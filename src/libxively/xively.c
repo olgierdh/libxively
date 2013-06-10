@@ -261,7 +261,7 @@ const xi_response_t* xi_datastream_get(
 const xi_response_t* xi_datastream_create(
             xi_context_t* xi, int32_t feed_id
           , const char * datastream_id
-          , const xi_datapoint_value_t* value )
+          , const xi_datapoint_t* datapoint )
 {
     XI_FUNCTION_PROLOGUE
 
@@ -270,7 +270,7 @@ const xi_response_t* xi_datastream_create(
             , xi->api_key
             , feed_id
             , datastream_id
-            , value );
+            , datapoint );
 
     if( data == 0 ) { goto err_handling; }
 
@@ -281,7 +281,7 @@ const xi_response_t* xi_datastream_create(
 const xi_response_t* xi_datastream_update(
           xi_context_t* xi, int32_t feed_id
         , const char * datastream_id
-        , const xi_datapoint_value_t* value )
+        , const xi_datapoint_t* datapoint )
 {
     XI_FUNCTION_PROLOGUE
 
@@ -290,7 +290,7 @@ const xi_response_t* xi_datastream_update(
             , xi->api_key
             , feed_id
             , datastream_id
-            , value );
+            , datapoint );
 
 
     if( data == 0 ) { goto err_handling; }
@@ -341,7 +341,7 @@ const xi_response_t* xi_datapoint_delete(
 
 extern const xi_response_t* xi_datapoint_delete_range(
             const xi_context_t* xi, int feed_id
-          , char * datastream_id
+          , const char * datastream_id
           , const xi_timestamp_t* start
           , const xi_timestamp_t* end )
 {

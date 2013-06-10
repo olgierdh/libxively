@@ -254,7 +254,7 @@ extern const xi_response_t* xi_feed_get(
 extern const xi_response_t* xi_datastream_create(
           xi_context_t* xi, int32_t feed_id
         , const char * datastream_id
-        , const xi_datapoint_value_t* value);
+        , const xi_datapoint_t* value);
 
 /**
  * \brief   Update a datastream with given datapoint using server or local timestamp
@@ -262,7 +262,7 @@ extern const xi_response_t* xi_datastream_create(
 extern const xi_response_t* xi_datastream_update(
           xi_context_t* xi, int32_t feed_id
         , const char * datastream_id
-        , const xi_datapoint_value_t* value );
+        , const xi_datapoint_t* value );
 
 /**
  * \brief   Retrieve latest datapoint from a given datastream
@@ -297,7 +297,7 @@ extern const xi_response_t* xi_datapoint_delete(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_response_t* xi_datapoint_delete_range(
-          const xi_context_t* xi, int feed_id, char * datastream_id
+          const xi_context_t* xi, int feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
 
 #ifdef __cplusplus
