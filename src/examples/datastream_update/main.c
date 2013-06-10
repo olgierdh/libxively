@@ -60,7 +60,7 @@ int main( int argc, const char* argv[] )
 
     xi_datastream_update( xi_context
             , atoi( argv[ 2 ] ), argv[ 3 ]
-            , &datapoint.value );
+            , &datapoint );
 
     printf( "err: %d - %s\n", ( int ) xi_get_last_error(), xi_get_error_string( xi_get_last_error() ) );
 

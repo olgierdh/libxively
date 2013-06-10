@@ -59,7 +59,7 @@ int main( int argc, const char* argv[] )
 
     xi_datastream_create( xi_context
             , atoi( argv[ 2 ] ), argv[ 3 ]
-            , &datapoint.value );
+            , &datapoint );
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );

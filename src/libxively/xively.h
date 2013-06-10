@@ -254,7 +254,7 @@ extern const xi_response_t* xi_feed_get(
 extern const xi_response_t* xi_datastream_create(
           xi_context_t* xi, int32_t feed_id
         , const char * datastream_id
-        , const xi_datapoint_value_t* value);
+        , const xi_datapoint_t* value);
 
 /**
  * \brief   Update a datastream with given datapoint using server or local timestamp
@@ -262,7 +262,7 @@ extern const xi_response_t* xi_datastream_create(
 extern const xi_response_t* xi_datastream_update(
           xi_context_t* xi, int32_t feed_id
         , const char * datastream_id
-        , const xi_datapoint_value_t* value );
+        , const xi_datapoint_t* value );
 
 /**
  * \brief   Retrieve latest datapoint from a given datastream

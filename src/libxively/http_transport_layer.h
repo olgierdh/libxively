@@ -22,14 +22,14 @@ const char* http_encode_create_datastream(
         , const char* x_api_key
         , int32_t feed_id
         , const char *datastream_id
-        , const xi_datapoint_value_t* value );
+        , const xi_datapoint_t* value );
 
 const char* http_encode_update_datastream(
           const data_layer_t*
         , const char* x_api_key
         , int32_t feed_id
         , const char *datastream_id
-        , const xi_datapoint_value_t* value );
+        , const xi_datapoint_t* value );
 
 const char* http_encode_get_datastream(
           const data_layer_t*
