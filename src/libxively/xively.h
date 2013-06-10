@@ -297,7 +297,7 @@ extern const xi_response_t* xi_datapoint_delete(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_response_t* xi_datapoint_delete_range(
-          const xi_context_t* xi, int feed_id, char * datastream_id
+          const xi_context_t* xi, int feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
 
 #ifdef __cplusplus
