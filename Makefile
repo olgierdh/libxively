@@ -16,10 +16,16 @@ clean:
 # When the IDE unpacks the library, it magically names it by basename of the
 # zip archive, so revision hash appears in the lib's name.
 mbed_zipfile: mbed-libxively-$(REV)
+# We simply append `XI_USER_AGENT` for mbed to `xi_consts.h`, as there is no
+# global constant which we can rely on, e.g. `__MBED__`. One can use the
+# constant `MBED_LIBRARY_VERSION`, but that requires `mbed.h` to be included
+# from where we need it. Only a global preprocessor constant would work.
 mbed-libxively-$(REV):
+	echo "#define XI_USER_AGENT \"libxively-mbed/0.1.x-$(shell git rev-parse --short HEAD)\"" >> src/libxively/xi_consts.h
 	zip "$@" \
 	   src/libxively/*.[ch] \
 	   src/libxively/comm_layers/mbed/*
+	git checkout src/libxively/xi_consts.h
 
 update_docs_branch:
 	-rm -rf doc/html
