@@ -21,7 +21,7 @@ mbed_zipfile: mbed-libxively-$(REV)
 # constant `MBED_LIBRARY_VERSION`, but that requires `mbed.h` to be included
 # from where we need it. Only a global preprocessor constant would work.
 mbed-libxively-$(REV):
-	echo "#define XI_USER_AGENT \"libxively-mbed/0.1.x-$(shell git rev-parse --short HEAD)\"" >> src/libxively/xi_consts.h
+	echo "#define XI_USER_AGENT \"libxively-mbed/0.1.x-$(REV)\"" >> src/libxively/xi_consts.h
 	zip "$@" \
 	   src/libxively/*.[ch] \
 	   src/libxively/comm_layers/mbed/*
