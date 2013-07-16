@@ -268,10 +268,7 @@ const char* csv_encode_create_datastream(
             , "%s,", datastream_id );
     XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
 
-    s = csv_encode_value( XI_CSV_LOCAL_BUFFER + offset, size - offset, data );
-    XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
-
-    s = snprintf( XI_CSV_LOCAL_BUFFER + offset, size - offset, "\n" );
+    s = csv_encode_datapoint_in_place( XI_CSV_LOCAL_BUFFER + offset, size - offset, data );
     XI_CHECK_S( s, size, offset, XI_CSV_ENCODE_DATASTREAM_BUFFER_OVERRUN );
 
     return XI_CSV_LOCAL_BUFFER;
