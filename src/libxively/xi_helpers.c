@@ -48,7 +48,7 @@ int xi_str_copy_untiln( char* dst, size_t dst_size, const char* src, char delim 
     return counter;
 }
 
-// used by the xi_mktime
+// used by the xi_mktime and xi_gmtime
 #define YEAR0               1900  /* the first year */
 #define EPOCH_YR            1970  /* EPOCH = Jan 1 1970 00:00:00 */
 #define SECS_DAY            (24L * 60L * 60L)
@@ -59,7 +59,7 @@ int xi_str_copy_untiln( char* dst, size_t dst_size, const char* src, char delim 
 #define TIME_MAX            ULONG_MAX
 #define ABB_LEN             3
 
-// used by the xi_mktime
+// used by the xi_mktime and xi_gmtime
 static const int _ytab[2][12] = {
     { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
       { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } };
@@ -162,9 +162,40 @@ time_t xi_mktime(register struct tm *timep)
     return ( time_t ) seconds;
 }
 
-struct tm* xi_gmtime( time_t* t )
+struct tm* xi_gmtime( register const time_t *timer )
 {
-    return gmtime( t );
+    static struct tm br_time;
+    register struct tm *timep = &br_time;
+    time_t time = *timer;
+    register unsigned long dayclock, dayno;
+    int year = EPOCH_YR;
+
+    dayclock = (unsigned long)time % SECS_DAY;
+    dayno = (unsigned long)time / SECS_DAY;
+
+    timep->tm_sec = dayclock % 60;
+    timep->tm_min = (dayclock % 3600) / 60;
+    timep->tm_hour = dayclock / 3600;
+    timep->tm_wday = (dayno + 4) % 7;       /* day 0 was a thursday */
+
+    while (dayno >= YEARSIZE(year)) {
+            dayno -= YEARSIZE(year);
+            year++;
+    }
+
+    timep->tm_year = year - YEAR0;
+    timep->tm_yday = dayno;
+    timep->tm_mon = 0;
+
+    while (dayno >= _ytab[LEAPYEAR(year)][timep->tm_mon]) {
+            dayno -= _ytab[LEAPYEAR(year)][timep->tm_mon];
+            timep->tm_mon++;
+    }
+
+    timep->tm_mday = dayno + 1;
+    timep->tm_isdst = 0;
+
+    return timep;
 }
 
 char* xi_replace_with(

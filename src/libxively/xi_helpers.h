@@ -49,9 +49,16 @@ int xi_str_copy_untiln( char* dst, size_t dst_size, const char* src, char delim 
 time_t xi_mktime( struct tm* t );
 
 /**
- * \brief   This just wraps system's `gmtime()`, it a facade for future use
+ * \brief   Converts from `time_t` to `tm`
+ *
+ * \note    This code assumes that unsigned long can be converted to `time_t`.
+ *          A `time_t` should not be wider than `unsigned long`, since this
+ *          would mean that the check for overflow at the end could fail.
+ *
+ * \note    This implementation had been copied from MINIX C library.
+ *          Which is 100% compatible with our license.
  */
-struct tm* xi_gmtime( time_t* t );
+struct tm* xi_gmtime( register const time_t* t );
 
 /**
  * \brief   Replaces `p` with `r` for every `p` in `buffer`
