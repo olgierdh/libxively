@@ -13,6 +13,11 @@
 #ifndef __XI_ALLOCATOR_H__
 #define __XI_ALLOCATOR_H__
 
+#ifdef MISSING_WINT_T
+typedef int wint_t;
+#endif
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
