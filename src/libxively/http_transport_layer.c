@@ -171,8 +171,8 @@ const char* http_encode_delete_datapoint(
 {
     XI_UNUSED( data_transport );
 
-    struct tm* ptm = xi_gmtime(
-        ( time_t* ) &o->timestamp.timestamp );
+    struct xi_tm* ptm = xi_gmtime(
+        ( xi_time_t* ) &o->timestamp.timestamp );
 
     int s = snprintf( XI_HTTP_QUERY_BUFFER
         , sizeof( XI_HTTP_QUERY_BUFFER )
@@ -338,19 +338,19 @@ const char* http_encode_datapoint_delete_range(
 {
     XI_UNUSED( data_layer );
 
-    struct tm stm;
-    struct tm etm;
+    struct xi_tm stm;
+    struct xi_tm etm;
 
     {
-        struct tm* tmp = start ? xi_gmtime(
-            ( time_t* ) &start->timestamp ) : 0;
-        memcpy( &stm, tmp, sizeof( struct tm ) );
+        struct xi_tm* tmp = start ? xi_gmtime(
+            ( xi_time_t* ) &start->timestamp ) : 0;
+        memcpy( &stm, tmp, sizeof( struct xi_tm ) );
     }
 
     {
-        struct tm* tmp = end ? xi_gmtime(
-            ( time_t* ) &end->timestamp ) : 0;
-        memcpy( &etm, tmp, sizeof( struct tm ) );
+        struct xi_tm* tmp = end ? xi_gmtime(
+            ( xi_time_t* ) &end->timestamp ) : 0;
+        memcpy( &etm, tmp, sizeof( struct xi_tm ) );
     }
 
     int s = 0;

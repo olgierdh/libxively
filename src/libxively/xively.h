@@ -12,10 +12,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <time.h>
-
 #include "comm_layer.h"
 #include "xi_consts.h"
+#include "xi_time.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,8 +131,8 @@ typedef union {
  * \brief   The datapoint timestamp
  */
 typedef struct {
-    time_t timestamp;
-    time_t micro;
+    xi_time_t timestamp;
+    xi_time_t micro;
 } xi_timestamp_t;
 
 /**
