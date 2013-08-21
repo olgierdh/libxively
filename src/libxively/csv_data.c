@@ -191,7 +191,7 @@ xi_datapoint_t* csv_decode_value(
             p->value_type       = XI_VALUE_TYPE_I32;
             break;
         case XI_STATE_FLOAT:
-            p->value.f32_value  = atof( p->value.str_value );
+            p->value.f32_value  = ( float ) atof( p->value.str_value );
             p->value_type       = XI_VALUE_TYPE_F32;
             break;
         case XI_STATE_STRING:
