@@ -8,8 +8,8 @@
  */
 
 #include <assert.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 #include "csv_data.h"
 #include "xi_macros.h"
@@ -225,8 +225,8 @@ int csv_encode_datapoint_in_place(
 
     if( datapoint->timestamp.timestamp != 0 )
     {
-        time_t stamp = datapoint->timestamp.timestamp;
-        struct tm* gmtinfo = xi_gmtime( &stamp );
+        xi_time_t stamp = datapoint->timestamp.timestamp;
+        struct xi_tm* gmtinfo = xi_gmtime( &stamp );
 
         s = snprintf( in, size
             , "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ,"
@@ -355,7 +355,7 @@ xi_datapoint_t* csv_decode_datapoint(
 
         // copy parsed data
         {
-            struct tm timeinfo;
+            struct xi_tm timeinfo;
 
             timeinfo.tm_year   = ye - 1900;
             timeinfo.tm_mon    = mo - 1;
@@ -364,7 +364,7 @@ xi_datapoint_t* csv_decode_datapoint(
             timeinfo.tm_min    = m;
             timeinfo.tm_sec    = s;
 
-            time_t timestamp = xi_mktime( &timeinfo );
+            xi_time_t timestamp = xi_mktime( &timeinfo );
 
             XI_CHECK_CND( ( int )timestamp == -1, XI_CSV_TIME_CONVERTION_ERROR );
 
