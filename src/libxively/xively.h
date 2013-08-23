@@ -43,6 +43,8 @@ typedef enum {
     XI_WSS,
 } xi_protocol_t;
 
+typedef uint32_t xi_feed_id_t;
+
 /**
  * \brief   _The context structure_ - it's the first agument for all functions
  *          that communicate with Xively API (_i.e. not helpers or utilities_)
@@ -50,7 +52,7 @@ typedef enum {
 typedef struct {
     char *api_key; /** Xively API key */
     xi_protocol_t protocol; /** Xively protocol */
-    int32_t feed_id; /** Xively feed ID */
+    xi_feed_id_t feed_id; /** Xively feed ID */
 } xi_context_t;
 
 /**
@@ -160,7 +162,7 @@ typedef struct {
  *          create dozens of datastreams due to a bug.
  */
 typedef struct {
-    int32_t           feed_id;
+    xi_feed_id_t      feed_id;
     size_t            datastream_count;
     xi_datastream_t   datastreams[ XI_MAX_DATASTREAMS ];
 } xi_feed_t;
@@ -222,7 +224,7 @@ extern uint32_t xi_get_network_timeout( void );
  */
 extern xi_context_t* xi_create_context(
           xi_protocol_t protocol, const char* api_key
-        , int32_t feed_id );
+        , xi_feed_id_t feed_id );
 
 /**
  * \brief   Library context destructor
@@ -251,7 +253,7 @@ extern const xi_response_t* xi_feed_get(
  * \brief   Create a datastream with given value using server timestamp
  */
 extern const xi_response_t* xi_datastream_create(
-          xi_context_t* xi, int32_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* value);
 
@@ -259,7 +261,7 @@ extern const xi_response_t* xi_datastream_create(
  * \brief   Update a datastream with given datapoint using server or local timestamp
  */
 extern const xi_response_t* xi_datastream_update(
-          xi_context_t* xi, int32_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* value );
 
@@ -267,7 +269,7 @@ extern const xi_response_t* xi_datastream_update(
  * \brief   Retrieve latest datapoint from a given datastream
  */
 extern const xi_response_t* xi_datastream_get(
-          xi_context_t* xi, int32_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id, xi_datapoint_t* dp );
 
 /**
@@ -275,7 +277,7 @@ extern const xi_response_t* xi_datastream_get(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_response_t* xi_datastream_delete(
-          xi_context_t* xi, int feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
           , const char* datastream_id );
 
 /**
@@ -287,7 +289,7 @@ extern const xi_response_t* xi_datastream_delete(
  *          `xi_datapoint_delete_range()` with short range instead.
  */
 extern const xi_response_t* xi_datapoint_delete(
-          const xi_context_t* xi, int feed_id
+          const xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* dp );
 
@@ -296,7 +298,7 @@ extern const xi_response_t* xi_datapoint_delete(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_response_t* xi_datapoint_delete_range(
-          const xi_context_t* xi, int feed_id, const char * datastream_id
+          const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
 
 #ifdef __cplusplus

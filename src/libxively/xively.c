@@ -150,7 +150,7 @@ uint32_t xi_get_network_timeout( void )
 
 xi_context_t* xi_create_context(
       xi_protocol_t protocol, const char* api_key
-    , int32_t feed_id )
+    , xi_feed_id_t feed_id )
 {
     // allocate the structure to store new context
     xi_context_t* ret = ( xi_context_t* ) xi_alloc( sizeof( xi_context_t ) );
@@ -234,7 +234,7 @@ const xi_response_t* xi_feed_update(
 }
 
 const xi_response_t* xi_datastream_get(
-            xi_context_t* xi, int32_t feed_id
+            xi_context_t* xi, xi_feed_id_t feed_id
           , const char * datastream_id, xi_datapoint_t* o )
 {
     XI_FUNCTION_PROLOGUE
@@ -259,7 +259,7 @@ const xi_response_t* xi_datastream_get(
 
 
 const xi_response_t* xi_datastream_create(
-            xi_context_t* xi, int32_t feed_id
+            xi_context_t* xi, xi_feed_id_t feed_id
           , const char * datastream_id
           , const xi_datapoint_t* datapoint )
 {
@@ -279,7 +279,7 @@ const xi_response_t* xi_datastream_create(
 }
 
 const xi_response_t* xi_datastream_update(
-          xi_context_t* xi, int32_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* datapoint )
 {
@@ -301,7 +301,7 @@ const xi_response_t* xi_datastream_update(
     XI_FUNCTION_EPILOGUE
 }
 const xi_response_t* xi_datastream_delete(
-            xi_context_t* xi, int32_t feed_id
+            xi_context_t* xi, xi_feed_id_t feed_id
           , const char * datastream_id )
 {
     XI_FUNCTION_PROLOGUE
@@ -320,7 +320,7 @@ const xi_response_t* xi_datastream_delete(
 }
 
 const xi_response_t* xi_datapoint_delete(
-          const xi_context_t* xi, int feed_id
+          const xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* o )
 {
@@ -340,7 +340,7 @@ const xi_response_t* xi_datapoint_delete(
 }
 
 extern const xi_response_t* xi_datapoint_delete_range(
-            const xi_context_t* xi, int feed_id
+            const xi_context_t* xi, xi_feed_id_t feed_id
           , const char * datastream_id
           , const xi_timestamp_t* start
           , const xi_timestamp_t* end )

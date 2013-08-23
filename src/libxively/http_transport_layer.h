@@ -20,33 +20,33 @@ extern "C" {
 const char* http_encode_create_datastream(
           const data_layer_t*
         , const char* x_api_key
-        , int32_t feed_id
+        , xi_feed_id_t feed_id
         , const char *datastream_id
         , const xi_datapoint_t* value );
 
 const char* http_encode_update_datastream(
           const data_layer_t*
         , const char* x_api_key
-        , int32_t feed_id
+        , xi_feed_id_t feed_id
         , const char *datastream_id
         , const xi_datapoint_t* value );
 
 const char* http_encode_get_datastream(
           const data_layer_t*
         , const char* x_api_key
-        , int32_t feed_id
+        , xi_feed_id_t feed_id
         , const char *datastream_id );
 
 const char* http_encode_delete_datastream(
           const data_layer_t*
         , const char* x_api_key
-        , int32_t feed_id
+        , xi_feed_id_t feed_id
         , const char *datastream_id );
 
 const char* http_encode_delete_datapoint(
           const data_layer_t*
         , const char* x_api_key
-        , int32_t feed_id
+        , xi_feed_id_t feed_id
         , const char *datastream_id
         , const xi_datapoint_t* o );
 
@@ -63,7 +63,7 @@ const char* http_encode_get_feed(
 const char* http_encode_datapoint_delete_range(
         const data_layer_t*
       , const char* x_api_key
-      , int feed_id
+      , xi_feed_id_t feed_id
       , const char* datastream_id
       , const xi_timestamp_t* start
       , const xi_timestamp_t* end );

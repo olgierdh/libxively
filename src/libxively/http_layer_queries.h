@@ -17,26 +17,28 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <xively.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 const char* http_construct_request_datapoint(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* datastream_id
         , const char* dp_ts_str
         , const char* x_api_key );
 
 const char* http_construct_request_datastream(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* datastream_id
         , const char* x_api_key );
 
 const char* http_construct_request_feed(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* x_api_key
         , const char* query_suffix );
 
