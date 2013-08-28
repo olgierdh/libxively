@@ -54,7 +54,7 @@ int main( int argc, const char* argv[] )
     o.timestamp.micro     = atoi( argv[ 5 ] );
 
     xi_datapoint_delete( xi_context
-            , atoi( argv[ 2 ] ), argv[ 3 ], &o );
+            , argv[ 3 ], &o );
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );

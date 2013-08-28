@@ -49,7 +49,7 @@ int main( int argc, const char* argv[] )
     }
 
     xi_datastream_delete( xi_context
-            , atoi( argv[ 2 ] ), argv[ 3 ] );
+            , argv[ 3 ] );
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );

@@ -50,7 +50,7 @@ int main( int argc, const char* argv[] )
 
     xi_datapoint_t ret;
     xi_datastream_get( xi_context
-            , atoi( argv[ 2 ] ), argv[ 3 ], &ret );
+            , argv[ 3 ], &ret );
 
     printf( "timestamp = %ld.%ld, value = %d\n"
         , ret.timestamp.timestamp, ret.timestamp.micro

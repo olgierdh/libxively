@@ -62,7 +62,7 @@ int main( int argc, const char* argv[] )
     start.timestamp = atoi( argv[ 4 ] );
     end.timestamp   = atoi( argv[ 5 ] );
 
-    xi_datapoint_delete_range( xi_context, xi_context->feed_id
+    xi_datapoint_delete_range( xi_context
         , argv[ 3 ], &start, &end );
 
     // destroy the context cause we don't need it anymore

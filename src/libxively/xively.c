@@ -143,7 +143,8 @@ uint32_t xi_get_network_timeout( void )
 //-----------------------------------------------------------------------
 
 xi_context_t* xi_create_context(
-      xi_protocol_t protocol, const char* api_key
+      xi_protocol_t protocol
+    , const char* api_key
     , xi_feed_id_t feed_id )
 {
     // allocate the structure to store new context
@@ -224,15 +225,16 @@ const xi_response_t* xi_feed_update(
 }
 
 const xi_response_t* xi_datastream_get(
-            xi_context_t* xi, xi_feed_id_t feed_id
-          , const char * datastream_id, xi_datapoint_t* o )
+            xi_context_t* xi
+          , const char * datastream_id
+          , xi_datapoint_t* o )
 {
     XI_FUNCTION_PROLOGUE
 
     const char* data = transport_layer->encode_get_datastream(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id );
 
     XI_FUNCTION_GET_RESPONSE
@@ -247,7 +249,7 @@ const xi_response_t* xi_datastream_get(
 
 
 const xi_response_t* xi_datastream_create(
-            xi_context_t* xi, xi_feed_id_t feed_id
+            xi_context_t* xi
           , const char * datastream_id
           , const xi_datapoint_t* datapoint )
 {
@@ -256,7 +258,7 @@ const xi_response_t* xi_datastream_create(
     const char* data = transport_layer->encode_create_datastream(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id
             , datapoint );
 
@@ -266,7 +268,7 @@ const xi_response_t* xi_datastream_create(
 }
 
 const xi_response_t* xi_datastream_update(
-          xi_context_t* xi, xi_feed_id_t feed_id
+          xi_context_t* xi
         , const char * datastream_id
         , const xi_datapoint_t* datapoint )
 {
@@ -275,7 +277,7 @@ const xi_response_t* xi_datastream_update(
     const char* data = transport_layer->encode_update_datastream(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id
             , datapoint );
 
@@ -284,7 +286,7 @@ const xi_response_t* xi_datastream_update(
     XI_FUNCTION_EPILOGUE
 }
 const xi_response_t* xi_datastream_delete(
-            xi_context_t* xi, xi_feed_id_t feed_id
+            xi_context_t* xi
           , const char * datastream_id )
 {
     XI_FUNCTION_PROLOGUE
@@ -292,7 +294,7 @@ const xi_response_t* xi_datastream_delete(
     const char* data = transport_layer->encode_delete_datastream(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id );
 
     XI_FUNCTION_GET_RESPONSE
@@ -301,7 +303,7 @@ const xi_response_t* xi_datastream_delete(
 }
 
 const xi_response_t* xi_datapoint_delete(
-          const xi_context_t* xi, xi_feed_id_t feed_id
+          const xi_context_t* xi
         , const char * datastream_id
         , const xi_datapoint_t* o )
 {
@@ -310,7 +312,7 @@ const xi_response_t* xi_datapoint_delete(
     const char* data = transport_layer->encode_delete_datapoint(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id
             , o );
 
@@ -320,7 +322,7 @@ const xi_response_t* xi_datapoint_delete(
 }
 
 extern const xi_response_t* xi_datapoint_delete_range(
-            const xi_context_t* xi, xi_feed_id_t feed_id
+            const xi_context_t* xi
           , const char * datastream_id
           , const xi_timestamp_t* start
           , const xi_timestamp_t* end )
@@ -330,7 +332,7 @@ extern const xi_response_t* xi_datapoint_delete_range(
     const char* data = transport_layer->encode_datapoint_delete_range(
               data_layer
             , xi->api_key
-            , feed_id
+            , xi->feed_id
             , datastream_id
             , start
             , end );
