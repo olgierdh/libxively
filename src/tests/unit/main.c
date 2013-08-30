@@ -273,7 +273,7 @@ void test_http_construct_request(void *data)
             "Accept: */*\r\n"
             "X-ApiKey: apikey\r\n";
 
-        int feed_id = 128;
+        xi_feed_id_t feed_id = 128;
         const char* ret = http_construct_request_datastream( "GET", &feed_id, "test", "apikey" );
         tt_assert( strcmp( expected, ret ) == 0 );
     }
@@ -287,7 +287,7 @@ void test_http_construct_request(void *data)
             "Accept: */*\r\n"
             "X-ApiKey: apikey\r\n";
 
-        int feed_id = 128;
+        xi_feed_id_t feed_id = 128;
         const char* ret = http_construct_request_datastream( "GET", &feed_id, 0, "apikey" );
         tt_assert( strcmp( expected, ret ) == 0 );
     }

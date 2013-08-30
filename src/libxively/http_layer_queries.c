@@ -14,6 +14,7 @@
 #include "xi_macros.h"
 #include "xi_err.h"
 #include "xi_consts.h"
+#include "xively.h"
 
 
 static const char XI_HTTP_TEMPLATE_FEED[] = "%s /v2/feeds%s.csv%s HTTP/1.1\r\n"
@@ -59,7 +60,7 @@ err_handling:
 
 inline static int http_construct_int(
       char* buffer, size_t buffer_size
-    , const int32_t* int_id )
+    , const xi_feed_id_t* feed_id )
 {
     // PRECONDITIONS
     assert( buffer      != 0 );
@@ -68,10 +69,10 @@ inline static int http_construct_int(
     int s = 0;
     int size = buffer_size;
 
-    if( int_id )
+    if( feed_id )
     {
         s = snprintf( buffer, size
-            , XI_HTTP_ID_TEMPLATE_D, *int_id );
+            , XI_HTTP_ID_TEMPLATE_D, *feed_id );
 
         XI_CHECK_SIZE( s, size, XI_HTTP_CONSTRUCT_REQUEST_BUFFER_OVERRUN )
     }
@@ -84,7 +85,7 @@ err_handling:
 
 inline static int http_construct_feed(
       char* buffer, size_t buffer_size
-    , const int32_t* feed_id )
+    , const xi_feed_id_t* feed_id )
 {
     // PRECONDITIONS
     assert( buffer != 0 );
@@ -101,7 +102,7 @@ inline static int http_construct_feed(
 
 inline static int http_construct_datastream(
       char* buffer, size_t buffer_size
-    , const int32_t* feed_id
+    , const xi_feed_id_t* feed_id
     , const char* datastream_id )
 {
     // PRECONDITIONS
@@ -133,7 +134,7 @@ err_handling:
 
 inline static int http_construct_datapoint(
       char* buffer, size_t buffer_size
-    , const int32_t* feed_id
+    , const xi_feed_id_t* feed_id
     , const char* datastream_id
     , const char* datapoint )
 {
@@ -192,7 +193,7 @@ err_handling:
 
 const char* http_construct_request_datapoint(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* datastream
         , const char* datapoint
         , const char* x_api_key )
@@ -217,7 +218,7 @@ err_handling:
 
 const char* http_construct_request_datastream(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* datastream
         , const char* x_api_key )
 {
@@ -240,7 +241,7 @@ err_handling:
 
 const char* http_construct_request_feed(
           const char* http_method
-        , const int32_t* feed_id
+        , const xi_feed_id_t* feed_id
         , const char* x_api_key
         , const char* query_suffix )
 {
