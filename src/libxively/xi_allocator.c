@@ -7,7 +7,6 @@
  * \brief   Our custom `alloc()` and `free()` [see xi_allocator.h]
  */
 
-#include <stdlib.h>
 #include "xi_allocator.h"
 
 void* xi_alloc( size_t b )
