@@ -13,8 +13,8 @@ INC_DIR := $(SDK_PATH)/src/incl
 include $(SDK_PATH)/build/env/common.mak
 
 export XI_USER_AGENT ?= '"libxively-lwip-experimental/0.1.x-detached"'
-export XI_COMM_LAYER ?= dummy
-export XI_EXTRA_CFLAGS := $(CFLAGS)
+export XI_COMM_LAYER ?= posix
+export XI_EXTRA_CFLAGS := $(CFLAGS) -DMISSING_WINT_T -DLWIP_COMPAT_SOCKETS=1
 export CC AR
 
 all:

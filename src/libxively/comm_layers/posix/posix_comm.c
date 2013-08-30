@@ -8,11 +8,16 @@
  */
 
 #include <stdio.h>
+#ifndef LWIP_COMPAT_SOCKETS
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <string.h>
 #include <unistd.h>
+#else
+#include <lwip/netdb.h>
+#include <lwip/sockets.h>
+#endif
+#include <string.h>
 #include <stdint.h>
 
 #include "posix_comm.h"
