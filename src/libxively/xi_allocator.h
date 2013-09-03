@@ -37,6 +37,8 @@ static inline void xi_free( void* p );
 
 #if (!defined(XI_ALLOCATOR)) || (XI_ALLOCATOR == 0)
 #include "xi_allocator_stdlib.h"
+#elif XI_ALLOCATOR == 1
+#include "xi_allocator_wmsdk.h"
 #endif
 
 #endif
