@@ -8,10 +8,10 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
 
 #include "http_layer_queries.h"
 #include "xi_macros.h"
+#include "xi_debug.h"
 #include "xi_err.h"
 #include "xi_consts.h"
 #include "xively.h"

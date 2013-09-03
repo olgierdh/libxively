@@ -7,13 +7,13 @@
  * \brief   Implements CSV _data layer_ encoders and decoders specific to Xively CSV data format [see csv_data.h]
  */
 
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "csv_data.h"
 #include "xi_macros.h"
 #include "xi_helpers.h"
+#include "xi_debug.h"
 #include "xi_err.h"
 #include "xi_consts.h"
 
