@@ -4,16 +4,21 @@
 /**
  * \file    xi_debug.h
  * \author  Olgierd Humenczuk
- * \brief   Macros to use for debugging (relies on `xi_printf()`)
+ * \brief   Macros to use for debugging
  */
 
 #ifndef __XI_DEBUG_H__
 #define __XI_DEBUG_H__
 
-#include "xi_printf.h"
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if (!defined(XI_DEBUG_PRINTF))
+  #include <stdio.h>
+  #define xi_printf(...) printf(__VA_ARGS__)
+#else
+  #define xi_printf(...) XI_DEBUG_PRINTF(__VA_ARGS__)
 #endif
 
 #if XI_DEBUG_OUTPUT
