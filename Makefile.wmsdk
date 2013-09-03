@@ -12,9 +12,20 @@ endif
 INC_DIR := $(SDK_PATH)/src/incl
 include $(SDK_PATH)/build/env/common.mak
 
-export XI_USER_AGENT ?= '"libxively-lwip-experimental/0.1.x-detached"'
-export XI_COMM_LAYER ?= posix
-export XI_EXTRA_CFLAGS := $(CFLAGS) -DMISSING_WINT_T -DLWIP_COMPAT_SOCKETS=1
+XI_USER_AGENT ?= '"libxively-lwip-experimental/0.1.x-detached"'
+XI_COMM_LAYER ?= posix
+
+XI_DEBUG_OUTPUT ?= 0
+## When assertions enabled, we get a linker error:
+##   https://gist.github.com/errordeveloper/4c17921cb2e1a9625ebd
+XI_DEBUG_ASSERT := 0
+XI_WARN_CFLAGS := -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas
+XI_OPTLEVEL ?= $(filter -O0 -O1 -O2 -O3 -O4 -O5 -Os,$(CFLAGS))
+XI_EXTRA_CFLAGS := $(filter-out -O0 -O1 -O2 -O3 -O4 -O5 -Os,$(CFLAGS)) \
+	-DXI_ALLOCATOR=1 -DLWIP_COMPAT_SOCKETS=1 -DLWIP_POSIX_SOCKETS_IO_NAMES=1
+
+export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT XI_USER_AGENT XI_COMM_LAYER
+export XI_WARN_CFLAGS XI_OPTLEVEL XI_EXTRA_CFLAGS
 export CC AR
 
 all:
