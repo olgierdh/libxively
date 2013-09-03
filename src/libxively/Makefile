@@ -32,7 +32,7 @@ objs: $(XI_OBJS)
 ## would involve more makefiles. Making the directories doesn't cost anything really.
 $(XI_OBJDIR)/%.o : %.c
 	-mkdir -p $(dir $@)
-	$(CC) $(XI_CFLAGS) $(XI_LAYERS_CFLAGS) $(CFLAGS) $< -o $@
+	$(CC) $(XI_CFLAGS) $(XI_LAYERS_CFLAGS) $< -o $@
 
 $(XI): $(XI_OBJS)
 	$(AR) $(XI_ARFLAGS) $(XI) $(XI_OBJS)
