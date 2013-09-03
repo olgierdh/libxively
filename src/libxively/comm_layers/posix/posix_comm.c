@@ -14,13 +14,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <assert.h>
 
 #include "posix_comm.h"
 #include "comm_layer.h"
 #include "xi_helpers.h"
 #include "xi_allocator.h"
 #include "posix_comm_layer_data_specific.h"
+#include "xi_debug.h"
 #include "xi_err.h"
 #include "xi_macros.h"
 #include "xi_globals.h"

@@ -8,7 +8,6 @@
  */
 
 #include <string.h>
-#include <assert.h>
 #include <stdio.h>
 
 #include "http_transport.h"
@@ -17,6 +16,7 @@
 #include "http_layer_parser.h"
 #include "xi_macros.h"
 #include "xi_helpers.h"
+#include "xi_debug.h"
 #include "xi_err.h"
 
 static char XI_HTTP_QUERY_BUFFER[ XI_QUERY_BUFFER_SIZE + XI_CONTENT_BUFFER_SIZE ];

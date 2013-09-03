@@ -11,8 +11,8 @@
  */
 
 #include <string.h>
-#include <assert.h>
 
+#include "xi_debug.h"
 #include "xi_helpers.h"
 #include "xi_allocator.h"
 

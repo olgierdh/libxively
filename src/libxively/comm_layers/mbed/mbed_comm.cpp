@@ -10,13 +10,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <assert.h>
 
 #include "mbed_comm.h"
 #include "comm_layer.h"
 #include "xi_helpers.h"
 #include "xi_allocator.h"
 #include "mbed_comm_layer_data_specific.h"
+#include "xi_debug.h"
 #include "xi_err.h"
 #include "xi_macros.h"
 #include "xi_printf.h"

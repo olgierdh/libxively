@@ -12,7 +12,11 @@
 
 #include "xi_printf.h"
 
-#ifdef XI_DEBUG_OUTPUT
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if XI_DEBUG_OUTPUT
     #define xi_debug_log_str(...) xi_printf( "[%d@%s] - %s", __LINE__, __FILE__, __VA_ARGS__ )
     #define xi_debug_log_data(...) xi_printf( "%s", __VA_ARGS__ )
     #define xi_debug_log_int(...) xi_printf( "%d", __VA_ARGS__ )
@@ -22,6 +26,20 @@
     #define xi_debug_log_data(...)
     #define xi_debug_log_int(...)
     #define xi_debug_log_endl(...)
+#endif
+
+#if XI_DEBUG_ASSERT
+    #ifdef NDEBUG
+        #undef NDEBUG
+    #endif
+    #include <assert.h>
+#else
+    /* The actual header is missing in some toolchains, so we wrap it here. */
+    #define assert(e) ((void)0)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif
