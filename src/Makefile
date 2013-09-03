@@ -14,7 +14,7 @@ export XI_OBJDIR
 
 # RULES:
 
-.PHONY: $(SUB_SRCDIRS)
+.PHONY: $(SUB_SRCDIRS) libxively examples test clean
 
 all: $(SUB_BINDIRS)
 
@@ -27,6 +27,15 @@ $(CREATE_DIRS):
 
 $(SUB_SRCDIRS):
 	$(MAKE) -C $@ && cd ..
+
+libxively:
+	$(MAKE) -C $@
+
+examples:
+	$(MAKE) -C $@
+
+test:
+	$(MAKE) -C $@
 
 clean:
 	$(RM) -rf $(XI_BINDIR)
