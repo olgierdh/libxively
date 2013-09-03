@@ -6,14 +6,20 @@ AR ?= ar
 XI_BUILD_TYPE ?= debug
 
 ifndef XI_OVERRIDE_CFLAGS
+  XI_WARN_CFLAGS ?= -Wall -Wextra
   XI_CFLAGS += -c -std=gnu99 -Iinclude
-  XI_CFLAGS += -Wall -Wextra $(XI_EXTRA_CFLAGS)
+  XI_CFLAGS += $(XI_WARN_CFLAGS) $(XI_EXTRA_CFLAGS)
   ifeq ($(XI_BUILD_TYPE),release)
-    XI_CFLAGS += -O2 -combine -fwhole-program
+    XI_OPTLEVEL ?= -O2
+    XI_CFLAGS += $(XI_OPTLEVEL) -combine -fwhole-program
   endif
   ifeq ($(XI_BUILD_TYPE),debug)
-    XI_CFLAGS += -O0 -D XI_DEBUG_OUTPUT
-
+    XI_OPTLEVEL ?= -O0
+    XI_CFLAGS += $(XI_OPTLEVEL)
+    XI_DEBUG_OUTPUT ?= 1
+    XI_DEBUG_ASSERT ?= 1
+    XI_CFLAGS += -DXI_DEBUG_OUTPUT=$(XI_DEBUG_OUTPUT)
+    XI_CFLAGS += -DXI_DEBUG_ASSERT=$(XI_DEBUG_ASSERT)
   endif
   XI_CFLAGS += $(foreach constant,$(XI_OVERRIDE_CONSTANTS),-D$(constant))
 else
