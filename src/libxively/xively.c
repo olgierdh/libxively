@@ -205,8 +205,6 @@ const xi_response_t* xi_feed_get(
             , xi->api_key
             , feed );
 
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
 
     feed = data_layer->decode_feed( response->http.http_content, feed );
@@ -226,8 +224,6 @@ const xi_response_t* xi_feed_update(
             , xi->api_key
             , feed );
 
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
 
     XI_FUNCTION_EPILOGUE
@@ -244,8 +240,6 @@ const xi_response_t* xi_datastream_get(
             , xi->api_key
             , feed_id
             , datastream_id );
-
-    if( data == 0 ) { goto err_handling; }
 
     XI_FUNCTION_GET_RESPONSE
 
@@ -272,9 +266,8 @@ const xi_response_t* xi_datastream_create(
             , datastream_id
             , datapoint );
 
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
+
     XI_FUNCTION_EPILOGUE
 }
 
@@ -292,11 +285,7 @@ const xi_response_t* xi_datastream_update(
             , datastream_id
             , datapoint );
 
-
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
-
 
     XI_FUNCTION_EPILOGUE
 }
@@ -311,8 +300,6 @@ const xi_response_t* xi_datastream_delete(
             , xi->api_key
             , feed_id
             , datastream_id );
-
-    if( data == 0 ) { goto err_handling; }
 
     XI_FUNCTION_GET_RESPONSE
 
@@ -333,9 +320,8 @@ const xi_response_t* xi_datapoint_delete(
             , datastream_id
             , o );
 
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
+
     XI_FUNCTION_EPILOGUE
 }
 
@@ -355,9 +341,8 @@ extern const xi_response_t* xi_datapoint_delete_range(
             , start
             , end );
 
-    if( data == 0 ) { goto err_handling; }
-
     XI_FUNCTION_GET_RESPONSE
+
     XI_FUNCTION_EPILOGUE
 }
 
