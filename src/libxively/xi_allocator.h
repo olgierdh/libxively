@@ -13,11 +13,6 @@
 #ifndef __XI_ALLOCATOR_H__
 #define __XI_ALLOCATOR_H__
 
-#ifdef MISSING_WINT_T
-typedef int wint_t;
-#endif
-#include <stdlib.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,16 +23,20 @@ extern "C" {
  *
  * \return  Pointer to allocated memory or null in case of any error.
  */
-void* xi_alloc( size_t bytes );
+static inline void* xi_alloc( size_t b );
 
 /**
  * \brief   Behaves like usual `free()`, it frees previously allocated chunk of
  * 		    of memory.
  */
-void xi_free( void* pointer );
+static inline void xi_free( void* p );
 
 #ifdef __cplusplus
 }
+#endif
+
+#if (!defined(XI_ALLOCATOR)) || (XI_ALLOCATOR == 0)
+#include "xi_allocator_stdlib.h"
 #endif
 
 #endif
