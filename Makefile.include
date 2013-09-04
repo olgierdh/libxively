@@ -7,7 +7,7 @@ XI_BUILD_TYPE ?= debug
 
 ifndef XI_OVERRIDE_CFLAGS
   XI_WARN_CFLAGS ?= -Wall -Wextra
-  XI_CFLAGS += -c -std=gnu99 -Iinclude
+  XI_CFLAGS += -c -std=gnu99 -Iinclude -fstrict-aliasing
   XI_CFLAGS += $(XI_WARN_CFLAGS) $(XI_EXTRA_CFLAGS)
   ifeq ($(XI_BUILD_TYPE),release)
     XI_OPTLEVEL ?= -O2
