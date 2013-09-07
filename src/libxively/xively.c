@@ -50,38 +50,33 @@ const comm_layer_t* get_comm_layer( void );
     int recv = 0;
 
 #define XI_FUNCTION_PROLOGUE  XI_FUNCTION_VARIABLES\
-    xi_debug_log_str( "Getting the comm layer...\n" );\
+    xi_debug_logger( "Getting the comm layer..." );\
     comm_layer = get_comm_layer();\
-    xi_debug_log_str( "Getting the transport layer...\n" );\
+    xi_debug_logger( "Getting the transport layer..." );\
     transport_layer = get_http_transport_layer();\
-    xi_debug_log_str( "Getting the data layer...\n");\
+    xi_debug_logger( "Getting the data layer...");\
     data_layer = get_csv_data_layer();\
 
 #define XI_FUNCTION_GET_RESPONSE if( data == 0 ) { goto err_handling; }\
-    xi_debug_log_str( "Connecting to the endpoint...\n" );\
+    xi_debug_logger( "Connecting to the endpoint..." );\
     conn = comm_layer->open_connection( XI_HOST, XI_PORT );\
     if( conn == 0 ) { goto err_handling; }\
-    xi_debug_log_str( "Sending data:\n" );\
-    xi_debug_log_data( data );\
+    xi_debug_logger( "Sending data:" );\
+    xi_debug_printf( "%s\n", data );\
     sent = comm_layer->send_data( conn, data, strlen( data ) );\
     if( sent == -1 ) { goto err_handling; }\
-    xi_debug_log_str( "Sent: " );\
-    xi_debug_log_int( ( int ) sent );\
-    xi_debug_log_endl();\
-    xi_debug_log_str( "Reading data...\n" );\
+    xi_debug_printf( "Sent: %d\n", ( int ) sent );\
+    xi_debug_logger( "Reading data..." );\
     recv = comm_layer->read_data( conn, buffer, XI_HTTP_MAX_CONTENT_SIZE );\
     if( recv == -1 ) { goto err_handling; }\
-    xi_debug_log_str( "Received: " );\
-    xi_debug_log_int( ( int ) recv );\
-    xi_debug_log_endl();\
-    xi_debug_log_str( "Response:\n" );\
-    xi_debug_log_data( buffer );\
-    xi_debug_log_endl();\
+    xi_debug_printf( "Received: %d\n", ( int ) recv );\
+    xi_debug_logger( "Response:" );\
+    xi_debug_printf( "%s\n", buffer );\
     response = transport_layer->decode_reply(\
         data_layer, buffer );\
     if( response == 0 ) { goto err_handling; }\
 
-#define XI_FUNCTION_EPILOGUE xi_debug_log_str( "Closing connection...\n" );\
+#define XI_FUNCTION_EPILOGUE xi_debug_logger( "Closing connection..." );\
 err_handling:\
     if( conn )\
     {\

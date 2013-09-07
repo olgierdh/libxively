@@ -50,10 +50,6 @@
 #define XI_VALUE_STRING_MAX_SIZE           32
 #endif
 
-#ifndef XI_PRINTF_BUFFER_SIZE
-#define XI_PRINTF_BUFFER_SIZE              512
-#endif
-
 #ifndef XI_QUERY_BUFFER_SIZE
 #define XI_QUERY_BUFFER_SIZE               512
 #endif

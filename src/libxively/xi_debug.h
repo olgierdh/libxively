@@ -4,28 +4,29 @@
 /**
  * \file    xi_debug.h
  * \author  Olgierd Humenczuk
- * \brief   Macros to use for debugging (relies on `xi_printf()`)
+ * \brief   Macros to use for debugging
  */
 
 #ifndef __XI_DEBUG_H__
 #define __XI_DEBUG_H__
 
-#include "xi_printf.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if XI_DEBUG_OUTPUT
-    #define xi_debug_log_str(...) xi_printf( "[%d@%s] - %s", __LINE__, __FILE__, __VA_ARGS__ )
-    #define xi_debug_log_data(...) xi_printf( "%s", __VA_ARGS__ )
-    #define xi_debug_log_int(...) xi_printf( "%d", __VA_ARGS__ )
-    #define xi_debug_log_endl(...) xi_printf( "\n" )
+#ifndef XI_DEBUG_PRINTF
+    #include <stdio.h>
+    #define __xi_printf(...) printf(__VA_ARGS__)
 #else
-    #define xi_debug_log_str(...)
-    #define xi_debug_log_data(...)
-    #define xi_debug_log_int(...)
-    #define xi_debug_log_endl(...)
+    #define __xi_printf(...) XI_DEBUG_PRINTF(__VA_ARGS__)
+#endif
+
+#if XI_DEBUG_OUTPUT
+    #define xi_debug_logger(msg) __xi_printf( "[%s:%d] %s\n", __FILE__, __LINE__, msg )
+    #define xi_debug_printf(...) __xi_printf( __VA_ARGS__ )
+#else
+    #define xi_debug_logger(...)
+    #define xi_debug_printf(...)
 #endif
 
 #if XI_DEBUG_ASSERT
