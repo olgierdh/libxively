@@ -19,7 +19,6 @@
 #include "xi_debug.h"
 #include "xi_err.h"
 #include "xi_macros.h"
-#include "xi_printf.h"
 #include "xi_globals.h"
 
 extern "C" {
