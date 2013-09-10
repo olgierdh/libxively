@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #if XI_DEBUG_OUTPUT
-    #define xi_debug_logger(msg) __xi_printf( "[%s:%d] %s\n", __FILE__, __LINE__, msg )
+    #define xi_debug_logger(msg) __xi_printf( "[%s:%d] %s\r\n", __FILE__, __LINE__, msg )
     #define xi_debug_printf(...) __xi_printf( __VA_ARGS__ )
 #else
     #define xi_debug_logger(...)
