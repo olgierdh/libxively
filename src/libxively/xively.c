@@ -62,16 +62,16 @@ const comm_layer_t* get_comm_layer( void );
     conn = comm_layer->open_connection( XI_HOST, XI_PORT );\
     if( conn == 0 ) { goto err_handling; }\
     xi_debug_logger( "Sending data:" );\
-    xi_debug_printf( "%s\n", data );\
+    xi_debug_printf( "%s\r\n", data );\
     sent = comm_layer->send_data( conn, data, strlen( data ) );\
     if( sent == -1 ) { goto err_handling; }\
-    xi_debug_printf( "Sent: %d\n", ( int ) sent );\
+    xi_debug_printf( "Sent: %d\r\n", ( int ) sent );\
     xi_debug_logger( "Reading data..." );\
     recv = comm_layer->read_data( conn, buffer, XI_HTTP_MAX_CONTENT_SIZE );\
     if( recv == -1 ) { goto err_handling; }\
-    xi_debug_printf( "Received: %d\n", ( int ) recv );\
+    xi_debug_printf( "Received: %d\r\n", ( int ) recv );\
     xi_debug_logger( "Response:" );\
-    xi_debug_printf( "%s\n", buffer );\
+    xi_debug_printf( "%s\r\n", buffer );\
     response = transport_layer->decode_reply(\
         data_layer, buffer );\
     if( response == 0 ) { goto err_handling; }\
