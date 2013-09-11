@@ -70,7 +70,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
         return 0;
     }
 
-    // set the timout
+    #ifndef XI_COMM_LAYER_POSIX_DISABLE_TIMEOUT
     {
         struct timeval timeout;
         timeout.tv_sec  = xi_globals.network_timeout / 1000;
@@ -92,6 +92,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
             goto err_handling;
         }
     }
+   #endif
 
 
     // remember the layer specific part
