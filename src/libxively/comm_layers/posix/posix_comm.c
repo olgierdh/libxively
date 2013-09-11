@@ -8,12 +8,14 @@
  */
 
 #include <stdio.h>
-#ifndef LWIP_COMPAT_SOCKETS
+#if (!defined(XI_COMM_LAYER_POSIX_COMPAT)) || (XI_COMM_LAYER_POSIX_COMPAT == 0)
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#else
+#elif XI_COMM_LAYER_POSIX_COMPAT == 1
+#define LWIP_COMPAT_SOCKETS 1
+#define LWIP_POSIX_SOCKETS_IO_NAMES 1
 #include <lwip/netdb.h>
 #include <lwip/sockets.h>
 #endif
