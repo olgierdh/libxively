@@ -16,6 +16,13 @@ ci_msp430:
 		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
 		XI_COMM_LAYER=dummy
 
+ci_avr:
+	$(MAKE) -C src clean
+	$(MAKE) -C src libxively \
+		CC=avr-gcc AR=avr-ar \
+		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
+		XI_COMM_LAYER=dummy
+
 # This provides a very easy way of importing the code base into mbed.org IDE.
 # We create a zip archive with shortened revision hash in the filename
 # To import the library into a project, click Import button and then select
