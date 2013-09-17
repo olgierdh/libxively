@@ -50,8 +50,6 @@ typedef enum
     , XI_ERR_COUNT
 } xi_err_t;
 
-#define XI_MAX_ERR_STRING 64
-
 #ifndef XI_OPT_NO_ERROR_STRINGS
 /**
  * \brief   Error description lookup table
