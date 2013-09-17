@@ -25,6 +25,9 @@ ifndef XI_OVERRIDE_CFLAGS
     XI_CFLAGS += -DXI_DEBUG_PRINTF=$(XI_DEBUG_PRINTF)
   endif
   XI_CFLAGS += $(foreach constant,$(XI_OVERRIDE_CONSTANTS),-D$(constant))
+  ifdef XI_OPTIMISE
+    XI_CFLAGS += $(foreach constant,$(XI_OPTIMISE),-DXI_OPT_$(constant))
+  endif
 else
   XI_CFLAGS := $(XI_OVERRIDE_CFLAGS)
   $(warning "Overriden XI_CFLAGS with $(XI_OVERRIDE_CFLAGS)")

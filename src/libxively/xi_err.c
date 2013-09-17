@@ -12,6 +12,7 @@
 
 static xi_err_t xi_err = XI_NO_ERR;
 
+#ifndef XI_OPT_NO_ERROR_STRINGS
 const char* xi_err_string[ XI_ERR_COUNT ] =
 {
           "XI_NO_ERR"
@@ -43,6 +44,12 @@ const char* xi_err_string[ XI_ERR_COUNT ] =
         , "XI_DATAPOINT_VALUE_BUFFER_OVERFLOW"         // XI_DATAPOINT_VALUE_BUFFER_OVERFLOW
 };
 
+const char* xi_get_error_string( xi_err_t e )
+{
+    return xi_err_string[ XI_CLAMP( ( short ) e, 0, XI_ERR_COUNT - 1 ) ];
+}
+#endif /* XI_OPT_NO_ERROR_STRINGS */
+
 xi_err_t xi_get_last_error()
 {
     xi_err_t ret = xi_err;
@@ -53,9 +60,4 @@ xi_err_t xi_get_last_error()
 void xi_set_err( xi_err_t e )
 {
     xi_err = e;
-}
-
-const char* xi_get_error_string( xi_err_t e )
-{
-    return xi_err_string[ XI_CLAMP( ( short ) e, 0, XI_ERR_COUNT - 1 ) ];
 }

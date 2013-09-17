@@ -50,12 +50,19 @@ typedef enum
     , XI_ERR_COUNT
 } xi_err_t;
 
-#define XI_MAX_ERR_STRING 64
-
+#ifndef XI_OPT_NO_ERROR_STRINGS
 /**
  * \brief   Error description lookup table
  */
 extern const char* xi_err_string[ XI_ERR_COUNT ];
+
+/**
+ * \brief   Error description string getter for a given value of `xi_err_t`
+ */
+extern const char* xi_get_error_string( xi_err_t e );
+#else
+#define xi_get_error_string(...)
+#endif
 
 /**
  * \brief   Error getter for the user
@@ -71,11 +78,6 @@ extern xi_err_t xi_get_last_error( void );
  *          If thread-safety is required, than _errno_ should be made thread-local.
  */
 extern void xi_set_err( xi_err_t e );
-
-/**
- * \brief   Error description string getter for a given value of `xi_err_t`
- */
-extern const char* xi_get_error_string( xi_err_t e );
 
 #ifdef __cplusplus
 }
