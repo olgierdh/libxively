@@ -57,6 +57,7 @@ wip_msp430_cc3000:
 		CC=msp430-gcc \
 		AR=msp430-ar \
 		XI_OPTLEVEL=-Os \
+		XI_EXTRA_CFLAGS=-mmcu=msp430fr5739 \
 		XI_DEBUG_OUTPUT=0 \
 		XI_DEBUG_ASSERT=0 \
 		XI_COMM_LAYER=msp430_cc3000
