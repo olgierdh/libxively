@@ -49,3 +49,14 @@ update_docs_branch:
 		&& git add . \
 		&& git commit -m "[docs] Regerated documentation for $(REV)" \
 		&& git push github master:gh-pages -f
+
+wip_msp430_cc3000:
+	$(MAKE) -C src clean
+	$(MAKE) -C src/ext/drivers msp430_cc3000
+	$(MAKE) -C src libxively \
+		CC=msp430-gcc \
+		AR=msp430-ar \
+		XI_OPTLEVEL=-Os \
+		XI_DEBUG_OUTPUT=0 \
+		XI_DEBUG_ASSERT=0 \
+		XI_COMM_LAYER=msp430_cc3000
