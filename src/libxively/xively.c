@@ -88,6 +88,14 @@ err_handling:\
 // HELPER FUNCTIONS
 //-----------------------------------------------------------------------
 
+xi_value_type_t xi_get_value_type( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+
+    return p->value_type;
+}
+
 xi_datapoint_t* xi_set_value_i32( xi_datapoint_t* p, int32_t value )
 {
     // PRECONDITION
@@ -99,6 +107,30 @@ xi_datapoint_t* xi_set_value_i32( xi_datapoint_t* p, int32_t value )
     return p;
 }
 
+int32_t xi_get_value_i32( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+    assert( p->value_type == XI_VALUE_TYPE_I32 );
+
+    return p->value.i32_value;
+}
+
+int32_t* xi_value_pointer_i32( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+
+    if( p->value_type == XI_VALUE_TYPE_I32 )
+    {
+      return &p->value.i32_value;
+    }
+    else
+    {
+      return NULL;
+    }
+}
+
 xi_datapoint_t* xi_set_value_f32( xi_datapoint_t* p, float value )
 {
     // PRECONDITION
@@ -108,6 +140,37 @@ xi_datapoint_t* xi_set_value_f32( xi_datapoint_t* p, float value )
     p->value_type       = XI_VALUE_TYPE_F32;
 
     return p;
+}
+
+float xi_get_value_f32( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+    assert( p->value_type == XI_VALUE_TYPE_F32 );
+
+    if( p->value_type == XI_VALUE_TYPE_F32 )
+    {
+      return p->value.f32_value;
+    }
+    else
+    {
+      return 0.;
+    }
+}
+
+float* xi_value_pointer_f32( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+
+    if( p->value_type == XI_VALUE_TYPE_F32 )
+    {
+      return &p->value.f32_value;
+    }
+    else
+    {
+      return NULL;
+    }
 }
 
 xi_datapoint_t* xi_set_value_str( xi_datapoint_t* p, const char* value )
@@ -126,6 +189,21 @@ xi_datapoint_t* xi_set_value_str( xi_datapoint_t* p, const char* value )
 
 err_handling:
     return 0;
+}
+
+char* xi_value_pointer_str( xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( p != 0 );
+
+    if( p->value_type == XI_VALUE_TYPE_STR )
+    {
+      return p->value.str_value;
+    }
+    else
+    {
+      return NULL;
+    }
 }
 
 void xi_set_network_timeout( uint32_t timeout )
