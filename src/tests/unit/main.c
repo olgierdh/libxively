@@ -599,6 +599,75 @@ end:
    ;
 }
 
+void test_datapoint_value_setters_and_getters(void* data)
+{
+  (void)(data);
+
+  void * ret;
+
+  xi_datapoint_t dp;
+
+  ret = xi_set_value_i32( &dp, 320 );
+
+  tt_assert( ret != 0 );
+
+  tt_assert( xi_get_value_i32( &dp ) == 320 );
+
+  tt_assert( xi_get_value_type( &dp ) == XI_VALUE_TYPE_I32 );
+
+  tt_assert( xi_value_pointer_i32( &dp ) != 0 &&
+             xi_value_pointer_f32( &dp ) == 0 &&
+             xi_value_pointer_str( &dp ) == 0 );
+
+  ret = xi_set_value_f32( &dp, (320.0/10) );
+
+  tt_assert( ret != 0 );
+
+  tt_assert( xi_get_value_f32( &dp ) == (320.0/10) );
+
+  tt_assert( xi_get_value_type( &dp ) == XI_VALUE_TYPE_F32 );
+
+  tt_assert( xi_value_pointer_i32( &dp ) == 0 &&
+             xi_value_pointer_f32( &dp ) != 0 &&
+             xi_value_pointer_str( &dp ) == 0 );
+
+  ret = xi_set_value_str( &dp, "Let's test everything!" );
+
+  tt_assert( ret != 0 );
+
+  char s[XI_VALUE_STRING_MAX_SIZE+100];
+  for (size_t i = 0; i < sizeof(s); i++) {
+    s[i] = 'a';
+  }
+
+  ret = xi_set_value_str( &dp, s );
+
+  tt_assert( ret != 0 )
+
+  tt_assert( xi_get_value_type( &dp ) == XI_VALUE_TYPE_STR );
+
+  tt_assert( xi_value_pointer_i32( &dp ) == 0 &&
+             xi_value_pointer_f32( &dp ) == 0 &&
+             xi_value_pointer_str( &dp ) != 0 );
+
+  char * x = xi_value_pointer_str( &dp );
+
+  tt_assert( strlen(s) > strlen(x) );
+  tt_assert( strlen(x) == XI_VALUE_STRING_MAX_SIZE-1 );
+
+  s[XI_VALUE_STRING_MAX_SIZE-5] = '\0';
+
+  ret = xi_set_value_str( &dp, s );
+
+  tt_assert( ret != 0 );
+
+  tt_assert( strlen(s) == strlen(x) );
+  tt_assert( strlen(x) == XI_VALUE_STRING_MAX_SIZE-5 );
+
+end:
+   ;
+}
+
 
 struct testcase_t demo_tests[] = {
     /* Here's a really simple test: it has a name you can refer to it
@@ -620,6 +689,7 @@ struct testcase_t demo_tests[] = {
     { "test_helpers_decode_value", test_helpers_decode_value, TT_ENABLED_, 0, 0 },
 
     { "test_create_and_delete_context", test_create_and_delete_context, TT_ENABLED_, 0, 0 },
+    { "test_datapoint_value_setters_and_getters", test_datapoint_value_setters_and_getters, TT_ENABLED_, 0, 0 },
     /* The array has to end with END_OF_TESTCASES. */
     END_OF_TESTCASES
 };

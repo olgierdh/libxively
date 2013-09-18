@@ -172,24 +172,100 @@ typedef struct {
 //-----------------------------------------------------------------------
 
 /**
- * \brief   Sets the xi_datapoint_t value field to `int32_t` value
+ * \brief   Gets the type of `xi_datapoint_t` value field
  *
- * \return  Pointer or `0` if an error occurred.
+ * **Example** \code
+            switch( xi_get_value_type(dp) ) {
+              case XI_VALUE_TYPE_I32:
+                printf("Got int value: %i\n", xi_get_value_i32(dp));
+                break;
+              case XI_VALUE_TYPE_F32:
+                printf("Got float value: %f\n", xi_get_value_f32(dp));
+                break;
+              case XI_VALUE_TYPE_STR:
+                printf("Got a string: %s\n", xi_get_value_str(dp));
+                break;
+              default:
+                printf("Unknown value type enumerator: %i", xi_get_value_type(dp));
+                break;
+            } \endcode
+ *
+ */
+xi_value_type_t xi_get_value_type( xi_datapoint_t* p );
+
+/**
+ * \brief   Sets 32-bit signed integer value of a datapoint
+ *
+ * \return  Pointer or `0` if an error occurred
  */
 extern xi_datapoint_t* xi_set_value_i32( xi_datapoint_t* dp, int32_t v );
 
 /**
- * \brief   Sets the `xi_datapoint_t` value field to `float` value
- * \return  Pointer or `0` if an error occurred.
+ * \brief   Gets 32-bit signed integer value of a datapoint
+ * \warning Only use this when you are sure the value is set and is of correct type!
+ */
+extern int32_t xi_get_value_i32( xi_datapoint_t* p );
+
+/**
+ * \brief   Gets pointer to 32-bit signed integer value of a datapont
+ * \return  A pointer or `NULL` if the type doesn't match
+ *
+ * **Example** \code
+  int32_t *v = xi_value_pointer_i32(p);
+  if(v == NULL) {
+    printf("Not an int32_t!\n");
+  } else {
+    printf("v=%i\n", *v);
+  } \endcode
+ */
+extern int32_t* xi_value_pointer_i32( xi_datapoint_t* p );
+
+/**
+ * \brief   Sets 32-bit float value of a datapoint
+ * \return  Pointer or `0` if an error occurred
  */
 extern xi_datapoint_t* xi_set_value_f32( xi_datapoint_t* dp, float v );
 
 /**
- * \brief   Sets the `xi_datapoint_t` value field to zero-terminated string value
+ * \brief   Gets 32-bit float value of a datapoint
+ * \warning Only use this when you are sure the value is set and is of correct type!
+ */
+extern float xi_get_value_f32( xi_datapoint_t* p );
+
+/**
+ * \brief   Gets pointer to 32-bit float value of a datapont
+ * \return  A pointer or `NULL` if the type doesn't match
  *
- * \return  Pointer or `0` if an error occurred.
+ * **Example** \code
+  float *v = xi_value_pointer_f32(p);
+  if(v == NULL) {
+    printf("Not a float!\n");
+  } else {
+    printf("v=%f\n", *v);
+  } \endcode
+ */
+extern float* xi_value_pointer_f32( xi_datapoint_t* p );
+
+/**
+ * \brief   Sets string value of datapoint
+ *
+ * \return  Pointer or `0` if an error occurred
  */
 extern xi_datapoint_t* xi_set_value_str( xi_datapoint_t* dp, const char* v );
+
+/**
+ * \brief   Gets pointer to string value of a datapont
+ * \return  A pointer or `NULL` if the type doesn't match
+ *
+ * **Example** \code
+  char *v = xi_value_pointer_str(p);
+  if(v == NULL) {
+    printf("Not a string!\n");
+  } else {
+    printf("v='%s'\n", *v);
+  } \endcode
+ */
+extern char* xi_value_pointer_str( xi_datapoint_t* p );
 
 /**
  * \brief   Sets the timeout for network operations
