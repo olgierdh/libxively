@@ -28,6 +28,9 @@ ifndef XI_OVERRIDE_CFLAGS
   ifdef XI_OPTIMISE
     XI_CFLAGS += $(foreach constant,$(XI_OPTIMISE),-DXI_OPT_$(constant))
   endif
+  ifeq ($(XI_FLOATS_DISABLED),true)
+	XI_CFLAGS += -DXI_FLOATS_DISABLED
+  endif
 else
   XI_CFLAGS := $(XI_OVERRIDE_CFLAGS)
   $(warning "Overriden XI_CFLAGS with $(XI_OVERRIDE_CFLAGS)")
