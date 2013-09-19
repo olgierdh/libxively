@@ -112,7 +112,8 @@ typedef enum
     XI_STATE_NUMBER,
     XI_STATE_FLOAT,
     XI_STATE_DOT,
-    XI_STATE_STRING
+    XI_STATE_STRING,
+    XI_STATES_NO
 } xi_dfa_state_t;
 
 xi_datapoint_t* csv_decode_value(
@@ -129,7 +130,7 @@ xi_datapoint_t* csv_decode_value(
     size_t  counter = 0;
 
     // the transition function
-    static const short states[][6][2] =
+    static const short states[][XI_STATES_NO][2] =
     {
           // state initial                          // state minus                            // state number                           // state float                            // state dot                              // string
         { { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  } },
@@ -191,8 +192,12 @@ xi_datapoint_t* csv_decode_value(
             p->value_type       = XI_VALUE_TYPE_I32;
             break;
         case XI_STATE_FLOAT:
-            p->value.f32_value  = ( float ) atof( p->value.str_value );
-            p->value_type       = XI_VALUE_TYPE_F32;
+            #ifndef XI_FLOATS_DISABLED
+                p->value.f32_value  = ( float ) atof( p->value.str_value );
+                p->value_type       = XI_VALUE_TYPE_F32;
+            #else
+                p->value_type       = XI_VALUE_TYPE_F32;
+            #endif
             break;
         case XI_STATE_STRING:
         default:
