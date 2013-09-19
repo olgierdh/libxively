@@ -56,13 +56,12 @@ typedef enum
  */
 extern const char* xi_err_string[ XI_ERR_COUNT ];
 
+#endif
 /**
  * \brief   Error description string getter for a given value of `xi_err_t`
  */
 extern const char* xi_get_error_string( xi_err_t e );
-#else
-#define xi_get_error_string(...)
-#endif
+
 
 /**
  * \brief   Error getter for the user
