@@ -6,9 +6,6 @@
  * \author  Olgierd Humenczuk
  * \brief   Error handling (POSIX-like) [see xi_err.h]
  */
-
-#include <assert.h>
-
 #include "xi_err.h"
 #include "xi_macros.h"
 
@@ -50,8 +47,6 @@ const char* xi_err_string[ XI_ERR_COUNT ] =
 const char* xi_get_error_string( xi_err_t e )
 {
 #ifdef XI_OPT_NO_ERROR_STRINGS
-    // precondition for this version to work
-    assert( ( short ) e < 255 );
     return ( const char* ) &e;
 #else
     return xi_err_string[ XI_CLAMP( ( short ) e, 0, XI_ERR_COUNT - 1 ) ];
