@@ -62,7 +62,6 @@ extern const char* xi_err_string[ XI_ERR_COUNT ];
  */
 extern const char* xi_get_error_string( xi_err_t e );
 
-
 /**
  * \brief   Error getter for the user
  * \return  The `xi_err_t` structure which can be converted to a string using `xi_get_error_string()` method.

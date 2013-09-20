@@ -6,6 +6,7 @@
  * \author  Olgierd Humenczuk
  * \brief   Error handling (POSIX-like) [see xi_err.h]
  */
+
 #include "xi_err.h"
 #include "xi_macros.h"
 
