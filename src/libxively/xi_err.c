@@ -43,12 +43,16 @@ const char* xi_err_string[ XI_ERR_COUNT ] =
         , "XI_SOCKET_CLOSE_ERROR"                      // XI_SOCKET_CLOSE_ERROR
         , "XI_DATAPOINT_VALUE_BUFFER_OVERFLOW"         // XI_DATAPOINT_VALUE_BUFFER_OVERFLOW
 };
+#endif /* XI_OPT_NO_ERROR_STRINGS */
 
 const char* xi_get_error_string( xi_err_t e )
 {
+#ifdef XI_OPT_NO_ERROR_STRINGS
+    return ( const char* ) &e;
+#else
     return xi_err_string[ XI_CLAMP( ( short ) e, 0, XI_ERR_COUNT - 1 ) ];
+#endif
 }
-#endif /* XI_OPT_NO_ERROR_STRINGS */
 
 xi_err_t xi_get_last_error()
 {
