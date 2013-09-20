@@ -8,11 +8,18 @@
  */
 
 #include <stdio.h>
+#if (!defined(XI_COMM_LAYER_POSIX_COMPAT)) || (XI_COMM_LAYER_POSIX_COMPAT == 0)
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <string.h>
 #include <unistd.h>
+#elif XI_COMM_LAYER_POSIX_COMPAT == 1
+#define LWIP_COMPAT_SOCKETS 1
+#define LWIP_POSIX_SOCKETS_IO_NAMES 1
+#include <lwip/netdb.h>
+#include <lwip/sockets.h>
+#endif
+#include <string.h>
 #include <stdint.h>
 
 #include "posix_comm.h"
@@ -63,7 +70,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
         return 0;
     }
 
-    // set the timout
+    #ifndef XI_COMM_LAYER_POSIX_DISABLE_TIMEOUT
     {
         struct timeval timeout;
         timeout.tv_sec  = xi_globals.network_timeout / 1000;
@@ -85,6 +92,7 @@ connection_t* posix_open_connection( const char* address, int32_t port )
             goto err_handling;
         }
     }
+   #endif
 
 
     // remember the layer specific part
