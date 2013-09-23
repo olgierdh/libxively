@@ -12,7 +12,20 @@ clean:
 ci_msp430:
 	$(MAKE) -C src clean
 	$(MAKE) -C src libxively \
-		CC=msp430-gcc AR=msp430-ar \
+		CC=msp430-elf-gcc AR=msp430-elf-ar \
+		XI_EXTRA_CFLAGS="-mmcu=msp430 -fdata-sections" \
+		XI_OPTLEVEL=-Os \
+		XI_OPTIMISE="NO_ERROR_STRINGS" \
+		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
+		XI_COMM_LAYER=dummy
+
+ci_msp430x:
+	$(MAKE) -C src clean
+	$(MAKE) -C src libxively \
+		CC=msp430-elf-gcc AR=msp430-elf-ar \
+		XI_EXTRA_CFLAGS="-mmcu=msp430x" \
+		XI_OPTLEVEL=-Os \
+		XI_OPTIMISE="NO_ERROR_STRINGS" \
 		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
 		XI_COMM_LAYER=dummy
 
@@ -52,12 +65,13 @@ update_docs_branch:
 
 wip_msp430_cc3000:
 	$(MAKE) -C src clean
-	$(MAKE) -C src/ext/drivers msp430_cc3000
+	$(MAKE) -C src/ext/drivers msp430_cc3000 CFLAGS="-mmcu=msp430fr5739"
 	$(MAKE) -C src libxively \
-		CC=msp430-gcc \
-		AR=msp430-ar \
+		CC=msp430-elf-gcc \
+		AR=msp430-elf-ar \
 		XI_OPTLEVEL=-Os \
-		XI_EXTRA_CFLAGS=-mmcu=msp430fr5739 \
+		XI_OPTIMISE="NO_ERROR_STRINGS" \
+		XI_EXTRA_CFLAGS="-mmcu=msp430fr5739" \
 		XI_DEBUG_OUTPUT=0 \
 		XI_DEBUG_ASSERT=0 \
 		XI_COMM_LAYER=msp430_cc3000
