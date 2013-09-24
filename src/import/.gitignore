@@ -1,0 +1,9 @@
+# List everything we don't need to check-in
+# tinytest
+tinytest/.gitignore
+tinytest/.travis.yml
+tinytest/Makefile
+tinytest/Makefile.avr
+tinytest/TODO
+tinytest/portable_demo.c
+tinytest/tinytest_demo.c
