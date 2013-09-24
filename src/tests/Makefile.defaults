@@ -1,6 +1,6 @@
 XI_UNIT_TEST_TARGET ?= native
 
-XI_COMM_LAYER := dummy
+XI_COMM_LAYER ?= dummy
 
 export XI_COMM_LAYER
 
