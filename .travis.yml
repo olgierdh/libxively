@@ -4,7 +4,6 @@ compiler:
   - gcc
 before_install:
   - "sudo apt-get -qq update"
-  - "sudo apt-get -qq install doxygen"
   - "if [ ! $CC = 'clang' ]; then sudo apt-get -qq install gcc-msp430 msp430-libc msp430mcu; fi"
   - "if [ ! $CC = 'clang' ]; then sudo apt-get -qq install gcc-avr avr-libc; fi"
 script:
