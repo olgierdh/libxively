@@ -23,7 +23,7 @@ all: $(XI_TEST)
 include Makefile.$(XI_UNIT_TEST_TARGET)
 
 $(XI_OBJDIR)/tinytest/tinytest.o: $(TINYTEST_SRCDIR)/tinytest.c
-	-mkdir -p $(dir $@)
+	@-mkdir -p $(dir $@)
 	$(CC) $(XI_CFLAGS) -c $< -o $@
 
 $(XI):
