@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#include "xi_consts.h"
+
 #include "layer_api.h"
 #include "layer_interface.h"
 #include "layer_connection.h"
@@ -8,12 +10,12 @@
 #include "layer_factory_conf.h"
 #include "layer_default_allocators.h"
 
+#include "posix_io_layer.h"
+
 enum LAYERS_ID
 {
-      DUMMY_LAYER_TYPE_1 = 0
-    , DUMMY_LAYER_TYPE_2
-    , DUMMY_LAYER_TYPE_3
-    , DUMMY_LAYER_TYPE_4
+      IO_LAYER = 0
+    , DUMMY_LAYER_TYPE_1
 };
 
 layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, char* buffer, size_t size )
@@ -21,8 +23,7 @@ layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, char* buffe
     ( void ) size;
     ( void ) buffer;
 
-	printf( "dummy_layer1_on_demand %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
+    return CALL_ON_PREV_ON_DEMAND( context->self, buffer, size );
 }
 
 layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const char* buffer, size_t size )
@@ -30,8 +31,7 @@ layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const c
     ( void ) size;
     ( void ) buffer;
 
-	printf( "dummy_layer1_on_data_ready %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
+    return CALL_ON_PREV_ON_DATA_READY( context->self, buffer, size );
 }
 
 layer_state_t dummy_layer1_close( layer_connectivity_t* context )
@@ -46,74 +46,72 @@ layer_state_t dummy_layer1_on_close( layer_connectivity_t* context )
 	return LAYER_STATE_OK;
 }
 
-layer_state_t dummy_layer2_on_demand( layer_connectivity_t* context, char* buffer, size_t size )
-{
-    ( void ) size;
-    ( void ) buffer;
-
-	printf( "dummy_layer2_on_demand %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
-}
-
-layer_state_t dummy_layer2_on_data_ready( layer_connectivity_t* context, const char* buffer, size_t size )
-{
-    ( void ) size;
-    ( void ) buffer;
-
-	printf( "dummy_layer2_on_data_ready %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
-}
-
-layer_state_t dummy_layer2_close( layer_connectivity_t* context )
-{
-	printf( "dummy_layer2_close %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
-}
-
-layer_state_t dummy_layer2_on_close( layer_connectivity_t* context )
-{
-	printf( "dummy_layer2_on_close %p\n", context->self->user_data );
-	return LAYER_STATE_OK;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define CONNECTION_SCHEME_1_DATA DUMMY_LAYER_TYPE_1, DUMMY_LAYER_TYPE_2
+#define CONNECTION_SCHEME_1_DATA IO_LAYER, DUMMY_LAYER_TYPE_1
 DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_LAYER_TYPES_CONF()
-      LAYER_TYPE( DUMMY_LAYER_TYPE_1, &dummy_layer1_on_demand, &dummy_layer1_on_data_ready, &dummy_layer1_close, &dummy_layer1_on_close )
-    , LAYER_TYPE( DUMMY_LAYER_TYPE_2, &dummy_layer2_on_demand, &dummy_layer2_on_data_ready, &dummy_layer2_close, &dummy_layer2_on_close )
+      LAYER_TYPE( IO_LAYER, &posix_io_layer_on_demand, &posix_io_layer_on_data_ready, &posix_io_layer_close, &posix_io_layer_on_close )
+    , LAYER_TYPE( DUMMY_LAYER_TYPE_1, &dummy_layer1_on_demand, &dummy_layer1_on_data_ready, &dummy_layer1_close, &dummy_layer1_on_close )
 END_LAYER_TYPES_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_FACTORY_CONF()
-      FACTORY_ENTRY( DUMMY_LAYER_TYPE_1, &placement_layer_pass_create, &placement_layer_pass_delete, &default_layer_heap_alloc, &default_layer_heap_free )
-    , FACTORY_ENTRY( DUMMY_LAYER_TYPE_2, &placement_layer_pass_create, &placement_layer_pass_delete, &default_layer_heap_alloc, &default_layer_heap_free )
+      FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete, &default_layer_heap_alloc, &default_layer_heap_free )
+    , FACTORY_ENTRY( DUMMY_LAYER_TYPE_1, &placement_layer_pass_create, &placement_layer_pass_delete, &default_layer_heap_alloc, &default_layer_heap_free )
 END_FACTORY_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static const char test_msg[]        = "This is test msg\n\n";
+static const size_t test_msg_length = sizeof( test_msg );
 
 int main( int argc, const char* argv[] )
 {
     ( void ) argc;
     ( void ) argv;
 
-    int user_data  = 0;
-    int user_data2 = 0;
-
-    void* user_datas[] = { &user_data, &user_data2 };
+    void* user_datas[] = { 0, 0 };
 
     layer_chain_t layer_chain = create_and_connect_layers( CONNECTION_SCHEME_1, user_datas, CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
 
-    layer_t* dummy_layer1_instance = layer_chain.bottom;
-    layer_t* dummy_layer2_instance = layer_chain.top;
+    layer_t* io_layer = connect_to_endpoint( layer_chain.bottom, XI_HOST, XI_PORT );
+    layer_t* dummy_layer = layer_chain.top;
 
-    CALL_ON_NEXT_ON_DEMAND( dummy_layer1_instance, 0, 0 );
+    printf( "%d\n", dummy_layer->layer_type_id );
+
+    if( io_layer == 0 )
+    {
+        printf( "Could not connect to the endpoint\n" ); exit( 1 );
+    }
+
+    CALL_ON_SELF_ON_DATA_READY( dummy_layer, test_msg, test_msg_length );
+
+
+    char buff[ 32 ];
+    memset( buff, 0, sizeof( buff ) );
+
+
+    layer_state_t layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31 );
+    size_t counter = 0;
+
+    printf( "Buffer \n[" );
+    printf( "%s", buff );
+
+    while( layer_state != LAYER_STATE_OK )
+    {
+        layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31 );
+        printf( "%s", buff );
+        memset( buff, 0, sizeof( buff ) );
+    }
+
+    printf( "]\n" );
+
+    /*CALL_ON_NEXT_ON_DEMAND( dummy_layer1_instance, 0, 0 );
     CALL_ON_PREV_ON_DEMAND( dummy_layer2_instance, 0, 0 );
     CALL_ON_SELF_ON_DEMAND( dummy_layer1_instance, 0, 0 );
     CALL_ON_SELF_ON_DEMAND( dummy_layer2_instance, 0, 0 );
@@ -131,7 +129,7 @@ int main( int argc, const char* argv[] )
     CALL_ON_NEXT_ON_CLOSE( dummy_layer1_instance );
     CALL_ON_PREV_ON_CLOSE( dummy_layer2_instance );
     CALL_ON_SELF_ON_CLOSE( dummy_layer1_instance );
-    CALL_ON_SELF_ON_CLOSE( dummy_layer2_instance );
+    CALL_ON_SELF_ON_CLOSE( dummy_layer2_instance );*/
 
 	return 0;
 }

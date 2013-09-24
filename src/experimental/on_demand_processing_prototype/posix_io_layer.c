@@ -14,17 +14,30 @@
 #include "xi_allocator.h"
 #include "xi_err.h"
 #include "xi_macros.h"
+#include "xi_debug.h"
+
+#include "layer_api.h"
+
 
 layer_state_t posix_io_layer_on_demand(
       layer_connectivity_t* context
     , char* buffer
     , size_t size )
 {
+    xi_debug_logger( "[posix_io_layer_on_demand]" );
+
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
     XI_UNUSED( posix_data );
     XI_UNUSED( buffer );
     XI_UNUSED( size );
+
+    size_t len = read( posix_data->socket_fd, buffer, size );
+
+    if( len == size )
+    {
+        return LAYER_STATE_FULL;
+    }
 
     return LAYER_STATE_OK;
 }
@@ -34,13 +47,25 @@ layer_state_t posix_io_layer_on_data_ready(
     , const char* buffer
     , size_t size )
 {
+    xi_debug_logger( "[posix_io_layer_on_data_ready]" );
+
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
     XI_UNUSED( posix_data );
     XI_UNUSED( buffer );
     XI_UNUSED( size );
 
-    return LAYER_STATE_OK;
+    if( buffer != 0 && size > 0 )
+    {
+        int len = write( posix_data->socket_fd, buffer, size );
+
+        if( len == size )
+        {
+            return LAYER_STATE_OK;
+        }
+    }
+
+    return LAYER_STATE_FULL;
 }
 
 layer_state_t posix_io_layer_close( layer_connectivity_t* context )
@@ -61,66 +86,71 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
     return LAYER_STATE_OK;
 }
 
-/**
- * \struct  posix_io_layer_init_data_t
- * \brief   simple configuration of the initialization of the posix connection endpoint
- */
-typedef struct
-{
-    const char* address;
-    const int   port;
-} posix_io_layer_init_data_t;
-
-/**
- * \brief connect_to_endpoint
- * \param layer
- * \param init_data
- * \return
- */
 layer_t* connect_to_endpoint(
       layer_t* layer
-    , void* init_data )
+    , const char* address
+    , const int port )
 {
-    posix_io_layer_init_data_t* the_init_data   = ( posix_io_layer_init_data_t* ) init_data;
+
+    {
+        char msg[ 256 ];
+        sprintf( msg, "Connecting layer [%d] to the endpoint", layer->layer_type_id );
+        xi_debug_logger( msg );
+    }
+
     posix_data_t* posix_data                    = xi_alloc( sizeof( posix_data_t ) );
 
     XI_CHECK_MEMORY( posix_data );
 
     layer->user_data                            = ( void* ) posix_data;
 
+    xi_debug_logger( "Creating socket..." );
     posix_data->socket_fd                       = socket( AF_INET, SOCK_STREAM, 0 );
 
     if( posix_data->socket_fd == -1 )
     {
+        xi_debug_logger( "Socket creation [failed]" );
         xi_set_err( XI_SOCKET_INITIALIZATION_ERROR );
         return 0;
     }
+
+    xi_debug_logger( "Socket creation [ok]" );
 
      // socket specific data
     struct sockaddr_in name;
     struct hostent* hostinfo;
 
+    xi_debug_logger( "Getting host by name..." );
+
     // get the hostaddress
-    hostinfo = gethostbyname( the_init_data->address );
+    hostinfo = gethostbyname( address );
 
     // if null it means that the address has not been founded
     if( hostinfo == NULL )
     {
+        xi_debug_logger( "Getting Host by name [failed]" );
         xi_set_err( XI_SOCKET_GETHOSTBYNAME_ERROR );
         goto err_handling;
     }
+
+    xi_debug_logger( "Getting Host by name [ok]" );
 
     // set the address and the port for further connection attempt
     memset( &name, 0, sizeof( struct sockaddr_in ) );
     name.sin_family     = AF_INET;
     name.sin_addr       = *( ( struct in_addr* ) hostinfo->h_addr );
-    name.sin_port       = htons( the_init_data->port );
+    name.sin_port       = htons( port );
+
+    xi_debug_logger( "Connecting to the endpoint..." );
 
     if( connect( posix_data->socket_fd, ( struct sockaddr* ) &name, sizeof( struct sockaddr ) ) == -1 )
     {
+        xi_debug_logger( "Connecting to the endpoint [failed]" );
         xi_set_err( XI_SOCKET_CONNECTION_ERROR );
         goto err_handling;
     }
+
+    xi_debug_logger( "Connecting to the endpoint [ok]" );
 
     // POSTCONDITIONS
     assert( layer != 0 );

@@ -39,4 +39,16 @@ layer_state_t posix_io_layer_on_close(
     layer_connectivity_t* context );
 
 
+/**
+ * \brief connect_to_endpoint
+ * \param layer
+ * \param init_data
+ * \return
+ */
+layer_t* connect_to_endpoint(
+      layer_t* layer
+    , const char* address
+    , const int port );
+
+
 #endif
