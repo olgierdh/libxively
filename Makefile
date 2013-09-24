@@ -1,8 +1,7 @@
 REV := $(shell git rev-parse --short HEAD)
 
-all: docs
+all:
 	$(MAKE) -C src
-	./src/bin/libxively_unit_test_suite
 docs:
 	doxygen
 clean:

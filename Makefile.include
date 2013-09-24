@@ -5,9 +5,10 @@ AR ?= ar
 
 XI_BUILD_TYPE ?= debug
 
+
 ifndef XI_OVERRIDE_CFLAGS
   XI_WARN_CFLAGS ?= -Wall -Wextra
-  XI_CFLAGS += -c -std=gnu99 -Iinclude -fstrict-aliasing
+  XI_CFLAGS += -std=gnu99 -Iinclude -fstrict-aliasing
   XI_CFLAGS += $(XI_WARN_CFLAGS) $(XI_EXTRA_CFLAGS)
   ifeq ($(XI_BUILD_TYPE),release)
     XI_OPTLEVEL ?= -O2
@@ -28,6 +29,9 @@ ifndef XI_OVERRIDE_CFLAGS
   ifdef XI_OPTIMISE
     XI_CFLAGS += $(foreach constant,$(XI_OPTIMISE),-DXI_OPT_$(constant))
   endif
+  XI_USER_AGENT ?= '"libxively-$(XI_COMM_LAYER)/0.1.x-$(shell git rev-parse --short HEAD)"'
+
+  XI_CFLAGS += -DXI_USER_AGENT=$(XI_USER_AGENT)
 else
   XI_CFLAGS := $(XI_OVERRIDE_CFLAGS)
   $(warning "Overriden XI_CFLAGS with $(XI_OVERRIDE_CFLAGS)")
@@ -40,7 +44,12 @@ else
   $(warning "Overriden XI_ARFLAGS with $(XI_OVERRIDE_ARFLAGS)")
 endif # XI_OVERRIDE_ARFLAGS
 
-XI_OBJDIR ?= $(CURDIR)/obj
-XI_BINDIR ?= $(CURDIR)/bin
+XI_OUTPUT ?= $(LIBXIVELY)/src
+XI_OBJDIR := $(XI_OUTPUT)/obj
+XI_BINDIR := $(XI_OUTPUT)/bin
 
 XI ?= $(XI_OBJDIR)/libxively.a
+
+XI_OBJECTS = $(XI_SOURCES:.c=.o)
+
+XI_OBJS = $(addprefix $(XI_OBJDIR)/,$(XI_OBJECTS))

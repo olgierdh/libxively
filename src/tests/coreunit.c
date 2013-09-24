@@ -704,8 +704,15 @@ struct testgroup_t groups[] = {
     END_OF_GROUPS
 };
 
+#if XI_UNIT_TEST_NATIVE
 int main( int argc, char const *argv[] )
 {
-    /* code */
-    return tinytest_main( argc, argv, groups );
+  return tinytest_main( argc, argv, groups );
 }
+#else
+int main() 
+{
+  const char a[] = {"avr"};
+  return tinytest_main(1, (const char **)a, groups);
+}
+#endif

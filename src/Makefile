@@ -1,42 +1,23 @@
-include ../Makefile.include
+LIBXIVELY := $(shell git rev-parse --show-toplevel)
 
-CREATE_DIRS := $(XI_BINDIR) $(XI_OBJDIR)
+include $(LIBXIVELY)/Makefile.include
+include tests/Makefile.defaults
 
-XI_SRCDIRS = libxively examples tests
-
-SUB_BINDIRS = $(addprefix $(XI_BINDIR)/,$(XI_SRCDIRS))
-
-#SUB_SRCDIRS := $(addprefix $(CURDIR)/,$(addsuffix "",$(XI_SRCDIRS)))
-SUB_SRCDIRS := $(addprefix $(CURDIR)/,$(XI_SRCDIRS))
+XI_COMM_LAYER ?= posix
 
 export XI_BINDIR
 export XI_OBJDIR
 
-# RULES:
+.PHONY: libxively tests clean
 
-.PHONY: $(SUB_SRCDIRS) libxively examples test clean
-
-all: $(SUB_BINDIRS)
-
-$(SUB_BINDIRS): | $(CREATE_DIRS)
-
-$(SUB_BINDIRS): $(SUB_SRCDIRS)
-
-$(CREATE_DIRS):
-	mkdir -p $@
-
-$(SUB_SRCDIRS):
-	$(MAKE) -C $@ && cd ..
 
 libxively:
 	$(MAKE) -C $@
 
-examples:
+#examples:
+#	$(MAKE) -C $@
+
+tests: clean libxively
 	$(MAKE) -C $@
 
-test:
-	$(MAKE) -C $@
-
-clean:
-	$(RM) -rf $(XI_BINDIR)
-	$(RM) -rf $(XI_OBJDIR)
+include $(LIBXIVELY)/Makefile.rules
