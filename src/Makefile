@@ -12,6 +12,7 @@ export XI_OBJDIR
 
 
 libxively:
+	$(MAKE) -C $@ deps
 	$(MAKE) -C $@
 
 #examples:

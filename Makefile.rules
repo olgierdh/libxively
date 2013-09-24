@@ -4,6 +4,10 @@ $(XI_OBJDIR)/%.o : %.c
 	-mkdir -p $(dir $@)
 	$(CC) $(XI_CFLAGS) -c $< -o $@
 
+$(XI_OBJDIR)/%.d : %.c
+	-mkdir -p $(dir $@)
+	$(CC) $(XI_CFLAGS) -MM $< -MF $@ -MT "$(@:.d=.o)"
+
 clean:
 	$(RM) -rf $(XI_BINDIR)
 	$(RM) -rf $(XI_OBJDIR)

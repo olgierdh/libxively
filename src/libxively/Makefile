@@ -12,8 +12,13 @@ XI_SOURCES = $(wildcard *.c) \
 all: $(XI)
 
 objs: $(XI_OBJS)
+deps: $(XI_DEPS)
 
 $(XI): $(XI_OBJS)
 	$(AR) $(XI_ARFLAGS) $(XI) $(XI_OBJS)
 
 include $(LIBXIVELY)/Makefile.rules
+
+ifneq ($(MAKECMDGOALS),clean)
+  -include $(XI_DEPS)
+endif
