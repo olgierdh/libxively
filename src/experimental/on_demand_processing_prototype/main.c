@@ -18,20 +18,22 @@ enum LAYERS_ID
     , DUMMY_LAYER_TYPE_1
 };
 
-layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, char* buffer, size_t size )
+layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, char* buffer, size_t size, const char impulse )
 {
+    ( void ) impulse;
     ( void ) size;
     ( void ) buffer;
 
-    return CALL_ON_PREV_ON_DEMAND( context->self, buffer, size );
+    return CALL_ON_PREV_ON_DEMAND( context->self, buffer, size, 0 );
 }
 
-layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const char* buffer, size_t size )
+layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const char* buffer, size_t size, const char impulse  )
 {
+    ( void ) impulse;
     ( void ) size;
     ( void ) buffer;
 
-    return CALL_ON_PREV_ON_DATA_READY( context->self, buffer, size );
+    return CALL_ON_PREV_ON_DATA_READY( context->self, buffer, size, 0 );
 }
 
 layer_state_t dummy_layer1_close( layer_connectivity_t* context )
@@ -89,22 +91,21 @@ int main( int argc, const char* argv[] )
         printf( "Could not connect to the endpoint\n" ); exit( 1 );
     }
 
-    CALL_ON_SELF_ON_DATA_READY( dummy_layer, test_msg, test_msg_length );
+    CALL_ON_SELF_ON_DATA_READY( dummy_layer, test_msg, test_msg_length, 0 );
 
 
     char buff[ 32 ];
     memset( buff, 0, sizeof( buff ) );
 
 
-    layer_state_t layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31 );
-    size_t counter = 0;
+    layer_state_t layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31, 0 );
 
     printf( "Buffer \n[" );
     printf( "%s", buff );
 
-    while( layer_state != LAYER_STATE_OK )
+    while( layer_state == LAYER_STATE_FULL )
     {
-        layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31 );
+        layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, buff, 31, 0 );
         printf( "%s", buff );
         memset( buff, 0, sizeof( buff ) );
     }

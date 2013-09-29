@@ -33,8 +33,8 @@ typedef enum
 /*
  * \brief   set of function types used across the layer system
  */
-typedef layer_state_t ( on_demand_t )       ( layer_connectivity_t* context, char* buffer, size_t size );
-typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const char* buffer, size_t size );
+typedef layer_state_t ( on_demand_t )       ( layer_connectivity_t* context, char* buffer, size_t size, const char impulse );
+typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const char* buffer, size_t size, const char impulse );
 typedef layer_state_t ( close_t )           ( layer_connectivity_t* context );
 typedef layer_state_t ( on_close_t )        ( layer_connectivity_t* context );
 

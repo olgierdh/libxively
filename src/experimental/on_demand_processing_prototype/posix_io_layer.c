@@ -22,15 +22,14 @@
 layer_state_t posix_io_layer_on_demand(
       layer_connectivity_t* context
     , char* buffer
-    , size_t size )
+    , size_t size
+    , const char impulse )
 {
     xi_debug_logger( "[posix_io_layer_on_demand]" );
 
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
-    XI_UNUSED( posix_data );
-    XI_UNUSED( buffer );
-    XI_UNUSED( size );
+    XI_UNUSED( impulse );
 
     size_t len = read( posix_data->socket_fd, buffer, size );
 
@@ -45,15 +44,14 @@ layer_state_t posix_io_layer_on_demand(
 layer_state_t posix_io_layer_on_data_ready(
       layer_connectivity_t* context
     , const char* buffer
-    , size_t size )
+    , size_t size
+    , const char impulse )
 {
     xi_debug_logger( "[posix_io_layer_on_data_ready]" );
 
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
-    XI_UNUSED( posix_data );
-    XI_UNUSED( buffer );
-    XI_UNUSED( size );
+    XI_UNUSED( impulse );
 
     if( buffer != 0 && size > 0 )
     {

@@ -16,7 +16,8 @@
 layer_state_t http_layer_on_demand(
       layer_connectivity_t* context
     , char* buffer
-    , size_t size );
+    , size_t size
+    , const char impulse );
 
 /**
  * \brief  see the layer_interface for details
@@ -24,7 +25,8 @@ layer_state_t http_layer_on_demand(
 layer_state_t http_layer_on_data_ready(
       layer_connectivity_t* context
     , const char* buffer
-    , size_t size );
+    , size_t size
+    , const char impulse );
 
 /**
  * \brief  see the layer_interface for details
