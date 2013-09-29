@@ -23,10 +23,11 @@
  */
 typedef enum
 {
-    LAYER_STATE_OK = 0,
-    LAYER_STATE_FULL,
-    LAYER_STATE_TIMEOUT,
-    LAYER_STATE_ERROR
+    LAYER_STATE_OK = 0,     // everything went fine, the exector can process the buffer
+    LAYER_STATE_FULL,       // the capacity of the buffer has been reached, so be carefull on parsing
+    LAYER_STATE_TIMEOUT,    // timeout occured
+    LAYER_STATE_NOT_READY,  // the layer is not yet ready ( should happen only in asynch mode when some of the sockets may be in EAGAIN state )
+    LAYER_STATE_ERROR       // something went terribly wrong, most probably it's not possible to recover
 } layer_state_t;
 
 
