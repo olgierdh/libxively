@@ -93,7 +93,7 @@ layer_t* connect_to_endpoint(
 {
 
     {
-        char msg[ 256 ];
+        char msg[ 32 ];
         sprintf( msg, "Connecting layer [%d] to the endpoint", layer->layer_type_id );
         xi_debug_logger( msg );
     }
