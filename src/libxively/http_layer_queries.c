@@ -27,7 +27,7 @@ static const char XI_HTTP_ID_TEMPLATE[]    = "/%s";
 static const char XI_HTTP_ID_TEMPLATE_D[]  = "/%d";
 
 static const char XI_HTTP_CONTENT_TEMPLATE[] = "Content-Type: text/plain\r\n"
-                                            "Content-Length: %d\r\n";
+                                               "Content-Length: %d\r\n";
 
 static char XI_QUERY_BUFFER[ XI_QUERY_BUFFER_SIZE ];
 static char XI_CONTENT_BUFFER[ XI_CONTENT_BUFFER_SIZE ];

@@ -17,12 +17,11 @@
 #include "xi_debug.h"
 
 #include "layer_api.h"
-
+#include "common.h"
 
 layer_state_t posix_io_layer_on_demand(
       layer_connectivity_t* context
-    , char* buffer
-    , size_t size
+    , void* data
     , const char impulse )
 {
     xi_debug_logger( "[posix_io_layer_on_demand]" );
@@ -31,9 +30,10 @@ layer_state_t posix_io_layer_on_demand(
 
     XI_UNUSED( impulse );
 
-    size_t len = read( posix_data->socket_fd, buffer, size );
+    data_descriptor_t* buffer = ( data_descriptor_t* ) data;
+    int len = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
 
-    if( len == size )
+    if( len == buffer->data_size )
     {
         return LAYER_STATE_FULL;
     }
@@ -43,21 +43,21 @@ layer_state_t posix_io_layer_on_demand(
 
 layer_state_t posix_io_layer_on_data_ready(
       layer_connectivity_t* context
-    , const char* buffer
-    , size_t size
+    , const void* data
     , const char impulse )
 {
     xi_debug_logger( "[posix_io_layer_on_data_ready]" );
 
-    posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
+    posix_data_t* posix_data                = ( posix_data_t* ) context->self->user_data;
+    const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
     XI_UNUSED( impulse );
 
-    if( buffer != 0 && size > 0 )
+    if( buffer != 0 && buffer->data_size > 0 )
     {
-        int len = write( posix_data->socket_fd, buffer, size );
+        int len = write( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
 
-        if( len == size )
+        if( len < buffer->data_size )
         {
             return LAYER_STATE_OK;
         }

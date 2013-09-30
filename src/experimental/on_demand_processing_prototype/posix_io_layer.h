@@ -15,8 +15,7 @@
  */
 layer_state_t posix_io_layer_on_demand(
       layer_connectivity_t* context
-    , char* buffer
-    , size_t size
+    , void* data
     , const char impulse );
 
 /**
@@ -24,8 +23,7 @@ layer_state_t posix_io_layer_on_demand(
  */
 layer_state_t posix_io_layer_on_data_ready(
       layer_connectivity_t* context
-    , const char* buffer
-    , size_t size
+    , const void* data
     , const char impulse );
 
 /**

@@ -21,12 +21,12 @@
 
 #ifdef __DEBUG
 #define CONNECT_LAYERS( lp_i, ln_i )\
-    ln_i->layer_connection.prev  = lp_i;\
-    lp_i->layer_connection.next  = ln_i;\
-    lp_i->debug_info.debug_line_connect = __LINE__;\
-    lp_i->debug_info.debug_file_connect = __FILE__;\
-    ln_i->debug_info.debug_line_connect = __LINE__;\
-    ln_i->debug_info.debug_file_connect = __FILE__;
+    ln_i->layer_connection.prev             = lp_i;\
+    lp_i->layer_connection.next             = ln_i;\
+    lp_i->debug_info.debug_line_connect     = __LINE__;\
+    lp_i->debug_info.debug_file_connect     = __FILE__;\
+    ln_i->debug_info.debug_line_connect     = __LINE__;\
+    ln_i->debug_info.debug_file_connect     = __FILE__;
 #else
 #define CONNECT_LAYERS( lp_i, ln_i )\
     ln_i->layer_connection.prev  = lp_i;\
@@ -46,35 +46,35 @@
 #define CALL_ON( layer, target, context )\
     context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection );\
     SET_DEBUG_INFO_ON( layer, context );
-#define CALL_ON2( layer, target, context, buffer, size, impulse )\
-    context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection, buffer, size, impulse );\
+#define CALL_ON2( layer, target, context, data, impulse )\
+    context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection, data, impulse );\
     SET_DEBUG_INFO_ON( layer, context )
 #else
 #define CALL_ON( layer, target, context )\
     context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection );
-#define CALL_ON2( layer, target, context, buffer, size, impulse )\
-    context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection, buffer, size, impulse )
+#define CALL_ON2( layer, target, context, data, impulse )\
+    context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection, data, impulse )
 #endif
 
 // ON_DEMAND
-#define CALL_ON_SELF_ON_DEMAND( context, buffer, size, impulse )\
-    CALL_ON2( self, on_demand, context, buffer, size, impulse )
+#define CALL_ON_SELF_ON_DEMAND( context, data, impulse )\
+    CALL_ON2( self, on_demand, context, data, impulse )
 
-#define CALL_ON_NEXT_ON_DEMAND( context, buffer, size, impulse )\
-    CALL_ON2( next, on_demand, context, buffer, size, impulse )
+#define CALL_ON_NEXT_ON_DEMAND( context, data, impulse )\
+    CALL_ON2( next, on_demand, context, data, impulse )
 
-#define CALL_ON_PREV_ON_DEMAND( context, buffer, size, impulse )\
-    CALL_ON2( prev, on_demand, context, buffer, size, impulse )
+#define CALL_ON_PREV_ON_DEMAND( context, data, impulse )\
+    CALL_ON2( prev, on_demand, context, data, impulse )
 
 // ON_DATA_READY
-#define CALL_ON_SELF_ON_DATA_READY( context, buffer, size, impulse )\
-    CALL_ON2( self, on_data_ready, context, buffer, size, impulse )
+#define CALL_ON_SELF_ON_DATA_READY( context, data, impulse )\
+    CALL_ON2( self, on_data_ready, context, data, impulse )
 
-#define CALL_ON_NEXT_ON_DATA_READY( context, buffer, size, impulse )\
-    CALL_ON2( next, on_data_ready, context, buffer, size, impulse )
+#define CALL_ON_NEXT_ON_DATA_READY( context, data, impulse )\
+    CALL_ON2( next, on_data_ready, context, data, impulse )
 
-#define CALL_ON_PREV_ON_DATA_READY( context, buffer, size, impulse )\
-    CALL_ON2( prev, on_data_ready, context, buffer, size, impulse )
+#define CALL_ON_PREV_ON_DATA_READY( context, data, impulse )\
+    CALL_ON2( prev, on_data_ready, context, data, impulse )
 
 // CLOSE
 #define CALL_ON_SELF_CLOSE( context )\

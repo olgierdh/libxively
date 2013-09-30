@@ -11,6 +11,16 @@
  */
 
 /**
+ * \brief types of impulses that the can be used across the http layer implementation
+ */
+typedef enum
+{
+      FEED_GET          = 0
+    , DATASTREAM_GET
+    ,
+} http_layer_impulse_t;
+
+/**
  * \brief   see the layer_interface for details
  */
 layer_state_t http_layer_on_demand(
