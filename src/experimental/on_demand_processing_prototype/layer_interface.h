@@ -33,7 +33,7 @@ typedef enum
 typedef enum
 {
     LAYER_HINT_NONE = 0,    // no hint, default behaviour
-    LAYER_HAVE_MORE_DATA    // more data will come in the future do not enter receive mode
+    LAYER_HINT_MORE_DATA    // more data will come in the future do not enter receive mode
 } layer_hint_t;
 
 
