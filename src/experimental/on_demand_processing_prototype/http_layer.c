@@ -36,7 +36,7 @@ static const char XI_HTTP_TEMPLATE_X_API_KEY[]      = "X-ApiKey: ";
 /**
  * \brief   see the layer_interface for details
  */
-layer_state_t http_layer_on_demand(
+layer_state_t http_layer_data_ready(
       layer_connectivity_t* context
     , void* data
     , const char impulse )

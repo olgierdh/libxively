@@ -13,7 +13,7 @@
 /**
  * \brief  see the layer_interface for details
  */
-layer_state_t posix_io_layer_on_demand(
+layer_state_t posix_io_layer_data_ready(
       layer_connectivity_t* context
     , void* data
     , const char impulse );

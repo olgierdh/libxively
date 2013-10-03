@@ -19,12 +19,12 @@ enum LAYERS_ID
     , DUMMY_LAYER_TYPE_1
 };
 
-layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, void* data, const char impulse )
+layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const char impulse )
 {
     ( void ) impulse;
     ( void ) data;
 
-    return CALL_ON_PREV_ON_DEMAND( context->self, data, 0 );
+    return CALL_ON_PREV_DATA_READY( context->self, data, 0 );
 }
 
 layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const void* data, const char impulse  )
@@ -55,9 +55,9 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_LAYER_TYPES_CONF()
-      LAYER_TYPE( IO_LAYER, &posix_io_layer_on_demand, &posix_io_layer_on_data_ready
+      LAYER_TYPE( IO_LAYER, &posix_io_layer_data_ready, &posix_io_layer_on_data_ready
                           , &posix_io_layer_close, &posix_io_layer_on_close )
-    , LAYER_TYPE( DUMMY_LAYER_TYPE_1, &dummy_layer1_on_demand, &dummy_layer1_on_data_ready
+    , LAYER_TYPE( DUMMY_LAYER_TYPE_1, &dummy_layer1_data_ready, &dummy_layer1_on_data_ready
                                     , &dummy_layer1_close, &dummy_layer1_on_close )
 END_LAYER_TYPES_CONF()
 
@@ -104,24 +104,24 @@ int main( int argc, const char* argv[] )
     data_descriptor_t tmp_data = { buff, 31 };
 
 
-    layer_state_t layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, ( void *) &tmp_data, 0 );
+    layer_state_t layer_state = CALL_ON_SELF_DATA_READY( dummy_layer, ( void *) &tmp_data, 0 );
 
     printf( "Buffer \n[" );
     printf( "%s", buff );
 
     while( layer_state == LAYER_STATE_FULL )
     {
-        layer_state = CALL_ON_SELF_ON_DEMAND( dummy_layer, ( void* ) &tmp_data, 0 );
+        layer_state = CALL_ON_SELF_DATA_READY( dummy_layer, ( void* ) &tmp_data, 0 );
         printf( "%s", buff );
         memset( buff, 0, sizeof( buff ) );
     }
 
     printf( "]\n" );
 
-    /*CALL_ON_NEXT_ON_DEMAND( dummy_layer1_instance, 0, 0 );
-    CALL_ON_PREV_ON_DEMAND( dummy_layer2_instance, 0, 0 );
-    CALL_ON_SELF_ON_DEMAND( dummy_layer1_instance, 0, 0 );
-    CALL_ON_SELF_ON_DEMAND( dummy_layer2_instance, 0, 0 );
+    /*CALL_ON_NEXT_DATA_READY( dummy_layer1_instance, 0, 0 );
+    CALL_ON_PREV_DATA_READY( dummy_layer2_instance, 0, 0 );
+    CALL_ON_SELF_DATA_READY( dummy_layer1_instance, 0, 0 );
+    CALL_ON_SELF_DATA_READY( dummy_layer2_instance, 0, 0 );
 
     CALL_ON_NEXT_ON_DATA_READY( dummy_layer1_instance, 0, 0 );
     CALL_ON_PREV_ON_DATA_READY( dummy_layer2_instance, 0, 0 );

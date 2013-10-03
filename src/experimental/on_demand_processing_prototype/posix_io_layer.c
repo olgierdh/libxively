@@ -19,12 +19,12 @@
 #include "layer_api.h"
 #include "common.h"
 
-layer_state_t posix_io_layer_on_demand(
+layer_state_t posix_io_layer_data_ready(
       layer_connectivity_t* context
     , void* data
     , const char impulse )
 {
-    xi_debug_logger( "[posix_io_layer_on_demand]" );
+    xi_debug_logger( "[posix_io_layer_data_ready]" );
 
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 

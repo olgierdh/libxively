@@ -34,7 +34,7 @@ typedef enum
 /*
  * \brief   set of function types used across the layer system
  */
-typedef layer_state_t ( on_demand_t )       ( layer_connectivity_t* context, void* data, const char impulse );
+typedef layer_state_t ( data_ready_t )      ( layer_connectivity_t* context, void* data, const char impulse );
 typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const void* data, const char impulse );
 typedef layer_state_t ( close_t )           ( layer_connectivity_t* context );
 typedef layer_state_t ( on_close_t )        ( layer_connectivity_t* context );
@@ -64,7 +64,7 @@ typedef struct layer_interface
     /**
      * \brief the function that is called whenever the prev layer wants more data to process/send over some kind of the connection
      */
-    on_demand_t         *on_demand;
+    data_ready_t         *data_ready;
 
     /**
      * \brief the function that is called whenever there is data that is ready and it's source is the prev layer

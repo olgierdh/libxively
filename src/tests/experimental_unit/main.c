@@ -15,12 +15,12 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-layer_state_t dummy_layer1_on_demand( layer_connectivity_t* context, void* data, const char impulse )
+layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const char impulse )
 {
     ( void ) data;
     ( void ) impulse;
 
-    printf( "dummy_layer1_on_demand %p\n", context->self->user_data );
+    printf( "dummy_layer1_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;
 }
 
@@ -45,12 +45,12 @@ layer_state_t dummy_layer1_on_close( layer_connectivity_t* context )
     return LAYER_STATE_OK;
 }
 
-layer_state_t dummy_layer2_on_demand( layer_connectivity_t* context, char* data, const char impulse )
+layer_state_t dummy_layer2_data_ready( layer_connectivity_t* context, char* data, const char impulse )
 {
     ( void ) data;
     ( void ) impulse;
 
-    printf( "dummy_layer2_on_demand %p\n", context->self->user_data );
+    printf( "dummy_layer2_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;
 }
 
@@ -85,7 +85,7 @@ void test_layer_initialization(void* data)
     (void)(data);
     int user_data = 0;
 
-    LAYER_LOCAL_TYPE( DLT1, 0, &dummy_layer1_on_demand
+    LAYER_LOCAL_TYPE( DLT1, 0, &dummy_layer1_data_ready
                       , &dummy_layer1_on_data_ready
                       , &dummy_layer1_close
                       , &dummy_layer1_on_close );

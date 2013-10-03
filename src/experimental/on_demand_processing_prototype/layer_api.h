@@ -57,14 +57,14 @@
 #endif
 
 // ON_DEMAND
-#define CALL_ON_SELF_ON_DEMAND( context, data, impulse )\
-    CALL_ON2( self, on_demand, context, data, impulse )
+#define CALL_ON_SELF_DATA_READY( context, data, impulse )\
+    CALL_ON2( self, data_ready, context, data, impulse )
 
-#define CALL_ON_NEXT_ON_DEMAND( context, data, impulse )\
-    CALL_ON2( next, on_demand, context, data, impulse )
+#define CALL_ON_NEXT_DATA_READY( context, data, impulse )\
+    CALL_ON2( next, data_ready, context, data, impulse )
 
-#define CALL_ON_PREV_ON_DEMAND( context, data, impulse )\
-    CALL_ON2( prev, on_demand, context, data, impulse )
+#define CALL_ON_PREV_DATA_READY( context, data, impulse )\
+    CALL_ON2( prev, data_ready, context, data, impulse )
 
 // ON_DATA_READY
 #define CALL_ON_SELF_ON_DATA_READY( context, data, impulse )\
