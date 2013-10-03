@@ -39,11 +39,11 @@ static const char XI_HTTP_TEMPLATE_X_API_KEY[]      = "X-ApiKey: ";
 layer_state_t http_layer_data_ready(
       layer_connectivity_t* context
     , void* data
-    , const char impulse )
+    , const layer_hint_t hint )
 {
     XI_UNUSED( context );
     XI_UNUSED( data );
-    XI_UNUSED( impulse );
+    XI_UNUSED( hint );
 
     return LAYER_STATE_OK;
 }
@@ -112,11 +112,11 @@ layer_state_t http_layer_on_data_ready_datastream_get(
 layer_state_t http_layer_on_data_ready(
       layer_connectivity_t* context
     , const void* data
-    , const char impulse )
+    , const layer_hint_t hint )
 {
     XI_UNUSED( context );
     XI_UNUSED( data );
-    XI_UNUSED( impulse );
+    XI_UNUSED( hint );
 
     return LAYER_STATE_OK;
 }

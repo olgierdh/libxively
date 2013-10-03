@@ -30,12 +30,18 @@ typedef enum
     LAYER_STATE_ERROR       // something went terribly wrong, most probably it's not possible to recover
 } layer_state_t;
 
+typedef enum
+{
+    LAYER_HINT_NONE = 0,    // no hint, default behaviour
+    LAYER_HAVE_MORE_DATA    // more data will come in the future do not enter receive mode
+} layer_hint_t;
+
 
 /*
  * \brief   set of function types used across the layer system
  */
-typedef layer_state_t ( data_ready_t )      ( layer_connectivity_t* context, void* data, const char impulse );
-typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const void* data, const char impulse );
+typedef layer_state_t ( data_ready_t )      ( layer_connectivity_t* context, void* data, const layer_hint_t hint );
+typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const void* data, const layer_hint_t hint );
 typedef layer_state_t ( close_t )           ( layer_connectivity_t* context );
 typedef layer_state_t ( on_close_t )        ( layer_connectivity_t* context );
 

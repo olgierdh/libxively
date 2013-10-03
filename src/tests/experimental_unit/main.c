@@ -15,19 +15,19 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const char impulse )
+layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const layer_hint_t hint )
 {
     ( void ) data;
-    ( void ) impulse;
+    ( void ) hint;
 
     printf( "dummy_layer1_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;
 }
 
-layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const void* data, const char impulse )
+layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const void* data, const layer_hint_t hint )
 {
     ( void ) data;
-    ( void ) impulse;
+    ( void ) hint;
 
     printf( "dummy_layer1_on_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;
@@ -45,19 +45,19 @@ layer_state_t dummy_layer1_on_close( layer_connectivity_t* context )
     return LAYER_STATE_OK;
 }
 
-layer_state_t dummy_layer2_data_ready( layer_connectivity_t* context, char* data, const char impulse )
+layer_state_t dummy_layer2_data_ready( layer_connectivity_t* context, char* data, const layer_hint_t hint )
 {
     ( void ) data;
-    ( void ) impulse;
+    ( void ) hint;
 
     printf( "dummy_layer2_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;
 }
 
-layer_state_t dummy_layer2_on_data_ready( layer_connectivity_t* context, const void* data, const char impulse )
+layer_state_t dummy_layer2_on_data_ready( layer_connectivity_t* context, const void* data, const layer_hint_t hint )
 {
     ( void ) data;
-    ( void ) impulse;
+    ( void ) hint;
 
     printf( "dummy_layer2_on_data_ready %p\n", context->self->user_data );
     return LAYER_STATE_OK;

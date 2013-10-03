@@ -19,17 +19,17 @@ enum LAYERS_ID
     , DUMMY_LAYER_TYPE_1
 };
 
-layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const char impulse )
+layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const layer_hint_t hint )
 {
-    ( void ) impulse;
+    ( void ) hint;
     ( void ) data;
 
     return CALL_ON_PREV_DATA_READY( context->self, data, 0 );
 }
 
-layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const void* data, const char impulse  )
+layer_state_t dummy_layer1_on_data_ready( layer_connectivity_t* context, const void* data, const layer_hint_t hint  )
 {
-    ( void ) impulse;
+    ( void ) hint;
     ( void ) data;
 
     return CALL_ON_PREV_ON_DATA_READY( context->self, data, 0 );

@@ -28,7 +28,7 @@ typedef enum
 layer_state_t http_layer_data_ready(
       layer_connectivity_t* context
     , void* data
-    , const char impulse );
+    , const layer_hint_t hint );
 
 /**
  * \brief  see the layer_interface for details
@@ -36,7 +36,7 @@ layer_state_t http_layer_data_ready(
 layer_state_t http_layer_on_data_ready(
       layer_connectivity_t* context
     , const void* data
-    , const char impulse );
+    , const layer_hint_t hint );
 
 /**
  * \brief  see the layer_interface for details
