@@ -1,5 +1,6 @@
 #include "layer_api.h"
 #include "http_layer.h"
+#include "http_layer_data.h"
 #include "xi_macros.h"
 #include "common.h"
 
@@ -34,24 +35,9 @@ static const char XI_HTTP_TEMPLATE_X_API_KEY[]      = "X-ApiKey: ";
 }
 
 /**
- * \brief   see the layer_interface for details
- */
-layer_state_t http_layer_data_ready(
-      layer_connectivity_t* context
-    , void* data
-    , const layer_hint_t hint )
-{
-    XI_UNUSED( context );
-    XI_UNUSED( data );
-    XI_UNUSED( hint );
-
-    return LAYER_STATE_OK;
-}
-
-/**
  * \brief  see the layer_interface for details
  */
-layer_state_t http_layer_data_ready_datastream_get(
+static inline layer_state_t http_layer_data_ready_datastream_get(
       layer_connectivity_t* context
     , const int feed_id
     , const char* datastream_id
@@ -107,6 +93,36 @@ layer_state_t http_layer_data_ready_datastream_get(
 }
 
 /**
+ * \brief   see the layer_interface for details
+ */
+layer_state_t http_layer_data_ready(
+      layer_connectivity_t* context
+    , void* data
+    , const layer_hint_t hint )
+{
+    XI_UNUSED( context );
+    XI_UNUSED( data );
+    XI_UNUSED( hint );
+
+    // unpack the data
+    const http_layer_data_t* http_layer_data = ( const http_layer_data_t* ) data;
+
+    switch( http_layer_data->query_type )
+    {
+        case HTTP_LAYER_DATA_DATASTREAM_GET:
+            return http_layer_data_ready_datastream_get(
+                          context, http_layer_data->xi_context.feed_id
+                        , http_layer_data->http_layer_data_u.xi_get_datastream.datastream
+                        , http_layer_data->xi_context.api_key );
+        default:
+            return LAYER_STATE_ERROR;
+    };
+
+    return LAYER_STATE_ERROR;
+}
+
+
+/**
  * \brief  see the layer_interface for details
  */
 layer_state_t http_layer_on_data_ready(
@@ -116,7 +132,7 @@ layer_state_t http_layer_on_data_ready(
 {
     XI_UNUSED( context );
     XI_UNUSED( data );
-    XI_UNUSED( hint );
+    XI_UNUSED( hint );    
 
     return LAYER_STATE_OK;
 }

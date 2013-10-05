@@ -83,7 +83,6 @@
 #define CALL_ON_NEXT_CLOSE( context )\
     CALL_ON( next, close, context )
 
-
 #define CALL_ON_PREV_CLOSE( context )\
     CALL_ON( prev, close, context )
 
