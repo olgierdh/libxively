@@ -2,6 +2,7 @@
 #include "http_layer.h"
 #include "http_layer_data.h"
 #include "xi_macros.h"
+#include "xi_debug.h"
 #include "common.h"
 
 
@@ -133,6 +134,13 @@ layer_state_t http_layer_on_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );    
+
+
+    // expecting data buffer so unpack it
+
+    const const_data_descriptor_t* data_description = ( const const_data_descriptor_t* ) data;
+
+    xi_debug_printf( "Received: [%s]", data_description->data_ptr );
 
     return LAYER_STATE_OK;
 }
