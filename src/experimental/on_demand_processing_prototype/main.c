@@ -118,25 +118,5 @@ int main( int argc, const char* argv[] )
 
     printf( "]\n" );
 
-    /*CALL_ON_NEXT_DATA_READY( dummy_layer1_instance, 0, 0 );
-    CALL_ON_PREV_DATA_READY( dummy_layer2_instance, 0, 0 );
-    CALL_ON_SELF_DATA_READY( dummy_layer1_instance, 0, 0 );
-    CALL_ON_SELF_DATA_READY( dummy_layer2_instance, 0, 0 );
-
-    CALL_ON_NEXT_ON_DATA_READY( dummy_layer1_instance, 0, 0 );
-    CALL_ON_PREV_ON_DATA_READY( dummy_layer2_instance, 0, 0 );
-    CALL_ON_SELF_ON_DATA_READY( dummy_layer1_instance, 0, 0 );
-    CALL_ON_SELF_ON_DATA_READY( dummy_layer2_instance, 0, 0 );
-
-    CALL_ON_NEXT_CLOSE( dummy_layer1_instance );
-    CALL_ON_PREV_CLOSE( dummy_layer2_instance );
-    CALL_ON_SELF_CLOSE( dummy_layer1_instance );
-    CALL_ON_SELF_CLOSE( dummy_layer2_instance );
-
-    CALL_ON_NEXT_ON_CLOSE( dummy_layer1_instance );
-    CALL_ON_PREV_ON_CLOSE( dummy_layer2_instance );
-    CALL_ON_SELF_ON_CLOSE( dummy_layer1_instance );
-    CALL_ON_SELF_ON_CLOSE( dummy_layer2_instance );*/
-
 	return 0;
 }
