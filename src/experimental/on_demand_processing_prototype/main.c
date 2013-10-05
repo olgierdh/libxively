@@ -46,9 +46,6 @@ END_FACTORY_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static const char test_msg[]        = "This is test msg\n\n";
-static const size_t test_msg_length = sizeof( test_msg );
-
 int main( int argc, const char* argv[] )
 {
     ( void ) argc;
