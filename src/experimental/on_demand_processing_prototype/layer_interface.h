@@ -27,20 +27,25 @@ typedef enum
     LAYER_STATE_FULL,       // the capacity of the buffer has been reached, so be carefull on parsing
     LAYER_STATE_TIMEOUT,    // timeout occured
     LAYER_STATE_NOT_READY,  // the layer is not yet ready ( should happen only in asynch mode when some of the sockets may be in EAGAIN state )
-    LAYER_STATE_ERROR       // something went terribly wrong, most probably it's not possible to recover
+    LAYER_STATE_MORE_DATA,  // means that the layer's need more data, may be used as a communication between layers to get more data from other layers
+                            //      may be used to trigger the read across the layers
+    LAYER_STATE_ERROR       // something went terribly wrong, most probably it's not possible to recover, please refer to the errno value
 } layer_state_t;
 
+/**
+ * \brief   the hints that are used to provide additional information to the layers that are going to precess the query
+ */
 typedef enum
 {
     LAYER_HINT_NONE = 0,    // no hint, default behaviour
-    LAYER_HINT_MORE_DATA    // more data will come in the future do not enter receive mode
+    LAYER_HINT_MORE_DATA    // more data will come in the future do not enter receive mode ( that will happen on default )
 } layer_hint_t;
 
 
 /*
  * \brief   set of function types used across the layer system
  */
-typedef layer_state_t ( data_ready_t )      ( layer_connectivity_t* context, void* data, const layer_hint_t hint );
+typedef layer_state_t ( data_ready_t )      ( layer_connectivity_t* context, const void* data, const layer_hint_t hint );
 typedef layer_state_t ( on_data_ready_t )   ( layer_connectivity_t* context, const void* data, const layer_hint_t hint );
 typedef layer_state_t ( close_t )           ( layer_connectivity_t* context );
 typedef layer_state_t ( on_close_t )        ( layer_connectivity_t* context );

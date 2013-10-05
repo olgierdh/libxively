@@ -24,8 +24,8 @@ static const char XI_HTTP_TEMPLATE_X_API_KEY[]      = "X-ApiKey: ";
  */
 #define layer_sender( context, data, hint ) \
 { \
-    const const_data_descriptor_t tmp_data = { (data), strlen( (data) ) }; \
-    layer_state_t layer_state = CALL_ON_PREV_ON_DATA_READY( context->self, ( const void* ) &tmp_data, hint ); \
+    const const_data_descriptor_t tmp_data = { (data), strlen( (data) ), 0 }; \
+    layer_state_t layer_state = CALL_ON_PREV_DATA_READY( context->self, ( const void* ) &tmp_data, hint ); \
     switch( layer_state ) \
     { \
         case LAYER_STATE_OK: \
@@ -58,7 +58,7 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
     sprintf( buff, "%d", feed_id );
 
     layer_sender( context, buff, LAYER_HINT_MORE_DATA ); // feed id
-    layer_sender( context, "datastreams", LAYER_HINT_MORE_DATA );
+    layer_sender( context, "/datastreams/", LAYER_HINT_MORE_DATA );
     layer_sender( context, datastream_id, LAYER_HINT_MORE_DATA ); // datastream id
     layer_sender( context, ".csv ", LAYER_HINT_MORE_DATA );
 
@@ -78,7 +78,6 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
 
     // SEND ACCEPT
     layer_sender( context, XI_HTTP_TEMPLATE_ACCEPT, LAYER_HINT_MORE_DATA );
-    layer_sender( context, "*/*", LAYER_HINT_MORE_DATA );
     layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
 
     // A API KEY
@@ -86,8 +85,7 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
     layer_sender( context, api_key, LAYER_HINT_MORE_DATA ); // api key
     layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
 
-    // the end, no more data double crlf
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
+    // the end, no more data tripple crlf
     layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_NONE );
 
     return LAYER_STATE_OK;
@@ -98,7 +96,7 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
  */
 layer_state_t http_layer_data_ready(
       layer_connectivity_t* context
-    , void* data
+    , const void* data
     , const layer_hint_t hint )
 {
     XI_UNUSED( context );
@@ -112,9 +110,9 @@ layer_state_t http_layer_data_ready(
     {
         case HTTP_LAYER_DATA_DATASTREAM_GET:
             return http_layer_data_ready_datastream_get(
-                          context, http_layer_data->xi_context.feed_id
+                          context, http_layer_data->xi_context->feed_id
                         , http_layer_data->http_layer_data_u.xi_get_datastream.datastream
-                        , http_layer_data->xi_context.api_key );
+                        , http_layer_data->xi_context->api_key );
         default:
             return LAYER_STATE_ERROR;
     };
@@ -140,7 +138,15 @@ layer_state_t http_layer_on_data_ready(
 
     const const_data_descriptor_t* data_description = ( const const_data_descriptor_t* ) data;
 
-    xi_debug_printf( "Received: [%s]", data_description->data_ptr );
+    xi_debug_printf( "%s", data_description->data_ptr );
+
+    // this is not true, however until the proper parsing will be plugged in this condition
+    // shall simulate the need for more data, warning, may hang if the transmission ends
+    // with the packet that size is equal to the size of the buffer
+    if( data_description->hint_size == data_description->data_size )
+    {
+        return LAYER_STATE_MORE_DATA;
+    }
 
     return LAYER_STATE_OK;
 }

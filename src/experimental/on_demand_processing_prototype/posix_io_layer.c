@@ -21,21 +21,30 @@
 
 layer_state_t posix_io_layer_data_ready(
       layer_connectivity_t* context
-    , void* data
+    , const void* data
     , const layer_hint_t hint )
 {
-    xi_debug_logger( "[posix_io_layer_data_ready]" );
+    posix_data_t* posix_data                = ( posix_data_t* ) context->self->user_data;
+    const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
-    posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
+    xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );
 
-    data_descriptor_t* buffer = ( data_descriptor_t* ) data;
-    int len = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
-
-    if( len == buffer->data_size )
+    if( buffer != 0 && buffer->data_size > 0 )
     {
-        return LAYER_STATE_FULL;
+        int len = write( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
+
+        if( len < buffer->data_size )
+        {
+            return LAYER_STATE_ERROR;
+        }
+    }
+
+    if( hint == LAYER_HINT_NONE )
+    {
+        xi_debug_logger( "recv:..." );
+        CALL_ON_SELF_ON_DATA_READY( context->self, 0, LAYER_HINT_NONE );
     }
 
     return LAYER_STATE_OK;
@@ -48,22 +57,34 @@ layer_state_t posix_io_layer_on_data_ready(
 {
     xi_debug_logger( "[posix_io_layer_on_data_ready]" );
 
-    posix_data_t* posix_data                = ( posix_data_t* ) context->self->user_data;
-    const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
+    posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
     XI_UNUSED( hint );
 
-    if( buffer != 0 && buffer->data_size > 0 )
-    {
-        int len = write( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
+    data_descriptor_t* buffer = 0;
 
-        if( len < buffer->data_size )
-        {
-            return LAYER_STATE_OK;
-        }
+    if( data )
+    {
+        buffer = ( data_descriptor_t* ) data;
+    }
+    else
+    {
+        static char data_buffer[ 32 ];
+        memset( data_buffer, 0, sizeof( data_buffer ) );
+        static data_descriptor_t buffer_descriptor = { data_buffer, sizeof( data_buffer ), 0 };
+        buffer = &buffer_descriptor;
     }
 
-    return LAYER_STATE_FULL;
+    layer_state_t state = LAYER_STATE_OK;
+
+    do
+    {
+        memset( buffer->data_ptr, 0, buffer->data_size );
+        buffer->hint_size = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
+        state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
+    } while( state == LAYER_STATE_MORE_DATA );
+
+    return LAYER_STATE_OK;
 }
 
 layer_state_t posix_io_layer_close( layer_connectivity_t* context )

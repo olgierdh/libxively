@@ -24,12 +24,14 @@ typedef struct
 {
     char*   data_ptr;
     int     data_size;
+    int     hint_size;
 } data_descriptor_t;
 
 typedef struct
 {
-    const char*   data_ptr;
-    int           data_size;
+    const char* data_ptr;
+    int         data_size;
+    int         hint_size;
 } const_data_descriptor_t;
 
 

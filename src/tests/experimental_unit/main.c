@@ -15,7 +15,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, void* data, const layer_hint_t hint )
+layer_state_t dummy_layer1_data_ready( layer_connectivity_t* context, const void* data, const layer_hint_t hint )
 {
     ( void ) data;
     ( void ) hint;

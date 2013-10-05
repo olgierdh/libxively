@@ -15,7 +15,7 @@
  */
 layer_state_t posix_io_layer_data_ready(
       layer_connectivity_t* context
-    , void* data
+    , const void* data
     , const layer_hint_t hint );
 
 /**

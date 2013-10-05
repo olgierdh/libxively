@@ -32,7 +32,7 @@ typedef enum
 typedef struct
 {
     xi_query_type_t query_type;
-    xi_context_t    xi_context;
+    xi_context_t*   xi_context;
 
     union
     {
