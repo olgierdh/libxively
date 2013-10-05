@@ -2,6 +2,7 @@ XI_BINDIR ?= $(CURDIR)
 
 ifndef XI_OBJDIR
   XI_EXPERIMENTAL_OBJDIR := $(CURDIR)
+  XI := ../../libxively/libxively.a
 else
   XI_EXPERIMENTAL_OBJDIR := $(XI_OBJDIR)/experimental/$(TARGET_BIN)
 endif
@@ -13,7 +14,7 @@ endif
 include ../../../Makefile.include
 
 INCLUDE_DIRS 	+= #
-LIBRARIES 	+= #
+LIBRARIES 		+= $(XI) #
 
 CFLAGS  += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
