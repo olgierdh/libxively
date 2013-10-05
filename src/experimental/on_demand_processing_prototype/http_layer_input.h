@@ -1,8 +1,8 @@
-#ifndef __HTTP_LAYER_DATA_H__
-#define __HTTP_LAYER_DATA_H__
+#ifndef __HTTP_LAYER_INPUT_H__
+#define __HTTP_LAYER_INPUT_H__
 
 /**
- *\file     http_layer_data.h
+ *\file     http_layer_input.h
  *\author   Olgierd Humenczuk
  *\brief    File contains declaration of the http layer data structure which is used
  *          within the between layer communication process.
@@ -16,9 +16,9 @@
  */
 typedef enum
 {
-      HTTP_LAYER_DATA_DATASTREAM_GET = 0
-    , HTTP_LAYER_DATA_DATASTREAM_DELETE
-    , HTTP_LAYER_DATA_DATASTREAM_UPDATE
+      HTTP_LAYER_INPUT_DATASTREAM_GET = 0
+    , HTTP_LAYER_INPUT_DATASTREAM_DELETE
+    , HTTP_LAYER_INPUT_DATASTREAM_UPDATE
 } xi_query_type_t;
 
 
@@ -42,7 +42,7 @@ typedef struct
         } xi_get_datastream;
     } http_layer_data_u;
 
-} http_layer_data_t;
+} http_layer_input_t;
 
 
-#endif // __HTTP_LAYER_DATA_H__
+#endif // __HTTP_LAYER_INPUT_H__

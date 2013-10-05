@@ -3,7 +3,7 @@
 
 // local
 #include "layer.h"
-#include "http_layer_data.h"
+#include "http_layer_input.h"
 
 #define XI_HTTP_SEND_BUFFER_SIZE 32
 

@@ -61,7 +61,7 @@ int main( int argc, const char* argv[] )
     printf( "%d\n", http_layer->layer_type_id );
 
     xi_context_t* context = xi_create_context( XI_HTTP, "1", 2 );
-    http_layer_data_t http_layer_data = { HTTP_LAYER_DATA_DATASTREAM_GET, context, { { "3" } } };
+    http_layer_input_t http_layer_input = { HTTP_LAYER_INPUT_DATASTREAM_GET, context, { { "3" } } };
 
     if( io_layer == 0 )
     {
@@ -69,7 +69,7 @@ int main( int argc, const char* argv[] )
     }
 
     // prepare the xi data
-    CALL_ON_SELF_DATA_READY( http_layer, ( void *) &http_layer_data, LAYER_HINT_NONE );
+    CALL_ON_SELF_DATA_READY( http_layer, ( void *) &http_layer_input, LAYER_HINT_NONE );
 
 	return 0;
 }

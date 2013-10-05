@@ -1,6 +1,6 @@
 #include "layer_api.h"
 #include "http_layer.h"
-#include "http_layer_data.h"
+#include "http_layer_input.h"
 #include "xi_macros.h"
 #include "xi_debug.h"
 #include "common.h"
@@ -104,15 +104,15 @@ layer_state_t http_layer_data_ready(
     XI_UNUSED( hint );
 
     // unpack the data
-    const http_layer_data_t* http_layer_data = ( const http_layer_data_t* ) data;
+    const http_layer_input_t* http_layer_input = ( const http_layer_input_t* ) data;
 
-    switch( http_layer_data->query_type )
+    switch( http_layer_input->query_type )
     {
-        case HTTP_LAYER_DATA_DATASTREAM_GET:
+        case HTTP_LAYER_INPUT_DATASTREAM_GET:
             return http_layer_data_ready_datastream_get(
-                          context, http_layer_data->xi_context->feed_id
-                        , http_layer_data->http_layer_data_u.xi_get_datastream.datastream
-                        , http_layer_data->xi_context->api_key );
+                          context, http_layer_input->xi_context->feed_id
+                        , http_layer_input->http_layer_data_u.xi_get_datastream.datastream
+                        , http_layer_input->xi_context->api_key );
         default:
             return LAYER_STATE_ERROR;
     };
@@ -131,7 +131,7 @@ layer_state_t http_layer_on_data_ready(
 {
     XI_UNUSED( context );
     XI_UNUSED( data );
-    XI_UNUSED( hint );    
+    XI_UNUSED( hint );
 
 
     // expecting data buffer so unpack it
