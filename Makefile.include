@@ -16,6 +16,7 @@ ifndef XI_OVERRIDE_CFLAGS
   endif
   ifeq ($(XI_BUILD_TYPE),debug)
     XI_OPTLEVEL ?= -O0
+	XI_CFLAGS += -g
     XI_CFLAGS += $(XI_OPTLEVEL)
     XI_CFLAGS += -D__DEBUG
     XI_DEBUG_OUTPUT ?= 1
