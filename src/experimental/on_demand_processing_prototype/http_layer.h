@@ -5,23 +5,11 @@
 #include "layer.h"
 #include "http_layer_input.h"
 
-#define XI_HTTP_SEND_BUFFER_SIZE 32
-
 /**
  * \file   http_layer.h
  * \author Olgierd Humenczuk
  * \brief  File that containes the declaration of the http layer functions
  */
-
-/**
- * \brief types of impulses that the can be used across the http layer implementation
- */
-typedef enum
-{
-      FEED_GET          = 0
-    , DATASTREAM_GET
-    ,
-} http_layer_impulse_t;
 
 /**
  * \brief   see the layer_interface for details

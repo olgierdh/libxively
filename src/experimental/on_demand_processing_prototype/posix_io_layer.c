@@ -69,7 +69,7 @@ layer_state_t posix_io_layer_on_data_ready(
     }
     else
     {
-        static char data_buffer[ 32 ];
+        static char data_buffer[ 64 ];
         memset( data_buffer, 0, sizeof( data_buffer ) );
         static data_descriptor_t buffer_descriptor = { data_buffer, sizeof( data_buffer ), 0 };
         buffer = &buffer_descriptor;
@@ -80,7 +80,8 @@ layer_state_t posix_io_layer_on_data_ready(
     do
     {
         memset( buffer->data_ptr, 0, buffer->data_size );
-        buffer->hint_size = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
+        buffer->hint_size = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size - 1 );
+        buffer->data_ptr[ buffer->hint_size ] = '\0'; // put guard
         state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
     } while( state == LAYER_STATE_MORE_DATA );
 

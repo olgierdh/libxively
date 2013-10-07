@@ -14,6 +14,7 @@
 
 #include "posix_io_layer.h"
 #include "http_layer.h"
+#include "http_layer_data.h"
 
 enum LAYERS_ID
 {
@@ -32,7 +33,7 @@ BEGIN_LAYER_TYPES_CONF()
       LAYER_TYPE( IO_LAYER, &posix_io_layer_data_ready, &posix_io_layer_on_data_ready
                           , &posix_io_layer_close, &posix_io_layer_on_close )
     , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
-                                    , &http_layer_close, &http_layer_on_close )
+                            , &http_layer_close, &http_layer_on_close )
 END_LAYER_TYPES_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +42,7 @@ BEGIN_FACTORY_CONF()
       FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
                              , &default_layer_heap_alloc, &default_layer_heap_free )
     , FACTORY_ENTRY( HTTP_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                                       , &default_layer_heap_alloc, &default_layer_heap_free )
+                               , &default_layer_heap_alloc, &default_layer_heap_free )
 END_FACTORY_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +52,12 @@ int main( int argc, const char* argv[] )
     ( void ) argc;
     ( void ) argv;
 
-    void* user_datas[] = { 0, 0 };
+    ///
+    http_layer_data_t http_layer_data;
+    memset( &http_layer_data, 0, sizeof( http_layer_data_t ) );
+    ///
+
+    void* user_datas[] = { 0, ( void* ) &http_layer_data };
 
     layer_chain_t layer_chain = create_and_connect_layers( CONNECTION_SCHEME_1, user_datas, CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
 

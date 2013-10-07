@@ -13,8 +13,9 @@
  */
 typedef struct
 {
-    char parser_state;  //!< represents the state of the http layer parser parsing header, state, payload etc, etc.
-    char buffer[ 32 ];  //!< this buffer size must be equal to the size of the biggest token that may be parsed will be used to store rest of the unparsed data to continue in next sweep
+    char          parser_state;          //!< represents the state of the http layer parser parsing header, state, payload etc, etc.
+    char          line_buffer[ 64 ];     //!< this buffer size must be equal to the size of the longest line to be processed via above layer
+    unsigned char last_char_marker;      //!< the marker that it's used to point to the last char in the buffer
 } http_layer_data_t;
 
 
