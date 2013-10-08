@@ -75,7 +75,7 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
     layer_sender( context, api_key, LAYER_HINT_MORE_DATA ); // api key
     layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
 
-    // the end, no more data doule crlf
+    // the end, no more data double crlf
     layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_NONE );
 
     return LAYER_STATE_OK;
@@ -95,14 +95,11 @@ static inline layer_state_t http_layer_on_data_ready_http_parse(
 {
     // expecting data buffer so unpack it
     const const_data_descriptor_t* data_description = ( const const_data_descriptor_t* ) data;
+    http_layer_data_t* http_data                    = ( http_layer_data_t* ) context->self->user_data;
 
     for( int i = 0; i < data_description->hint_size; ++i )
     {
         putchar( data_description->data_ptr[ i ] );
-        if( data_description->data_ptr[ i ] == '\r' )
-        {
-            int a = 0;
-        }
         fflush( stdout );
     }
 
@@ -143,7 +140,12 @@ static inline layer_state_t http_line_layer_on_data_ready(
 
                 // call the next layer on data ready with proper values
                 const const_data_descriptor_t tmp_data_description = { http_data->line_buffer, http_data->last_char_marker - 1, http_data->last_char_marker - 1 };
-                printf( "\n0\n");
+
+                if( tmp_data_description.hint_size == 0 )
+                {
+                    printf ( "\ndouble crlf\n" );
+                }
+
                 layer_state_t tmp_layer_state = http_layer_on_data_ready_http_parse( &context->self->layer_connection, ( void* ) &tmp_data_description, LAYER_HINT_NONE );
 
                 http_data->last_char_marker = 0;
@@ -151,7 +153,9 @@ static inline layer_state_t http_line_layer_on_data_ready(
                 if( tmp_layer_state == LAYER_STATE_OK ) // the end of parsing may have happend here
                 {
                     return LAYER_STATE_OK;
-                } // else let's continue
+                }
+
+                // else let's continue
             }
         }
         else
@@ -163,13 +167,16 @@ static inline layer_state_t http_line_layer_on_data_ready(
             {
                 memcpy( http_data->line_buffer + http_data->last_char_marker, data_description->data_ptr, eol - data_description->data_ptr );
 
-                // printf( "\n[ [%s] ]\n", http_data->line_buffer + http_data->last_char_marker );
-
                 http_data->last_char_marker += eol - data_description->data_ptr;
                 http_data->line_buffer[ http_data->last_char_marker ] = '\0';
 
                 const const_data_descriptor_t tmp_data_description = { http_data->line_buffer, http_data->last_char_marker, http_data->last_char_marker };
-                printf( "\n1\n" );
+
+                if( tmp_data_description.hint_size == 0 )
+                {
+                    printf ( "\ndouble crlf\n" );
+                }
+
                 layer_state_t tmp_layer_state = http_layer_on_data_ready_http_parse( &context->self->layer_connection, ( void* ) &tmp_data_description, LAYER_HINT_NONE );
 
                 if( tmp_layer_state == LAYER_STATE_OK ) // the end of parsing may have happend here
@@ -202,7 +209,12 @@ static inline layer_state_t http_line_layer_on_data_ready(
 
             // call the next layer on data ready with proper values
             const const_data_descriptor_t tmp_data_description = { data_description->data_ptr + current_offset, data_description->data_size - current_offset, eol - ( data_description->data_ptr + current_offset ) };
-            printf( "\n2\n" );
+
+            if( tmp_data_description.hint_size == 0 )
+            {
+                printf ( "\ndouble crlf\n" );
+            }
+
             layer_state_t tmp_layer_state = http_layer_on_data_ready_http_parse( &context->self->layer_connection, ( void* ) &tmp_data_description, LAYER_HINT_NONE );
 
             if( tmp_layer_state == LAYER_STATE_OK ) // the end of parsing may have happend here
@@ -228,7 +240,7 @@ static inline layer_state_t http_line_layer_on_data_ready(
             // set up the proper marker position
             http_data->last_char_marker = data_description->hint_size - current_offset;
 
-
+            // @TODO add proper error handling
             if( current_offset > data_description->hint_size )
             {
                 printf( "\noffset too big!\n" );
@@ -295,6 +307,8 @@ layer_state_t http_layer_on_data_ready(
     {
         case 0:
             return http_line_layer_on_data_ready( &context->self->layer_connection, data, hint );
+        case 1:
+            return http_layer_on_data_ready_http_parse( &context->self->layer_connection, data, hint );
     }
 
     return LAYER_STATE_MORE_DATA;
