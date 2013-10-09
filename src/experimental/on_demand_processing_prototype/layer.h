@@ -22,6 +22,7 @@ typedef struct layer
     layer_connectivity_t        layer_connection;
     layer_type_id_t             layer_type_id;
     void*                       user_data;
+    short                       layer_states[ 4 ];
 #ifdef __DEBUG
     layer_debug_info_t          debug_info;
 #endif

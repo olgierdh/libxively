@@ -5,7 +5,7 @@
 
 #ifdef __DEBUG
 #define LAYER_LOCAL_INSTANCE( layer_name_instance, layer_interface, layer_type_id, user_data )\
-    layer_t layer_name_instance                     = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data, { 0, 0, 0, 0, 0, 0 } };\
+    layer_t layer_name_instance                     = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };\
     INIT_INSTANCE( layer_name_instance )
 #define INIT_INSTANCE( instance )\
     instance.layer_connection.self                  = &instance;\
@@ -13,7 +13,7 @@
     instance.debug_info.debug_file_init             = __FILE__;
 #else
 #define LAYER_LOCAL_INSTANCE( layer_name_instance, layer_interface, layer_type_id, user_data )\
-    layer_t   layer_name_instance                   = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data };\
+    layer_t   layer_name_instance                   = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data, { 0, 0, 0, 0 } };\
     INIT_INSTANCE( layer_name_instance )
 #define INIT_INSTANCE( instance )\
     instance.layer_connection.self                  = &instance;
@@ -95,6 +95,33 @@
 
 #define CALL_ON_PREV_ON_CLOSE( context )\
     CALL_ON( prev, on_close, context )
+
+typedef enum
+{
+      FUNCTION_ID_ON_DATA_READY = 0
+    , FUNCTION_ID_DATA_READY
+    , FUNCTION_ID_ON_CLOSE
+    , FUNCTION_ID_CLOSE
+} layer_api_function_id_t;
+
+
+// COROUTINE API
+#define BEGIN_CORO( state )\
+    switch( state )\
+    { \
+        default:
+
+#define YIELD( state, ret )\
+    state = __LINE__; return ret; case __LINE__:
+
+#define EXIT( state, ret )\
+    state = 1; return ret;
+
+#define RESTART( state, ret )\
+    state = 0; return ret;
+
+#define END_CORO()\
+    };
 
 
 #endif // __LAYER_API_H__

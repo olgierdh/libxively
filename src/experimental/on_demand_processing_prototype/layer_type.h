@@ -12,7 +12,7 @@
 /**
  * \brief   layer_type_id_t
  */
-typedef int layer_type_id_t;
+typedef unsigned char layer_type_id_t;
 
 /**
  * \brief   layer type definition
