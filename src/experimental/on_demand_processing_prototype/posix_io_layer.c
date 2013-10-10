@@ -69,7 +69,7 @@ layer_state_t posix_io_layer_on_data_ready(
     }
     else
     {
-        static char data_buffer[ 64 ];
+        static char data_buffer[ 32 ];
         memset( data_buffer, 0, sizeof( data_buffer ) );
         static data_descriptor_t buffer_descriptor = { data_buffer, sizeof( data_buffer ), 0 };
         buffer = &buffer_descriptor;

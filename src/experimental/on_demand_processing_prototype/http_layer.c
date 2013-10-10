@@ -8,6 +8,7 @@
 #include "common.h"
 #include "xi_stated_sscanf_state.h"
 
+
 /**
  * @brief xi_stated_sscanf
  * @param state
@@ -27,115 +28,123 @@ short xi_stated_sscanf(
 
     for( ; s->p < pattern->hint_size - 1; )
     {
-        if( pattern->data_ptr[ s->p ] != '%' ) // accept state
+        if( pattern->data_ptr[ s->p ] != '%' ) // check on the raw pattern basis one to one
         {
-            if( pattern->data_ptr[ s->p++ ] != source->data_ptr[ s->i++ ] )
+            if( pattern->data_ptr[ s->p ] != source->data_ptr[ s->i ] )
             {
                 return -1;
             }
             else
             {
-                if( s->i == source->hint_size ) { goto xi_stated_sscanf_1; }
+                s->i++;
+                s->p++;
 
-                continue;
-
-xi_stated_sscanf_1:
-                YIELD( s->state, 0 )
-                s->i = 0;
-                continue;
+                if( s->i == source->hint_size )
+                {
+                    YIELD( s->state, 0 )
+                    s->i = 0;
+                    continue;
+                }
             }
         }
         else // parsing state
         {
-            // simplified so don't expect to parse %%
+            // simplified version so don't expect to parse %%
             s->p++; // let's move the marker to the type
 
-            switch( pattern->data_ptr[ s->p ] )
+            // @TODO think of this implementation and take into concideration
+            // an idea of putting more of each case implementation into the common function
+            // that would than be reused and make the code smaller
+            if( pattern->data_ptr[ s->p ] == 'd' )
             {
-                case 'd':
-                    {
-                        s->buff_len = 0;
+                s->buff_len = 0;
 
-                        goto xi_stated_sscanf_3;
-xi_stated_sscanf_2:
-                        YIELD( s->state, 0 )
-                        s->i = 0;
-xi_stated_sscanf_3:
-                        while( source->data_ptr[ s->i ] >= 48 && source->data_ptr[ s->i ] <= 57 )
-                        {
-                            s->buffer[ s->buff_len++ ] = source->data_ptr[ s->i++ ];
-
-                            if( s->i == source->hint_size )
-                            {
-                                goto xi_stated_sscanf_2;
-                            }
-                        }
-
-                        short base      = 10;
-                        int*  value     = ( int* ) variables[ s->vi ];
-                        *value          = ( s->buffer[ s->buff_len - 1 ] - 48 );
-
-                        for( unsigned char j = 1; j < s->buff_len; ++j, base *= 10 )
-                        { *value += base * ( s->buffer[ s->buff_len - j - 1 ] - 48 ); }
-
-                        s->p++;     // move on, finished with parsing
-                        s->vi++;    // switch to the next variable
-                    }
-                break;
-                case 's':
-                    {
-                        s->tmp_i = 0;
-                        char* svalue = ( char* ) variables[ s->vi ];
-
-                        goto xi_stated_sscanf_5;
-xi_stated_sscanf_4:
-                        YIELD( s->state, 0 )
-                        s->i = 0;
-xi_stated_sscanf_5:
-
-                        while( source->data_ptr[ s->i ] >= 65 && source->data_ptr[ s->i ] <= 122 )
-                        {
-                            svalue[ s->tmp_i++ ] = source->data_ptr[ s->i++ ];
-
-                            if( s->i == source->hint_size )
-                            {
-                                goto xi_stated_sscanf_4;
-                            }
-                        }
-
-                        svalue[ s->tmp_i ] = '\0'; // put guard
-
-                        s->p++;     // move on, finished with parsing
-                        s->vi++;    // switch to the next variable
-                    }
-                break;
-            case '.':
+                while( source->data_ptr[ s->i ] >= 48 && source->data_ptr[ s->i ] <= 57 )
                 {
-                    s->tmp_i = 0;
-                    char* svalue = ( char* ) variables[ s->vi ];
+                    s->buffer[ s->buff_len++ ] = source->data_ptr[ s->i++ ];
 
-                    goto xi_stated_sscanf_7;
-xi_stated_sscanf_6:
-                    YIELD( s->state, 0 )
-                    s->i = 0;
-xi_stated_sscanf_7:
-
-                    while( source->data_ptr[ s->i ] >= 32 && source->data_ptr[ s->i ] <= 122 )
+                    if( s->i == source->hint_size )
                     {
-                        svalue[ s->tmp_i++ ] = source->data_ptr[ s->i++ ];
-
-                        if( s->i == source->hint_size )
-                        {
-                            goto xi_stated_sscanf_6;
-                        }
+                        YIELD( s->state, 0 )
+                        s->i = 0;
                     }
-
-                    svalue[ s->tmp_i ] = '\0'; // put guard
-
-                    s->p++;     // move on, finished with parsing
-                    s->vi++;    // switch to the next variable
                 }
-            break;
+
+                short base      = 10;
+                int*  value     = ( int* ) variables[ s->vi ];
+                *value          = ( s->buffer[ s->buff_len - 1 ] - 48 );
+
+                for( unsigned char j = 1; j < s->buff_len; ++j, base *= 10 )
+                { *value += base * ( s->buffer[ s->buff_len - j - 1 ] - 48 ); }
+
+                s->p++;     // move on, finished with parsing
+                s->vi++;    // switch to the next variable
+            }
+            else if( pattern->data_ptr[ s->p ] == 's' )
+            {
+                s->tmp_i = 0;
+
+                char* svalue = ( char* ) variables[ s->vi ];
+
+                while( ( source->data_ptr[ s->i ] >= 65 && source->data_ptr[ s->i ] <= 122 ) || source->data_ptr[ s->i ] == 45 )
+                {
+                    svalue[ s->tmp_i++ ] = source->data_ptr[ s->i++ ];
+
+                    if( s->i == source->hint_size )
+                    {
+                        YIELD( s->state, 0 )
+                        s->i = 0;
+                    }
+                }
+
+                svalue[ s->tmp_i ] = '\0'; // put guard
+
+                s->p++;     // move on, finished with parsing
+                s->vi++;    // switch to the next variable
+            }
+            else if( pattern->data_ptr[ s->p ] == '.' )
+            {
+                s->tmp_i = 0;
+
+                char* svalue = ( char* ) variables[ s->vi ];
+
+                while( source->data_ptr[ s->i ] >= 32 && source->data_ptr[ s->i ] <= 122 )
+                {
+                    svalue[ s->tmp_i++ ] = source->data_ptr[ s->i++ ];
+
+                    if( s->i == source->hint_size )
+                    {
+                        YIELD( s->state, 0 )
+                        s->i = 0;
+                    }
+                }
+
+                svalue[ s->tmp_i ] = '\0'; // put guard
+
+                s->p++;     // move on, finished with parsing
+                s->vi++;    // switch to the next variable
+            }
+            else if( pattern->data_ptr[ s->p ] == 'B' )
+            {
+                s->tmp_i = 0;
+
+                char* svalue = ( char* ) variables[ s->vi ];
+
+                while( source->data_ptr[ s->i ] >= 0 && source->data_ptr[ s->i ] <= 127 )
+                {
+                    svalue[ s->tmp_i++ ] = source->data_ptr[ s->i++ ];
+
+                    if( s->i == source->hint_size )
+                    {
+                        YIELD( s->state, 0 )
+                        s->i = 0;
+                    }
+                }
+
+                svalue[ s->tmp_i ] = '\0'; // put guard
+
+                s->p++;     // move on, finished with parsing
+                s->vi++;    // switch to the next variable
             }
         }
     }
@@ -290,19 +299,17 @@ layer_state_t http_layer_on_data_ready(
     , const void* data
     , const layer_hint_t hint )
 {
-    XI_UNUSED( context );
-    XI_UNUSED( data );
+
     XI_UNUSED( hint );
 
     // unpack http_layer_data so unpack it
     http_layer_data_t* http_layer_data = ( http_layer_data_t* ) context->self->user_data;
 
-    // expecting data buffer
-    const const_data_descriptor_t* data_description = ( const const_data_descriptor_t* ) data;
+    // some tmp variables
     int  value            = 0;
     short sscanf_state    = 0;
-    char svalue[ 32 ];
-    char header_name[ 16 ];
+    char svalue[ 64 ];
+    char header_name[ 32 ];
 
     xi_stated_sscanf_state_t* xi_stated_state = &http_layer_data->xi_stated_sscanf_state;
 
@@ -312,19 +319,128 @@ layer_state_t http_layer_on_data_ready(
 
     // STAGE 01 find the http status
     {
-
         //
         {
             char status_pattern[]       = "HTTP/1.1 %d %s\r\n";
             const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
             void*                  pv[] = { ( void* ) &value, ( void* ) &svalue };
+            sscanf_state                = 0;
 
-            goto http_layer_on_data_ready_2;
+            while( sscanf_state == 0 )
+            {
+                sscanf_state = xi_stated_sscanf(
+                              xi_stated_state
+                            , &v
+                            , ( const_data_descriptor_t* ) data
+                            , pv );
 
-http_layer_on_data_ready_1:
-            YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
+                if( sscanf_state == 0 )
+                {
+                    YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
+                    continue;
+                }
+            }
 
-http_layer_on_data_ready_2:
+            if( sscanf_state == -1 )
+            {
+                EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+            }
+        }
+    }
+
+
+    // reset
+
+    // STAGE 02 reading headers
+    {
+        char status_pattern[]       = "%s: %.\r\n";
+        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+        void*                  pv[] = { ( void* ) &header_name, ( void* ) &svalue };
+
+        do
+        {
+            sscanf_state            = 0;
+
+            while( sscanf_state == 0 )
+            {
+                sscanf_state = xi_stated_sscanf(
+                              xi_stated_state
+                            , &v
+                            , ( const_data_descriptor_t* ) data
+                            , pv );
+
+                if( sscanf_state == 0 )
+                {
+                    YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
+                    continue;
+                }
+            }
+
+            if( sscanf_state == 1 )
+            {
+                xi_debug_printf( "%s: %s\n", header_name, svalue );
+
+                if( memcmp( header_name, "Content-Length", sizeof( "Content-Length" ) ) == 0 )
+                {
+                    xi_stated_sscanf_state_t tmp_state;
+                    memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
+
+                    char tmp_status_pattern[]           = "%d";
+                    const_data_descriptor_t tmp_v       = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ) };
+                    const_data_descriptor_t tmp_data    = { svalue, sizeof( svalue ), sizeof( svalue ) };
+                    void*                   tmp_pv[]    = { ( void* ) &http_layer_data->content_length };
+
+                    sscanf_state = xi_stated_sscanf( &tmp_state, &tmp_v, &tmp_data, tmp_pv );
+
+                    if( sscanf_state == -1 )
+                    {
+                        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+                    }
+                }
+            }
+
+        } while( sscanf_state == 1 );
+    }
+
+    // STAGE 03 reading second \r\n that means that the payload should begin just right after
+    {
+        char status_pattern[]       = "\r\n";
+        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+
+        sscanf_state                = 0;
+
+        while( sscanf_state == 0 )
+        {
+            sscanf_state = xi_stated_sscanf(
+                          xi_stated_state
+                        , &v
+                        , ( const_data_descriptor_t* ) data
+                        , 0 );
+
+            if( sscanf_state == 0 )
+            {
+                YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
+                continue;
+            }
+        }
+    }
+
+    // STAGE 04 reading payload
+    {
+        // clear the buffer
+        memset( svalue, 0, sizeof( svalue ) );
+        xi_debug_printf( "\n" );
+
+        char status_pattern[]       = "%B";
+        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+        void*                  pv[] = { ( void* ) &svalue };
+
+        http_layer_data->counter    = 0;
+        sscanf_state                = 0;
+
+        while( sscanf_state == 0 )
+        {
+            short before = xi_stated_state->i;
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
@@ -332,57 +448,28 @@ http_layer_on_data_ready_2:
                         , ( const_data_descriptor_t* ) data
                         , pv );
 
-            switch( sscanf_state )
+            short after = xi_stated_state->i;
+
+            http_layer_data->counter += ( after - before );
+
+            if( http_layer_data->content_length == http_layer_data->counter )
             {
-                case 0:
-                    goto http_layer_on_data_ready_1;
-                case -1:
-                    goto http_layer_on_data_ready_3;
-                case 1:
-                    goto http_layer_on_data_ready_4;
+                xi_debug_printf( "%s\n", svalue );
+                EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
             }
 
-http_layer_on_data_ready_3:
-            EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+            if( sscanf_state == 0 )
+            {
+                YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
+                xi_stated_state->tmp_i  = 0; // reset the value pointer
+                xi_stated_state->i      = 0; // reset the source pointer
+                xi_debug_printf( "%s", svalue );
+                memset( svalue, 0, sizeof( svalue ) );
+            }
         }
     }
 
-http_layer_on_data_ready_4:
-    // stage 2 reading headers
-    {
-        char status_pattern[]       = "%s: %.\r\n";
-        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-        void*                  pv[] = { ( void* ) &header_name, ( void* ) &svalue };
-
-        goto http_layer_on_data_ready_6;
-
-http_layer_on_data_ready_5:
-        YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
-
-http_layer_on_data_ready_6:
-
-        sscanf_state = xi_stated_sscanf(
-                      xi_stated_state
-                    , &v
-                    , ( const_data_descriptor_t* ) data
-                    , pv );
-
-        switch( sscanf_state )
-        {
-            case 0:
-                goto http_layer_on_data_ready_5;
-            case -1:
-                goto http_layer_on_data_ready_7;
-            case 1:
-                goto http_layer_on_data_ready_8;
-        }
-
-http_layer_on_data_ready_7:
-        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
-    }
-
-http_layer_on_data_ready_8:
-    return LAYER_STATE_OK;
+    EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
 
     END_CORO()
 
