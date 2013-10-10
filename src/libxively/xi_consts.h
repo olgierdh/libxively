@@ -11,8 +11,8 @@
  *          out what exactly they are doing.
  */
 
-#ifndef __XI_CONSTST_H__
-#define __XI_CONSTST_H__
+#ifndef __XI_CONSTS_H__
+#define __XI_CONSTS_H__
 
 #ifndef XI_HTTP_MAX_HEADERS
 #define XI_HTTP_MAX_HEADERS                16
@@ -74,4 +74,4 @@
 #define XI_PORT                            80
 #endif
 
-#endif // __XI_CONSTST_H__
+#endif // __XI_CONSTS_H__
