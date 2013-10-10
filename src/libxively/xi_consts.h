@@ -14,6 +14,10 @@
 #ifndef __XI_CONSTS_H__
 #define __XI_CONSTS_H__
 
+#ifdef MBED_USERNAME
+#include "xi_consts_mbed.h"
+#endif
+
 #ifndef XI_HTTP_MAX_HEADERS
 #define XI_HTTP_MAX_HEADERS                16
 #endif
