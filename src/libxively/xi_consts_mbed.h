@@ -10,6 +10,7 @@
 #ifndef __XI_CONSTS_H__
 #define __XI_CONSTS_H__
 
-#define XI_USER_AGENT "libxively-mbed/0.1.x (" MBED_USERNAME ")"
+#include "xi_version.h" // this header is only needed on mbed
+#define XI_USER_AGENT "libxively-mbed/" XI_VERSION " (" MBED_USERNAME ")"
 
 #endif // __XI_CONSTS_H__
