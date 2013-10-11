@@ -11,6 +11,6 @@
 #define __XI_CONSTS_MBED_H__
 
 #include "xi_version.h" // this header is only needed on mbed
-#define XI_USER_AGENT "libxively-mbed/" XI_VERSION " (" MBED_USERNAME ")"
+#define XI_USER_AGENT "libxively-mbed/" XI_VERSION
 
 #endif // __XI_CONSTS_MBED_H__
