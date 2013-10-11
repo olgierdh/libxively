@@ -10,7 +10,7 @@
 #ifndef __MBED_COMM_LAYER_DATA_SPECIFIC_H__
 #define __MBED_COMM_LAYER_DATA_SPECIFIC_H__
 
-#include "EthernetInterface.h"
+#include "TCPSocketConnection.h"
 
 typedef struct {
     TCPSocketConnection* socket_ptr;
