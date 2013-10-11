@@ -7,10 +7,10 @@
  * \brief   Constants that user may wish to override based on their needs
  */
 
-#ifndef __XI_CONSTS_H__
-#define __XI_CONSTS_H__
+#ifndef __XI_CONSTS_MBED_H__
+#define __XI_CONSTS_MBED_H__
 
 #include "xi_version.h" // this header is only needed on mbed
 #define XI_USER_AGENT "libxively-mbed/" XI_VERSION " (" MBED_USERNAME ")"
 
-#endif // __XI_CONSTS_H__
+#endif // __XI_CONSTS_MBED_H__
