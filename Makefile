@@ -25,7 +25,7 @@ ci_avr:
 MBED_HEAD ?= HEAD
 MBED_TEMP ?= mbed_mercurial
 MBED_USER ?= xively
-MBED_REPO ?= libxively-test
+MBED_REPO ?= libxively
 
 MBED_URL := https://$(MBED_USER)@mbed.org/users/$(MBED_USER)/code/$(MBED_REPO)/
 
