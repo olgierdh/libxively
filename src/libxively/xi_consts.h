@@ -18,6 +18,10 @@
 #include "xi_consts_mbed.h"
 #endif
 
+#if XI_USER_CONFIG
+#include "xi_user_config.h"
+#endif
+
 #ifndef XI_HTTP_MAX_HEADERS
 #define XI_HTTP_MAX_HEADERS                16
 #endif
