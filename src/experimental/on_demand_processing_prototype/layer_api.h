@@ -105,23 +105,4 @@ typedef enum
 } layer_api_function_id_t;
 
 
-// COROUTINE API
-#define BEGIN_CORO( state )\
-    switch( state )\
-    { \
-        default:
-
-#define YIELD( state, ret )\
-    state = __LINE__; return ret; case __LINE__:
-
-#define EXIT( state, ret )\
-    state = 1; return ret;
-
-#define RESTART( state, ret )\
-    state = 0; return ret;
-
-#define END_CORO()\
-    };
-
-
 #endif // __LAYER_API_H__

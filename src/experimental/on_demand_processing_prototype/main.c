@@ -54,6 +54,7 @@ int main( int argc, const char* argv[] )
 
     ///
     http_layer_data_t http_layer_data;
+
     memset( &http_layer_data, 0, sizeof( http_layer_data_t ) );
     ///
 
@@ -63,8 +64,6 @@ int main( int argc, const char* argv[] )
 
     layer_t* io_layer = connect_to_endpoint( layer_chain.bottom, XI_HOST, XI_PORT );
     layer_t* http_layer = layer_chain.top;
-
-    printf( "%d\n", http_layer->layer_type_id );
 
     xi_context_t* context = xi_create_context( XI_HTTP, "1", 2 );
     http_layer_input_t http_layer_input = { HTTP_LAYER_INPUT_DATASTREAM_GET, context, { { "3" } } };
