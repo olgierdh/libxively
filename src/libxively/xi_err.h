@@ -14,6 +14,8 @@
 #ifndef __XI_ERR_H__
 #define __XI_ERR_H__
 
+#include "xi_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

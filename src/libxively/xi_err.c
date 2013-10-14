@@ -9,6 +9,7 @@
 
 #include "xi_err.h"
 #include "xi_macros.h"
+#include "xi_config.h"
 
 static xi_err_t xi_err = XI_NO_ERR;
 
