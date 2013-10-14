@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #include "comm_layer.h"
-#include "xi_consts.h"
+#include "xi_config.h"
 #include "xi_time.h"
 
 #ifdef __cplusplus
