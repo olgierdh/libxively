@@ -178,7 +178,7 @@ layer_state_t http_layer_on_data_ready(
     {
         //
         {
-            char status_pattern[]       = "HTTP/1.1 %d %s\r\n";
+            char status_pattern[]       = "HTTP/1.1 %d %31s\r\n";
             const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
             void*                  pv[] = { ( void* ) &value, ( void* ) svalue };
             sscanf_state                = 0;
@@ -209,7 +209,7 @@ layer_state_t http_layer_on_data_ready(
 
     // STAGE 02 reading headers
     {
-        const char status_pattern[]       = "%s: %.\r\n";
+        const char status_pattern[]       = "%31s: %63.\r\n";
         const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
         void*                  pv[]       = { ( void* ) ( char* ) header_name, ( void* ) ( char* ) svalue };
 

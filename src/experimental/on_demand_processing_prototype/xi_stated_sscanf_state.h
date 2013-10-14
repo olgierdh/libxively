@@ -3,6 +3,7 @@
 
 typedef struct
 {
+    int max_len;
     short state;
     char buffer[ 8 ];
     unsigned char p;
