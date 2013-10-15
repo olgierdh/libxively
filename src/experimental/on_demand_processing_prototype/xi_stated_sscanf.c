@@ -164,7 +164,7 @@ short xi_stated_sscanf(
 
                 do
                 {
-                    data_descriptor_t dst_desc = { ( char* ) variables[ s->vi ], s->max_len, s->max_len };
+                    data_descriptor_t dst_desc = { ( char* ) variables[ s->vi ], s->max_len, s->max_len - 1 };
 
                     switch( pattern->data_ptr[ s->p ] )
                     {
