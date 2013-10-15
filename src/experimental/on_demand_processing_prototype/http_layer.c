@@ -285,25 +285,24 @@ layer_state_t http_layer_on_data_ready(
                     {
                         EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
                     }
+
                 }
-                else
+
+                http_header_type_t header_type = classify_header( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name );
+
+                if( header_type != XI_HTTP_HEADER_UNKNOWN )
                 {
-                    http_header_type_t header_type = classify_header( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name );
+                    memcpy( http_layer_data->response->http.http_headers[ header_type ].name
+                          , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
+                          , XI_HTTP_HEADER_NAME_MAX_SIZE );
 
-                    if( header_type != XI_HTTP_HEADER_UNKNOWN )
-                    {
-                        memcpy( http_layer_data->response->http.http_headers[ header_type ].name
-                              , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
-                              , XI_HTTP_HEADER_NAME_MAX_SIZE );
-
-                        memcpy( http_layer_data->response->http.http_headers[ header_type ].value
-                              , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
-                              , XI_HTTP_HEADER_VALUE_MAX_SIZE );
-                    }
-
-                    http_layer_data->response->http.http_headers_checklist[ header_type ]
-                            = &http_layer_data->response->http.http_headers[ header_type ];
+                    memcpy( http_layer_data->response->http.http_headers[ header_type ].value
+                          , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+                          , XI_HTTP_HEADER_VALUE_MAX_SIZE );
                 }
+
+                http_layer_data->response->http.http_headers_checklist[ header_type ]
+                        = &http_layer_data->response->http.http_headers[ header_type ];
             }
 
         } while( sscanf_state == 1 );
