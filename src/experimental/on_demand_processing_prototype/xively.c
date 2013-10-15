@@ -250,6 +250,8 @@ const xi_response_t* xi_datastream_create(
     XI_UNUSED( feed_id );
     XI_UNUSED( datastream_id );
     XI_UNUSED( datapoint );
+
+    return 0;
 }
 
 const xi_response_t* xi_datastream_update(
@@ -261,6 +263,8 @@ const xi_response_t* xi_datastream_update(
     XI_UNUSED( feed_id );
     XI_UNUSED( datastream_id );
     XI_UNUSED( datapoint );
+
+    return 0;
 }
 
 const xi_response_t* xi_datastream_delete(
@@ -270,6 +274,8 @@ const xi_response_t* xi_datastream_delete(
     XI_UNUSED( xi );
     XI_UNUSED( feed_id );
     XI_UNUSED( datastream_id );
+
+    return 0;
 }
 
 const xi_response_t* xi_datapoint_delete(
@@ -281,6 +287,8 @@ const xi_response_t* xi_datapoint_delete(
     XI_UNUSED( feed_id );
     XI_UNUSED( datastream_id );
     XI_UNUSED( o );
+
+    return 0;
 }
 
 extern const xi_response_t* xi_datapoint_delete_range(
@@ -294,6 +302,8 @@ extern const xi_response_t* xi_datapoint_delete_range(
     XI_UNUSED( datastream_id );
     XI_UNUSED( start );
     XI_UNUSED( end );
+
+    return 0;
 }
 
 
