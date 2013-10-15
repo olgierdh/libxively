@@ -2,7 +2,7 @@ XI_BINDIR ?= $(CURDIR)
 
 ifndef XI_OBJDIR
   XI_EXPERIMENTAL_OBJDIR := $(CURDIR)
-  XI := ../../libxively/libxively.a
+  #XI := ../../libxively/libxively.a
 else
   XI_EXPERIMENTAL_OBJDIR := $(XI_OBJDIR)/experimental/$(TARGET_BIN)
 endif
@@ -20,7 +20,6 @@ CFLAGS  += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
 
 SOURCES := $(wildcard *.c)
-SOURCES += ../../libxively/xi_err.c
 HEADERS := $(wildcard *.h)
 OBJECTS := $(SOURCES:.c=.o)
 OBJS    := $(addprefix $(XI_EXPERIMENTAL_OBJDIR)/,$(OBJECTS))

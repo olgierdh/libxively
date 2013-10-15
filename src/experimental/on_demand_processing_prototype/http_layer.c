@@ -205,8 +205,6 @@ layer_state_t http_layer_on_data_ready(
         }
     }
 
-    // reset
-
     // STAGE 02 reading headers
     {
         const char status_pattern[]       = "%31s: %63.\r\n";
