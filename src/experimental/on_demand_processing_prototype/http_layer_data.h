@@ -9,6 +9,7 @@
  */
 
 #include "xi_stated_sscanf_state.h"
+#include "xively.h"
 
 /**
  *\brief    shall contain the data needed via parsing and constructing queries
@@ -20,6 +21,7 @@ typedef struct
     xi_stated_sscanf_state_t    xi_stated_sscanf_state;
     short                       counter;               //!< multiple purposes counter
     short                       content_length;        //!< how big is the payload
+    xi_response_t*              response;
 } http_layer_data_t;
 
 

@@ -108,7 +108,6 @@ typedef struct {
     http_header_t*  http_headers_checklist[ XI_HTTP_HEADERS_COUNT ];
     http_header_t   http_headers[ XI_HTTP_MAX_HEADERS ];
     size_t          http_headers_size;
-    char            http_content[ XI_HTTP_MAX_CONTENT_SIZE ];
 } http_response_t;
 
 /**

@@ -56,8 +56,15 @@ int main( int argc, const char* argv[] )
     http_layer_data_t http_layer_data;
 
     memset( &http_layer_data, 0, sizeof( http_layer_data_t ) );
-    ///
 
+    /// context and response
+    xi_context_t* context = xi_create_context( XI_HTTP, "1", 2 );
+    xi_response_t xi_response;
+
+    memset( &xi_response, 0, sizeof( xi_response_t ) );
+    http_layer_data.response = &xi_response;
+
+    ///
     void* user_datas[] = { 0, ( void* ) &http_layer_data };
 
     layer_chain_t layer_chain = create_and_connect_layers( CONNECTION_SCHEME_1, user_datas, CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
@@ -65,8 +72,13 @@ int main( int argc, const char* argv[] )
     layer_t* io_layer = connect_to_endpoint( layer_chain.bottom, XI_HOST, XI_PORT );
     layer_t* http_layer = layer_chain.top;
 
-    xi_context_t* context = xi_create_context( XI_HTTP, "1", 2 );
-    http_layer_input_t http_layer_input = { HTTP_LAYER_INPUT_DATASTREAM_GET, context, { { "3" } } };
+    // create the input parameter
+    http_layer_input_t http_layer_input =
+    {
+          HTTP_LAYER_INPUT_DATASTREAM_GET
+        , context
+        , { { "3" } }
+    };
 
     if( io_layer == 0 )
     {

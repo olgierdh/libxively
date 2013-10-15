@@ -23,7 +23,7 @@
 #endif
 
 #ifndef XI_HTTP_HEADER_NAME_MAX_SIZE
-#define XI_HTTP_HEADER_NAME_MAX_SIZE       64
+#define XI_HTTP_HEADER_NAME_MAX_SIZE       32
 #endif
 
 #ifndef XI_HTTP_HEADER_VALUE_MAX_SIZE

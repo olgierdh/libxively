@@ -10,6 +10,36 @@
 #include "xi_coroutine.h"
 
 
+// static array of recognizable http headers
+static const char* XI_HTTP_TOKEN_NAMES[ XI_HTTP_HEADERS_COUNT ] =
+    {
+          "date"            // XI_HTTP_HEADER_DATE
+        , "content-type"    // XI_HTTP_HEADER_CONTENT_TYPE
+        , "content-length"  // XI_HTTP_HEADER_CONTENT_LENGTH
+        , "connection"      // XI_HTTP_HEADER_CONNECTION
+        , "x-request-id"    // XI_HTTP_HEADER_X_REQUEST_ID
+        , "cache-control"   // XI_HTTP_HEADER_CACHE_CONTROL
+        , "age"             // XI_HTTP_HEADER_AGE
+        , "vary"            // XI_HTTP_HEADER_VARY
+        , "unknown"         // XI_HTTP_HEADER_UNKNOWN, //!< !!!! this must be always on the last position
+    };
+
+/**
+ * \brief   classify_header function that finds a proper type for a given http header name
+ * \param   header header name to be classified
+ * \return  classified http header type
+ */
+static inline http_header_type_t classify_header( const char* header )
+{
+    for( unsigned short i = 0; i < XI_HTTP_HEADER_COUNT - 1; ++i )
+    {
+        if( strcasecmp( header, XI_HTTP_TOKEN_NAMES[ i ] ) == 0 )
+            return ( http_header_type_t ) i;
+    }
+
+    return XI_HTTP_HEADER_UNKNOWN;
+}
+
 /**
  * \brief layer_sender little helper to encapsulate
  *        error handling over sending data between layers
@@ -159,18 +189,11 @@ layer_state_t http_layer_on_data_ready(
     http_layer_data_t* http_layer_data = ( http_layer_data_t* ) context->self->user_data;
 
     // some tmp variables
-    int  value             = 0;
     short sscanf_state     = 0;
-    char svalue[ 64 ];
-    char header_name[ 32 ];
 
     xi_stated_sscanf_state_t* xi_stated_state = &http_layer_data->xi_stated_sscanf_state;
 
     BEGIN_CORO( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ] )
-
-
-    memset( svalue, 0, sizeof( svalue ) );
-    memset( header_name, 0, sizeof( header_name ) );
 
     memset( xi_stated_state, 0, sizeof( xi_stated_sscanf_state_t ) );
 
@@ -178,13 +201,14 @@ layer_state_t http_layer_on_data_ready(
     {
         //
         {
-            char status_pattern[]       = "HTTP/1.1 %d %31s\r\n";
-            const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-            void*                  pv[] = { ( void* ) &value, ( void* ) svalue };
             sscanf_state                = 0;
 
             while( sscanf_state == 0 )
             {
+                char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) "s\r\n";
+                const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+                void* pv[]                  = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
+
                 sscanf_state = xi_stated_sscanf(
                               xi_stated_state
                             , ( const_data_descriptor_t* ) &v
@@ -203,20 +227,24 @@ layer_state_t http_layer_on_data_ready(
                 EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
             }
         }
-    }
+    }    
 
     // STAGE 02 reading headers
     {
-        const char status_pattern[]       = "%31s: %63.\r\n";
-        const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-        void*                  pv[]       = { ( void* ) ( char* ) header_name, ( void* ) ( char* ) svalue };
-
         do
         {
             sscanf_state = 0;
 
             while( sscanf_state == 0 )
             {
+                const char status_pattern[]       = "%" XI_STR( XI_HTTP_HEADER_NAME_MAX_SIZE ) "s: %" XI_STR( XI_HTTP_HEADER_VALUE_MAX_SIZE ) ".\r\n";
+                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+                void*                  pv[]       =
+                {
+                      ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
+                    , ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+                };
+
                 sscanf_state = xi_stated_sscanf(
                               xi_stated_state
                             , ( const_data_descriptor_t* ) &v
@@ -232,16 +260,23 @@ layer_state_t http_layer_on_data_ready(
 
             if( sscanf_state == 1 )
             {
-                xi_debug_printf( "%s: %s\n", header_name, svalue );
+                xi_debug_printf( "%s: %s\n"
+                                 , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
+                                 , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
 
-                if( memcmp( header_name, "Content-Length", sizeof( "Content-Length" ) ) == 0 )
+                if( memcmp( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name, "Content-Length", sizeof( "Content-Length" ) ) == 0 )
                 {
                     xi_stated_sscanf_state_t tmp_state;
                     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
 
                     char tmp_status_pattern[]           = "%d";
                     const_data_descriptor_t tmp_v       = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ) };
-                    const_data_descriptor_t tmp_data    = { svalue, sizeof( svalue ), sizeof( svalue ) };
+                    const_data_descriptor_t tmp_data    =
+                    {
+                          http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+                        , XI_HTTP_HEADER_VALUE_MAX_SIZE
+                        , XI_HTTP_HEADER_VALUE_MAX_SIZE
+                    };
                     void*                   tmp_pv[]    = { ( void* ) &http_layer_data->content_length };
 
                     sscanf_state = xi_stated_sscanf( &tmp_state, &tmp_v, &tmp_data, tmp_pv );
@@ -251,6 +286,24 @@ layer_state_t http_layer_on_data_ready(
                         EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
                     }
                 }
+                else
+                {
+                    http_header_type_t header_type = classify_header( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name );
+
+                    if( header_type != XI_HTTP_HEADER_UNKNOWN )
+                    {
+                        memcpy( http_layer_data->response->http.http_headers[ header_type ].name
+                              , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
+                              , XI_HTTP_HEADER_NAME_MAX_SIZE );
+
+                        memcpy( http_layer_data->response->http.http_headers[ header_type ].value
+                              , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+                              , XI_HTTP_HEADER_VALUE_MAX_SIZE );
+                    }
+
+                    http_layer_data->response->http.http_headers_checklist[ header_type ]
+                            = &http_layer_data->response->http.http_headers[ header_type ];
+                }
             }
 
         } while( sscanf_state == 1 );
@@ -258,13 +311,13 @@ layer_state_t http_layer_on_data_ready(
 
     // STAGE 03 reading second \r\n that means that the payload should begin just right after
     {
-        char status_pattern[]       = "\r\n";
-        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-
         sscanf_state                = 0;
 
         while( sscanf_state == 0 )
         {
+            char status_pattern[]       = "\r\n";
+            const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
                         , ( const_data_descriptor_t* ) &v
@@ -282,12 +335,8 @@ layer_state_t http_layer_on_data_ready(
     // STAGE 04 reading payload
     {
         // clear the buffer
-        memset( svalue, 0, sizeof( svalue ) );
+        memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
         xi_debug_printf( "\n" );
-
-        char status_pattern[]       = "%B";
-        const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-        void*                  pv[] = { ( void* ) svalue };
 
         http_layer_data->counter    = 0;
         sscanf_state                = 0;
@@ -295,6 +344,10 @@ layer_state_t http_layer_on_data_ready(
         while( sscanf_state == 0 )
         {
             short before = xi_stated_state->i;
+
+            char status_pattern[]       = "%B";
+            const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+            void*                  pv[] = { ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value };
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
@@ -308,7 +361,7 @@ layer_state_t http_layer_on_data_ready(
 
             if( http_layer_data->content_length == http_layer_data->counter )
             {
-                xi_debug_printf( "%s\n", svalue );
+                xi_debug_printf( "%s\n", http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
                 EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
             }
 
@@ -317,8 +370,8 @@ layer_state_t http_layer_on_data_ready(
                 YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
                 xi_stated_state->tmp_i  = 0; // reset the value pointer
                 xi_stated_state->i      = 0; // reset the source pointer
-                xi_debug_printf( "%s", svalue );
-                memset( svalue, 0, sizeof( svalue ) );
+                xi_debug_printf( "%s", http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
+                memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
             }
         }
     }
