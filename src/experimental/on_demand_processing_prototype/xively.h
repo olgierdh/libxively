@@ -101,9 +101,9 @@ typedef struct {
 } http_header_t;
 
 typedef struct {
-    int             http_version1;
-    int             http_version2;
-    int             http_status;
+    unsigned char   http_version1;
+    unsigned char   http_version2;
+    unsigned short  http_status;
     char            http_status_string[ XI_HTTP_STATUS_STRING_SIZE ];
     http_header_t*  http_headers_checklist[ XI_HTTP_HEADERS_COUNT ];
     http_header_t   http_headers[ XI_HTTP_MAX_HEADERS ];
