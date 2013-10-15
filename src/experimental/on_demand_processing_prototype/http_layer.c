@@ -264,7 +264,9 @@ layer_state_t http_layer_on_data_ready(
                                  , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
                                  , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
 
-                if( memcmp( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name, "Content-Length", sizeof( "Content-Length" ) ) == 0 )
+                http_header_type_t header_type = classify_header( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name );
+
+                if( header_type == XI_HTTP_HEADER_CONTENT_LENGTH )
                 {
                     xi_stated_sscanf_state_t tmp_state;
                     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
@@ -285,10 +287,7 @@ layer_state_t http_layer_on_data_ready(
                     {
                         EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
                     }
-
                 }
-
-                http_header_type_t header_type = classify_header( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name );
 
                 if( header_type != XI_HTTP_HEADER_UNKNOWN )
                 {
