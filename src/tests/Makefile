@@ -27,6 +27,6 @@ $(XI_OBJDIR)/tinytest/tinytest.o: $(TINYTEST_SRCDIR)/tinytest.c
 	$(CC) $(XI_CFLAGS) -c $< -o $@
 
 $(XI):
-	$(MAKE) -C ../libxively
+	$(MAKE) -C .. libxively
 
 include $(LIBXIVELY)/Makefile.rules
