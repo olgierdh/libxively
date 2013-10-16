@@ -13,15 +13,15 @@ export XI_COMM_LAYER
 export XI_BINDIR
 export XI_OBJDIR
 
-.PHONY: libxively tests clean
+.PHONY: libxively examples tests clean
 
 
 libxively:
 	$(MAKE) -C $@ deps
 	$(MAKE) -C $@
 
-#examples:
-#	$(MAKE) -C $@
+examples:
+	$(MAKE) -C $@
 
 tests: clean libxively
 	$(MAKE) -C $@

@@ -1,7 +1,7 @@
 REV := $(shell git rev-parse --short HEAD)
 
 all:
-	$(MAKE) -C src
+	$(MAKE) -C src examples
 docs:
 	doxygen
 clean:
