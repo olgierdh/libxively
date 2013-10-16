@@ -5,6 +5,8 @@
 *~
 *.zip
 
+obj/
+bin/
 doc/html
 libxively.sublime-project
 libxively.sublime-workspace

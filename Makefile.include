@@ -44,7 +44,7 @@ else
   $(warning "Overriden XI_ARFLAGS with $(XI_OVERRIDE_ARFLAGS)")
 endif # XI_OVERRIDE_ARFLAGS
 
-XI_OUTPUT ?= $(LIBXIVELY)/src
+XI_OUTPUT ?= $(LIBXIVELY)/
 XI_OBJDIR := $(XI_OUTPUT)/obj
 XI_BINDIR := $(XI_OUTPUT)/bin
 
