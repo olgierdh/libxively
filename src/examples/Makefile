@@ -1,12 +1,18 @@
-EXAMPLE_DIRS = \
-	       datapoint_delete \
-	       datapoint_delete_range \
-	       datastream_create \
-	       datastream_delete \
-	       datastream_get \
-	       datastream_update \
-	       feed_get \
-	       feed_update
+LIBXIVELY := $(shell git rev-parse --show-toplevel)
 
-all:
-	for dir in $(EXAMPLE_DIRS); do ($(MAKE) -C $$dir) || exit 1; done
+include $(LIBXIVELY)/Makefile.include
+
+XI_EXAMPLE_SOURCES = $(wildcard *.c)
+XI_EXTRA_CFLAGS += -I../libxively/
+XI_EXAMPLES = $(addprefix $(XI_BINDIR)/,$(XI_EXAMPLE_SOURCES:.c=))
+
+all: $(XI_EXAMPLES)
+
+$(XI_BINDIR)/%: %.c $(XI)
+	@-mkdir -p $(dir $@)
+	$(CC) $(XI_CFLAGS) $^ -o $@
+
+$(XI):
+	$(MAKE) -C .. libxively
+
+include $(LIBXIVELY)/Makefile.rules

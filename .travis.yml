@@ -3,13 +3,11 @@ compiler:
   - clang
   - gcc
 before_install:
-  - "git submodule update --init --recursive"
   - "sudo apt-get -qq update"
-  - "sudo apt-get -qq install doxygen"
   - "if [ ! $CC = 'clang' ]; then sudo apt-get -qq install gcc-msp430 msp430-libc msp430mcu; fi"
   - "if [ ! $CC = 'clang' ]; then sudo apt-get -qq install gcc-avr avr-libc; fi"
 script:
-  - "make all"
-  - "src/bin/libxively_unit_test_suite"
+  - "make -C src libxively"
+  - "make -C src tests XI_UNIT_TEST_TARGET=native"
   - "if [ ! $CC = 'clang' ]; then make ci_msp430; fi"
   - "if [ ! $CC = 'clang' ]; then make ci_avr; fi"

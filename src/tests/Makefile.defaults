@@ -1,0 +1,24 @@
+XI_UNIT_TEST_TARGET ?= native
+
+XI_COMM_LAYER ?= dummy
+
+export XI_COMM_LAYER
+
+ifeq ($(XI_UNIT_TEST_TARGET),avr)
+  CC = avr-gcc
+  AR = avr-ar
+  XI_DEBUG_ASSERT = 0
+  XI_DEBUG_OUTPUT = 0
+  XI_EXTRA_CFLAGS += -mmcu=atmega2560
+
+  export CC AR
+  export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT
+endif
+
+ifeq ($(XI_UNIT_TEST_TARGET),native)
+  XI_EXTRA_CFLAGS += -DXI_UNIT_TEST_NATIVE=1
+else
+  XI_EXTRA_CFLAGS += -DXI_UNIT_TEST_NATIVE=0
+endif
+
+export XI_EXTRA_CFLAGS
