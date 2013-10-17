@@ -3,9 +3,9 @@ LIBXIVELY := $(shell git rev-parse --show-toplevel)
 include $(LIBXIVELY)/Makefile.include
 include Makefile.defaults
 
-XI_TEST_SUITE ?= coreunit.c
+XI_TEST_SUITE ?= coreunit
 
-XI_TEST_SOURCES := $(XI_TEST_SUITE) $(XI) $(XI_OBJDIR)/tinytest/tinytest.o
+XI_TEST_SOURCES := $(XI_TEST_SUITE).c $(XI) $(XI_OBJDIR)/tinytest/tinytest.o
 
 TINYTEST_SRCDIR ?= ../import/tinytest/
 
