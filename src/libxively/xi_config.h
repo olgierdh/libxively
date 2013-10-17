@@ -2,7 +2,7 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file    xi_consts.h
+ * \file    xi_config.h
  * \author  Olgierd Humenczuk
  * \brief   Constants that user may wish to override based on their needs
  *
@@ -11,8 +11,16 @@
  *          out what exactly they are doing.
  */
 
-#ifndef __XI_CONSTST_H__
-#define __XI_CONSTST_H__
+#ifndef __XI_CONFIG_H__
+#define __XI_CONFIG_H__
+
+#ifdef MBED_USERNAME
+#include "xi_config_mbed.h"
+#endif
+
+#if XI_USER_CONFIG
+#include "xi_user_config.h"
+#endif
 
 #ifndef XI_HTTP_MAX_HEADERS
 #define XI_HTTP_MAX_HEADERS                16
@@ -74,4 +82,4 @@
 #define XI_PORT                            80
 #endif
 
-#endif // __XI_CONSTST_H__
+#endif // __XI_CONFIG_H__

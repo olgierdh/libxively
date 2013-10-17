@@ -13,7 +13,7 @@
 #include "xi_macros.h"
 #include "xi_debug.h"
 #include "xi_err.h"
-#include "xi_consts.h"
+#include "xi_config.h"
 #include "xively.h"
 
 

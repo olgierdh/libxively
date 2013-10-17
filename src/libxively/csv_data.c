@@ -15,7 +15,7 @@
 #include "xi_helpers.h"
 #include "xi_debug.h"
 #include "xi_err.h"
-#include "xi_consts.h"
+#include "xi_config.h"
 
 static char XI_CSV_LOCAL_BUFFER[ XI_CSV_BUFFER_SIZE ];
 
