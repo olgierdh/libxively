@@ -707,12 +707,16 @@ struct testgroup_t groups[] = {
 #if XI_UNIT_TEST_NATIVE
 int main( int argc, char const *argv[] )
 {
-  return tinytest_main( argc, argv, groups );
+  int r = tinytest_main( argc, argv, groups );
+  printf( "status: %i\n", r );
+  return r;
 }
 #else
 int main() 
 {
-  const char a[] = {"avr"};
-  return tinytest_main(1, (const char **)a, groups);
+  const char a[] = {"sim"};
+  int r = tinytest_main( 1, (const char **) a, groups );
+  printf( "status: %i\n", r);
+  return r;
 }
 #endif
