@@ -1,8 +1,10 @@
 XI_UNIT_TEST_TARGET ?= native
-
 XI_COMM_LAYER ?= dummy
 
 export XI_COMM_LAYER
+
+ifndef XI_UNIT_TEST_DEFAULTS
+export XI_UNIT_TEST_DEFAULTS = ""
 
 ifeq ($(XI_UNIT_TEST_TARGET),avr)
   CC = avr-gcc
@@ -22,3 +24,4 @@ else
 endif
 
 export XI_EXTRA_CFLAGS
+endif
