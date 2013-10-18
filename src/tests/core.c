@@ -669,7 +669,7 @@ end:
 }
 
 
-struct testcase_t demo_tests[] = {
+struct testcase_t core_tests[] = {
     /* Here's a really simple test: it has a name you can refer to it
        with, and a function to invoke it. */
     { "test_parse_http_status", test_parse_http_status, TT_ENABLED_, 0, 0 },
@@ -699,7 +699,7 @@ struct testcase_t demo_tests[] = {
 struct testgroup_t groups[] = {
 
     /* Every group has a 'prefix', and an array of tests.  That's it. */
-    { "csv/", demo_tests },
+    { "csv/", core_tests },
 
     END_OF_GROUPS
 };
