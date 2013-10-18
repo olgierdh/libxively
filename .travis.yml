@@ -26,7 +26,16 @@ before_install:
         unset TOOLCHAIN_NAME TOOLCHAIN_TARBALL TOOLCHAIN_URL;
         msp430-elf-gcc --version;
     fi"
-  - "if [ ! $CC = 'clang' ]; then sudo apt-get -qq install gcc-avr avr-libc; fi"
+  - "if [ ! $CC = 'clang' ]; then
+        TOOLCHAIN_NAME='avr-02102013-1';
+        TOOLCHAIN_TARBALL=${TOOLCHAIN_NAME}.txz;
+        TOOLCHAIN_URL=https://s3.amazonaws.com/com.xively.packages/${TOOLCHAIN_TARBALL};
+        curl $TOOLCHAIN_URL -o /run/shm/$TOOLCHAIN_TARBALL;
+        sudo tar xf /run/shm/$TOOLCHAIN_TARBALL -C /usr/;
+        export PATH=/usr/${TOOLCHAIN_NAME}/bin:$PATH;
+        unset TOOLCHAIN_NAME TOOLCHAIN_TARBALL TOOLCHAIN_URL;
+        msp430-elf-gcc --version;
+    fi"
 script:
   - "make -C src libxively"
   - "make -C src tests XI_UNIT_TEST_TARGET=native"
