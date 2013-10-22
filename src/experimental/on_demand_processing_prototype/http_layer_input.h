@@ -10,6 +10,8 @@
 
 
 #include "xively.h"
+#include "layer.h"
+#include "xi_generator.h"
 
 /**
  * \enum describes the xi http layer api input function types
@@ -31,8 +33,9 @@ typedef enum
  */
 typedef struct
 {
-    xi_query_type_t query_type;
-    xi_context_t*   xi_context;
+    xi_query_type_t     query_type;
+    xi_context_t*       xi_context;
+    xi_generator_t*     payload_generator;
 
     union
     {

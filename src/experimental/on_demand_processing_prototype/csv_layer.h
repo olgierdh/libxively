@@ -38,5 +38,8 @@ layer_state_t csv_layer_close(
 layer_state_t csv_layer_on_close(
     layer_connectivity_t* context );
 
+const void* csv_layer_data_generator_datastream_get(
+          const void* input
+        , short* state );
 
 #endif // __CSV_LAYER_H__

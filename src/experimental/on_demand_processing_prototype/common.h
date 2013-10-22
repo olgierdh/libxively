@@ -23,15 +23,15 @@ typedef struct
 typedef struct
 {
     char*   data_ptr;
-    int     data_size;
-    int     hint_size;
+    short   data_size;
+    short   hint_size;
 } data_descriptor_t;
 
 typedef struct
 {
-    const char* data_ptr;
-    int         data_size;
-    int         hint_size;
+    const char*       data_ptr;
+    short             data_size;
+    short             hint_size;
 } const_data_descriptor_t;
 
 

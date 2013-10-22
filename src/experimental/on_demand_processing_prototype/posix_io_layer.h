@@ -7,7 +7,7 @@
 /**
  * \file   posix_io_layer.h
  * \author Olgierd Humenczuk
- * \brief  File that containes the declaration of the posix io layer functions
+ * \brief  File that contains the declaration of the posix io layer functions
  */
 
 /**

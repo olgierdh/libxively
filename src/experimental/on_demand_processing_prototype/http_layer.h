@@ -48,5 +48,9 @@ layer_state_t http_layer_on_close(
 layer_t* init_http_layer(
       layer_t* layer );
 
+const void* http_layer_data_generator_datastream_get(
+          const void* input
+        , short* state );
+
 
 #endif // __HTTP_LAYER_H__

@@ -15,6 +15,7 @@
 #include "posix_io_layer.h"
 #include "http_layer.h"
 #include "http_layer_data.h"
+#include "csv_layer.h"
 
 enum LAYERS_ID
 {
@@ -77,8 +78,10 @@ int main( int argc, const char* argv[] )
     {
           HTTP_LAYER_INPUT_DATASTREAM_GET
         , context
+        , 0
         , { { "3" } }
     };
+
 
     if( io_layer == 0 )
     {

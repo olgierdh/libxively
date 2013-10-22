@@ -8,6 +8,7 @@
 #include "common.h"
 #include "xi_stated_sscanf.h"
 #include "xi_coroutine.h"
+#include "layer_helpers.h"
 
 
 // static array of recognizable http headers
@@ -41,20 +42,64 @@ static inline http_header_type_t classify_header( const char* header )
 }
 
 /**
- * \brief layer_sender little helper to encapsulate
- *        error handling over sending data between layers
+ * \brief http_layer_data_generator_datastream_get
+ * \param input
+ * \param state
+ * \return
  */
-#define layer_sender( context, data, hint ) \
-{ \
-    const const_data_descriptor_t tmp_data = { (data), strlen( (data) ), 0 }; \
-    layer_state_t layer_state = CALL_ON_PREV_DATA_READY( context->self, ( const void* ) &tmp_data, hint ); \
-    switch( layer_state ) \
-    { \
-        case LAYER_STATE_OK: \
-            break; \
-        default: \
-            return layer_state; \
-    } \
+const void* http_layer_data_generator_datastream_get(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input = ( const http_layer_input_t* const ) input;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        gen_ptr_text( *state, XI_HTTP_GET );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
+        {
+            static char buff[ 16 ];
+            sprintf( buff, "%d", http_layer_input->xi_context->feed_id );
+
+            gen_ptr_text( *state, buff ); // feed id
+        }
+
+        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, http_layer_input->http_layer_data_u.xi_get_datastream.datastream ); // datastream id
+        gen_static_text( *state, ".csv " );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND HOST
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HOST );
+        gen_static_text( *state, "api.xively.com" );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND USER AGENT
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_USER_AGENT );
+        gen_static_text( *state, "libxively-posix/experimental" );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND ACCEPT
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_ACCEPT );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // A API KEY
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_X_API_KEY );
+        gen_ptr_text( *state, http_layer_input->xi_context->api_key ); // api key
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // the end, no more data double crlf
+        gen_ptr_text_and_exit( *state, XI_HTTP_CRLF );
+
+    END_CORO()
 }
 
 /**
@@ -62,86 +107,31 @@ static inline http_header_type_t classify_header( const char* header )
  */
 static inline layer_state_t http_layer_data_ready_datastream_get(
       layer_connectivity_t* context
-    , const int feed_id
-    , const char* datastream_id
-    , const char* api_key )
+    , const http_layer_input_t* input )
 {
-    // buffer that is locally used to encode the data to be sent over the layers system
-    char buff[ 16 ];
+    // generator state
+    short gstate = 0;
 
-    // SEND TYPE
-    layer_sender( context, XI_HTTP_GET, LAYER_HINT_MORE_DATA );
+    // send the data through the next layer
+    while( gstate != 1 )
+    {
+        const const_data_descriptor_t* ret
+                = ( const const_data_descriptor_t* ) http_layer_data_generator_datastream_get( input, &gstate );
 
-    // SEND ADDRESS
-    layer_sender( context, XI_HTTP_TEMPLATE_FEED, LAYER_HINT_MORE_DATA );
-    layer_sender( context, "/", LAYER_HINT_MORE_DATA );
+        layer_state_t state
+                = CALL_ON_PREV_DATA_READY(
+                      context->self
+                    , ( const void* ) ret
+                    , ( gstate != 1 ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
 
-    memset( buff, 0, sizeof( buff ) );
-    sprintf( buff, "%d", feed_id );
-
-    layer_sender( context, buff, LAYER_HINT_MORE_DATA ); // feed id
-    layer_sender( context, "/datastreams/", LAYER_HINT_MORE_DATA );
-    layer_sender( context, datastream_id, LAYER_HINT_MORE_DATA ); // datastream id
-    layer_sender( context, ".csv ", LAYER_HINT_MORE_DATA );
-
-    // SEND HTTP
-    layer_sender( context, XI_HTTP_TEMPLATE_HTTP, LAYER_HINT_MORE_DATA );
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
-
-    // SEND HOST
-    layer_sender( context, XI_HTTP_TEMPLATE_HOST, LAYER_HINT_MORE_DATA );
-    layer_sender( context, "api.xively.com", LAYER_HINT_MORE_DATA );
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
-
-    // SEND USER AGENT
-    layer_sender( context, XI_HTTP_TEMPLATE_USER_AGENT, LAYER_HINT_MORE_DATA );
-    layer_sender( context, "libxively-posix/experimental", LAYER_HINT_MORE_DATA );
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
-
-    // SEND ACCEPT
-    layer_sender( context, XI_HTTP_TEMPLATE_ACCEPT, LAYER_HINT_MORE_DATA );
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
-
-    // A API KEY
-    layer_sender( context, XI_HTTP_TEMPLATE_X_API_KEY, LAYER_HINT_MORE_DATA );
-    layer_sender( context, api_key, LAYER_HINT_MORE_DATA ); // api key
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_MORE_DATA );
-
-    // the end, no more data double crlf
-    layer_sender( context, XI_HTTP_CRLF, LAYER_HINT_NONE );
+        if( state != LAYER_STATE_OK )
+        {
+            return state;
+        }
+    }
 
     return LAYER_STATE_OK;
 }
-
-/**
- * \brief http_layer_on_data_ready_http_parse
- * \param context
- * \param data
- * \param hint
- * \return
- */
-static inline layer_state_t http_layer_on_data_ready_http_parse(
-        layer_connectivity_t* context
-      , const void* data
-      , const layer_hint_t hint )
-{
-    XI_UNUSED( hint );
-    XI_UNUSED( context );
-
-    // expecting data buffer so unpack it
-    const const_data_descriptor_t* data_description = ( const const_data_descriptor_t* ) data;
-    // http_layer_data_t* http_data                    = ( http_layer_data_t* ) context->self->user_data;
-
-    for( int i = 0; i < data_description->hint_size; ++i )
-    {
-        putchar( data_description->data_ptr[ i ] );
-        fflush( stdout );
-    }
-
-    return LAYER_STATE_MORE_DATA;
-}
-
-
 
 /**
  * \brief   see the layer_interface for details
@@ -162,9 +152,7 @@ layer_state_t http_layer_data_ready(
     {
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
             return http_layer_data_ready_datastream_get(
-                          context, http_layer_input->xi_context->feed_id
-                        , http_layer_input->http_layer_data_u.xi_get_datastream.datastream
-                        , http_layer_input->xi_context->api_key );
+                          context, http_layer_input );
         default:
             return LAYER_STATE_ERROR;
     };
@@ -201,12 +189,12 @@ layer_state_t http_layer_on_data_ready(
     {
         //
         {
-            sscanf_state                = 0;
+            sscanf_state                          = 0;
 
             while( sscanf_state == 0 )
             {
-                char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) "s\r\n";
-                const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+                const char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) "s\r\n";
+                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
                 void* pv[]                  = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
 
                 sscanf_state = xi_stated_sscanf(
@@ -271,14 +259,15 @@ layer_state_t http_layer_on_data_ready(
                     xi_stated_sscanf_state_t tmp_state;
                     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
 
-                    char tmp_status_pattern[]           = "%d";
-                    const_data_descriptor_t tmp_v       = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ) };
-                    const_data_descriptor_t tmp_data    =
+                    const char tmp_status_pattern[]           = "%d";
+                    const const_data_descriptor_t tmp_v       = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ) };
+                    const const_data_descriptor_t tmp_data    =
                     {
                           http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
                         , XI_HTTP_HEADER_VALUE_MAX_SIZE
                         , XI_HTTP_HEADER_VALUE_MAX_SIZE
                     };
+
                     void*                   tmp_pv[]    = { ( void* ) &http_layer_data->content_length };
 
                     sscanf_state = xi_stated_sscanf( &tmp_state, &tmp_v, &tmp_data, tmp_pv );
@@ -307,14 +296,19 @@ layer_state_t http_layer_on_data_ready(
         } while( sscanf_state == 1 );
     }
 
+    if( sscanf_state == -1 )
+    {
+        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+    }
+
     // STAGE 03 reading second \r\n that means that the payload should begin just right after
     {
         sscanf_state                = 0;
 
         while( sscanf_state == 0 )
         {
-            char status_pattern[]       = "\r\n";
-            const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+            const char status_pattern[]       = "\r\n";
+            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
@@ -330,6 +324,11 @@ layer_state_t http_layer_on_data_ready(
         }
     }
 
+    if( sscanf_state == -1 )
+    {
+        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+    }
+
     // STAGE 04 reading payload
     {
         // clear the buffer
@@ -343,9 +342,9 @@ layer_state_t http_layer_on_data_ready(
         {
             short before = xi_stated_state->i;
 
-            char status_pattern[]       = "%B";
-            const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
-            void*                  pv[] = { ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value };
+            const char status_pattern[]       = "%B";
+            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ) };
+            void*                        pv[] = { ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value };
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
@@ -372,6 +371,11 @@ layer_state_t http_layer_on_data_ready(
                 memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
             }
         }
+    }
+
+    if( sscanf_state == -1 )
+    {
+        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
     }
 
     EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
