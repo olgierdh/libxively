@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "xi_debug.h"
 
