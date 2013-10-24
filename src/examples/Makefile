@@ -3,7 +3,7 @@ LIBXIVELY := $(shell git rev-parse --show-toplevel)
 include $(LIBXIVELY)/Makefile.include
 
 XI_EXAMPLE_SOURCES = $(wildcard *.c)
-XI_EXTRA_CFLAGS += -I../libxively/
+XI_CFLAGS += -I../libxively/
 XI_EXAMPLES = $(addprefix $(XI_BINDIR)/,$(XI_EXAMPLE_SOURCES:.c=))
 
 all: $(XI_EXAMPLES)

@@ -11,7 +11,7 @@ ifeq ($(XI_UNIT_TEST_TARGET),cortex-m3-qemu)
   AR = arm-none-eabi-ar
   XI_DEBUG_ASSERT = 0
   XI_DEBUG_OUTPUT = 1
-  XI_EXTRA_CFLAGS += -mcpu=cortex-m3 -mthumb -T generic-hosted.ld
+  XI_CFLAGS += -mcpu=cortex-m3 -mthumb -T generic-hosted.ld
 
   export CC AR
   export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT
@@ -22,17 +22,17 @@ ifeq ($(XI_UNIT_TEST_TARGET),avr)
   AR = avr-ar
   XI_DEBUG_ASSERT = 0
   XI_DEBUG_OUTPUT = 0
-  XI_EXTRA_CFLAGS += -mmcu=atmega2560
+  XI_CFLAGS += -mmcu=atmega2560
 
   export CC AR
   export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT
 endif
 
 ifeq ($(XI_UNIT_TEST_TARGET),native)
-  XI_EXTRA_CFLAGS += -DXI_UNIT_TEST_NATIVE=1
+  XI_CFLAGS += -DXI_UNIT_TEST_NATIVE=1
 else
-  XI_EXTRA_CFLAGS += -DXI_UNIT_TEST_NATIVE=0
+  XI_CFLAGS += -DXI_UNIT_TEST_NATIVE=0
 endif
 
-export XI_EXTRA_CFLAGS
+export XI_CFLAGS
 endif
