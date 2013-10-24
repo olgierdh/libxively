@@ -149,7 +149,7 @@ const void* http_layer_data_generator_datastream_body(
     BEGIN_CORO( *state )
 
         {
-            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
             gen_ptr_text( *state, static_buff_32 ); // feed id
         }
 
@@ -240,7 +240,7 @@ const void* http_layer_data_generator_datastream_create_body(
     BEGIN_CORO( *state )
 
         {
-            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
             gen_ptr_text( *state, static_buff_32 ); // feed id
         }
 
@@ -315,7 +315,7 @@ const void* http_layer_data_generator_feed_get(
         gen_static_text( *state, "/" );
 
         {
-            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
             gen_ptr_text( *state, static_buff_32 ); // feed id
         }
 
@@ -371,7 +371,7 @@ const void* http_layer_data_generator_feed_update(
         gen_static_text( *state, "/" );
 
         {
-            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
             gen_ptr_text( *state, static_buff_32 ); // feed id
         }
 
@@ -407,7 +407,7 @@ const void* http_layer_data_generator_datastream_delete(
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
         gen_ptr_text( *state, static_buff_32 ); // feed id
 
         gen_static_text( *state, "/datastreams/" );
@@ -447,7 +447,7 @@ const void* http_layer_data_generator_datapoint_delete(
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
         gen_ptr_text( *state, static_buff_32 ); // feed id
 
         gen_static_text( *state, "/datastreams/" );
@@ -508,7 +508,7 @@ const void* http_layer_data_generator_datapoint_delete_range(
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        sprintf( static_buff_32, "%d", ( uint32_t ) http_layer_input->xi_context->feed_id );
         gen_ptr_text( *state, static_buff_32 ); // feed id
 
         gen_static_text( *state, "/datastreams/" );
