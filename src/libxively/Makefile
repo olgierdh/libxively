@@ -3,7 +3,7 @@ include $(LIBXIVELY)/Makefile.include
 
 XI_LAYER_DIRS := io/$(XI_IO_LAYER)
 
-XI_EXTRA_CFLAGS += -I./ \
+XI_CFLAGS += -I./ \
 	$(foreach layerdir,$(XI_LAYER_DIRS),-I./$(layerdir))
 
 XI_SOURCES = $(wildcard *.c) \

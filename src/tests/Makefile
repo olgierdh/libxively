@@ -9,10 +9,10 @@ XI_TEST_SOURCES := $(XI_TEST_SUITE).c $(XI) $(XI_OBJDIR)/tinytest/tinytest.o
 
 TINYTEST_SRCDIR ?= ../import/tinytest/
 
-XI_EXTRA_CFLAGS += -I../libxively/ -I$(TINYTEST_SRCDIR)
+XI_CFLAGS += -I../libxively/ -I$(TINYTEST_SRCDIR)
 
 ifneq ($(XI_UNIT_TEST_TARGET),native)
-  XI_EXTRA_CFLAGS += -DNO_FORKING
+  XI_CFLAGS += -DNO_FORKING
 endif
 
 XI_TEST = $(XI_BINDIR)/libxively_$(XI_UNIT_TEST_TARGET)_unit_test
