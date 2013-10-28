@@ -51,6 +51,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 #define call_sub_gen( state, input, sub_gen ) \
 { \
     static short sub_state = 0; \
+    sub_state = 0; \
     while( sub_state != 1 ) \
     { \
         YIELD( state, sub_gen( input, &sub_state) ); \
