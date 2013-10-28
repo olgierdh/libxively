@@ -33,9 +33,9 @@ typedef enum
  */
 typedef struct
 {
-    xi_query_type_t     query_type;
-    xi_context_t*       xi_context;
-    xi_generator_t*     payload_generator;
+    xi_query_type_t     query_type;             //!< pass the information about the type of the query that is constructed
+    xi_context_t*       xi_context;             //!< the pointer to the context of the xi library
+    xi_generator_t*     payload_generator;      //!< the pointer to the payload generator, used via the http layer to construct the payload
 
     union
     {
@@ -43,7 +43,7 @@ typedef struct
         {
             const char* datastream;
         } xi_get_datastream;
-    } http_layer_data_u;
+    } http_layer_data_u;                        //!< the union suppose to contain different combinations of data used in queries
 
 } http_layer_input_t;
 
