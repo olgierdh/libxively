@@ -4,7 +4,9 @@
 
 typedef struct
 {
-
+    short state;
+    short counter;
+    short sp;
 } xi_stated_csv_decode_value_state_t;
 
 #endif // __XI_STATED_CSV_DECODE_VALUE_STATE_H__

@@ -1,13 +1,39 @@
 #include "csv_layer.h"
+#include "xively.h"
+
+// xi
 #include "xi_macros.h"
 #include "xi_debug.h"
-#include "xively.h"
-#include "xi_stated_csv_decode_value_state.h"
 #include "xi_coroutine.h"
 #include "xi_generator.h"
+#include "xi_stated_csv_decode_value_state.h"
+
 #include "layer_api.h"
 #include "http_layer_input.h"
 #include "layer_helpers.h"
+
+inline static int csv_encode_value(
+      char* buffer
+    , size_t buffer_size
+    , const xi_datapoint_t* p )
+{
+    // PRECONDITION
+    assert( buffer != 0 );
+    assert( buffer_size != 0 );
+    assert( p != 0 );
+
+    switch( p->value_type )
+    {
+        case XI_VALUE_TYPE_I32:
+            return snprintf( buffer, buffer_size, "%d", p->value.i32_value );
+        case XI_VALUE_TYPE_F32:
+            return snprintf( buffer, buffer_size, "%f", p->value.f32_value );
+        case XI_VALUE_TYPE_STR:
+            return snprintf( buffer, buffer_size, "%s", p->value.str_value );
+        default:
+            return -1;
+    }
+}
 
 typedef enum
 {
@@ -16,7 +42,8 @@ typedef enum
     XI_STATE_NUMBER,
     XI_STATE_FLOAT,
     XI_STATE_DOT,
-    XI_STATE_STRING
+    XI_STATE_STRING,
+    XI_STATES_NO
 } xi_dfa_state_t;
 
 typedef enum
@@ -28,7 +55,8 @@ typedef enum
     XI_CHAR_SPACE,
     XI_CHAR_NEWLINE,
     XI_CHAR_TAB,
-    XI_CHAR_MINUS
+    XI_CHAR_MINUS,
+    XI_CHARS_NO
 } xi_char_type_t;
 
 inline static xi_char_type_t csv_classify_char( char c )
@@ -83,7 +111,7 @@ inline static xi_char_type_t csv_classify_char( char c )
 }
 
 // the transition function
-static const short const states[][6][2] =
+static const short states[][6][2] =
 {
       // state initial                          // state minus                            // state number                           // state float                            // state dot                              // string
     { { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  }, { XI_CHAR_UNKNOWN   , XI_STATE_STRING  } },
@@ -96,64 +124,89 @@ static const short const states[][6][2] =
     { { XI_CHAR_MINUS     , XI_STATE_MINUS   }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  } }
 };
 
-xi_datapoint_t* xi_stated_csv_decode_value(
-    xi_stated_csv_decode_value_state_t* st, const char* buffer, xi_datapoint_t* p )
+// @TODO
+// static const short accepting_states[] = { XI_STATE_ };
+
+char xi_stated_csv_decode_value(
+          xi_stated_csv_decode_value_state_t* st
+        , const const_data_descriptor_t* source
+        , xi_datapoint_t* p
+        , layer_hint_t hint )
 {
-    XI_UNUSED( st );
+    // unused
+    XI_UNUSED( hint );
 
     // PRECONDITION
-    assert( buffer != 0 );
+    assert( st != 0 );
+    assert( source != 0 );
     assert( p != 0 );
+
+    // if not the first run jump into the proper label
+    if( st->state != XI_STATE_INITIAL )
+    {
+        goto data_ready;
+    }
 
     // secure the output buffer
     XI_GUARD_EOS( p->value.str_value, XI_VALUE_STRING_MAX_SIZE );
 
     // clean the counter
-    size_t  counter = 0;
+    st->counter = 0;
 
-    char    c = *buffer;
-    short   s = XI_STATE_INITIAL;
+    char    c   = source->data_ptr[ ( st->sp )++ ];
+    st->state   = XI_STATE_INITIAL;
 
+    // main processing loop
     while( c != '\n' && c !='\0' && c!='\r' )
     {
-        if( counter >= XI_VALUE_STRING_MAX_SIZE - 1 )
+        if( st->counter >= XI_VALUE_STRING_MAX_SIZE - 1 )
         {
             xi_set_err( XI_DATAPOINT_VALUE_BUFFER_OVERFLOW );
             return 0;
         }
 
         xi_char_type_t ct = csv_classify_char( c );
-        s = states[ ct ][ s ][ 1 ];
+        st->state = states[ ct ][ st->state ][ 1 ];
 
-        switch( s )
+        switch( st->state )
         {
             case XI_STATE_MINUS:
             case XI_STATE_NUMBER:
             case XI_STATE_FLOAT:
             case XI_STATE_DOT:
             case XI_STATE_STRING:
-                p->value.str_value[ counter ] = c;
+                p->value.str_value[ st->counter ] = c;
                 break;
         }
 
-        c = *( ++buffer );
-        ++counter;
+        // this is where we shall need to jump for more data
+        if( st->sp == source->hint_size )
+        {
+            // need more data
+            return 0;
+data_ready:
+            st->sp = 0; // reset the counter
+        }
+
+        //
+        ++( st->counter );
+        c = source->data_ptr[ ( st->sp )++ ];
     }
 
     // set the guard
-    p->value.str_value[ counter ] = '\0';
+    p->value.str_value[ st->counter ] = '\0';
 
     // update of the state for loose states...
-    switch( s )
+    switch( st->state )
     {
         case XI_STATE_MINUS:
         case XI_STATE_DOT:
         case XI_STATE_INITIAL:
-            s = XI_STATE_STRING;
+            st->state = XI_STATE_STRING;
             break;
     }
 
-    switch( s )
+    switch( st->state )
     {
         case XI_STATE_NUMBER:
             p->value.i32_value  = atoi( p->value.str_value );
@@ -168,7 +221,7 @@ xi_datapoint_t* xi_stated_csv_decode_value(
             p->value_type       = XI_VALUE_TYPE_STR;
     }
 
-    return p;
+    return 1;
 }
 
 
@@ -184,6 +237,56 @@ layer_state_t csv_layer_data_ready(
     // later aligator
 
     return LAYER_STATE_OK;
+}
+
+/**
+ * @brief csv_layer_data_generator_datapoint generates the data related to the datapoint
+ * @param input
+ * @param state
+ * @return
+ */
+const void* csv_layer_data_generator_datapoint(
+          const void* input
+        , short* state )
+{
+    // we expect input to be datapoint
+    const xi_datapoint_t* dp = ( xi_datapoint_t* ) input;
+
+    ENABLE_GENERATOR();
+    BEGIN_CORO( *state )
+
+        // if there is a timestamp encode it
+        if( dp->timestamp.timestamp != 0 )
+        {
+            xi_time_t stamp = dp->timestamp.timestamp;
+            struct xi_tm* gmtinfo = xi_gmtime( &stamp );
+
+            static char buffer[ 32 ] = { '\0' };
+
+            snprintf( buffer, 32
+                , "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ,"
+                , gmtinfo->tm_year + 1900
+                , gmtinfo->tm_mon + 1
+                , gmtinfo->tm_mday
+                , gmtinfo->tm_hour
+                , gmtinfo->tm_min
+                , gmtinfo->tm_sec
+                , ( int ) dp->timestamp.micro );
+
+            gen_ptr_text( *state, buffer );
+        }
+
+        // value
+        {
+            static char buffer[ 32 ] = { '\0' };
+            csv_encode_value( buffer, sizeof( buffer ), dp );
+            gen_ptr_text( *state, buffer );
+        }
+
+        // end of line
+        gen_static_text_and_exit( *state, "\n" );
+
+    END_CORO()
 }
 
 /**
@@ -205,11 +308,15 @@ const void* csv_layer_data_generator_datastream_update(
         gen_static_text( *state, "sub_test1" );
         gen_static_text( *state, "sub_test2" );
         gen_static_text( *state, "sub_test3" );
+
+        call_sub_gen( *state, input, csv_layer_data_generator_datapoint );
+
         gen_static_text( *state, "sub_test4" );
         gen_static_text_and_exit( *state, "sub_test5" );
 
     END_CORO()
 }
+
 
 /**
  * \brief  see the layer_interface for details

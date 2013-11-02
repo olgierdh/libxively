@@ -42,4 +42,9 @@ const void* csv_layer_data_generator_datastream_get(
           const void* input
         , short* state );
 
+const void* csv_layer_data_generator_datapoint(
+          const void* input
+        , short* state );
+
+
 #endif // __CSV_LAYER_H__
