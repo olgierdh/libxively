@@ -20,7 +20,7 @@ typedef struct
     unsigned char               last_char_marker;      //!< the marker that it's used to point to the last char in the buffer
     xi_stated_sscanf_state_t    xi_stated_sscanf_state;
     short                       counter;               //!< multiple purposes counter
-    short                       content_length;        //!< how big is the payload
+    short                       content_length;        //!< size of the payload
     xi_response_t*              response;
 } http_layer_data_t;
 

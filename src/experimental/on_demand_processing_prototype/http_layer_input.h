@@ -29,7 +29,7 @@ typedef enum
  *          that we shall send over network.
  *
  *\note     Version of that structure is specialized for communication with RESTful xively API
- *          so it is not fully functional generic implementation of the HTTP protocol capabilities.
+ *          so it is not fully functional generic implementation of the HTTP protoco.
  */
 typedef struct
 {
@@ -42,6 +42,7 @@ typedef struct
         struct
         {
             const char*     datastream;
+            xi_datapoint_t* value;
         } xi_get_datastream;
 
         struct
@@ -49,6 +50,11 @@ typedef struct
             const char*     datastream;
             xi_datapoint_t* value;
         } xi_update_datastream;
+
+        struct
+        {
+            xi_feed_t*      feed;
+        } xi_get_feed;
     } http_layer_data_u;                        //!< the union suppose to contain different combinations of data used in queries
 
 } http_layer_input_t;

@@ -18,7 +18,7 @@
 typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 
 #define ENABLE_GENERATOR() \
-    static const_data_descriptor_t __tmp = { 0, 0, 0 }; \
+    static const_data_descriptor_t __tmp = { 0, 0, 0, 0 }; \
 
 // couple of macros
 #define gen_ptr_text( state, ptr_text ) \
@@ -26,7 +26,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
     size_t len = strlen( ptr_text ); \
     __tmp.data_ptr = ptr_text; \
     __tmp.data_size = len; \
-    __tmp.hint_size = len; \
+    __tmp.real_size = len; \
     YIELD( state, ( void* ) &__tmp ); \
 }
 
@@ -35,7 +35,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
     size_t len = strlen( ptr_text ); \
     __tmp.data_ptr  = ptr_text; \
     __tmp.data_size = len; \
-    __tmp.hint_size = len; \
+    __tmp.real_size = len; \
     EXIT( state, ( void* ) &__tmp ); \
 }
 
@@ -44,7 +44,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 { \
     static const char* const tmp_str = text; \
     __tmp.data_ptr = tmp_str; \
-    __tmp.hint_size = __tmp.data_size = sizeof( text ) - 1; \
+    __tmp.real_size = __tmp.data_size = sizeof( text ) - 1; \
     YIELD( state, ( void* ) &__tmp ); \
 }
 
@@ -62,7 +62,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 { \
     static const char* const tmp_str = text; \
     __tmp.data_ptr = tmp_str; \
-    __tmp.hint_size = __tmp.data_size = sizeof( text ) - 1; \
+    __tmp.real_size = __tmp.data_size = sizeof( text ) - 1; \
     EXIT( state, ( void* ) &__tmp ); \
 }
 

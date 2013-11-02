@@ -35,6 +35,18 @@ static inline void to_int( xi_stated_sscanf_state_t* s, int* out )
     }
 }
 
+static inline void to_unsigned_char( xi_stated_sscanf_state_t* s, unsigned char* out )
+{
+    int base = 10;
+    *out     = ( s->buffer[ s->buff_len - 1 ] - 48 );
+
+    for( unsigned char j = 1; j < s->buff_len; ++j, base *= 10 )
+    {
+        *out += base * ( s->buffer[ s->buff_len - j - 1 ] - 48 );
+    }
+}
+
+
 static inline unsigned char pass_all( const char c )
 {
     ( void ) c;
@@ -53,12 +65,12 @@ static inline char safe_until_copier(
     {
         dst->data_ptr[ (*dst_i)++ ] = src->data_ptr[ (*src_i)++ ];
 
-        if( *dst_i == dst->hint_size )
+        if( *dst_i == dst->real_size )
         {
             return -1;
         }
 
-        if( *src_i == src->hint_size )
+        if( *src_i == src->real_size )
         {
             return 0; // more data needed
         }
@@ -82,7 +94,7 @@ short xi_stated_sscanf(
     s->vi = 0;
     s->p  = 0;
 
-    for( ; s->p < pattern->hint_size - 1; )
+    for( ; s->p < pattern->real_size - 1; )
     {
         if( pattern->data_ptr[ s->p ] != '%' ) // check on the raw pattern basis one to one
         {
@@ -95,10 +107,10 @@ short xi_stated_sscanf(
                 s->i++;
                 s->p++;
 
-                if( s->i == source->hint_size )
+                if( s->i == source->real_size )
                 {
                     // accepting should have bigger priority than more data
-                    if( s->p == pattern->hint_size - 1 )
+                    if( s->p == pattern->real_size - 1 )
                     {
                         goto accept;
                     }
@@ -122,7 +134,7 @@ short xi_stated_sscanf(
                 s->buff_len = 0;
 
                 {
-                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ) };
+                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ), 0 };
                     res = safe_until_copier( &s->buff_len, &s->p, &dst_desc, pattern, &is_digit );
                 }
 
@@ -131,7 +143,7 @@ short xi_stated_sscanf(
                     EXIT( s->state, -1 );
                 }
 
-                to_int( s, ( int* ) &( s->max_len ) );
+                to_unsigned_char( s, ( unsigned char* ) &( s->max_len ) );
             }
 
 
@@ -144,7 +156,7 @@ short xi_stated_sscanf(
 
                 do
                 {
-                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ) };
+                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ), 0 };
                     res = safe_until_copier( &s->buff_len, &s->i, &dst_desc, source, &is_digit );
                     if( res == 0 )
                     {
@@ -164,7 +176,7 @@ short xi_stated_sscanf(
 
                 do
                 {
-                    data_descriptor_t dst_desc = { ( char* ) variables[ s->vi ], s->max_len, s->max_len - 1 };
+                    data_descriptor_t dst_desc = { ( char* ) variables[ s->vi ], s->max_len, s->max_len - 1, 0 };
 
                     switch( pattern->data_ptr[ s->p ] )
                     {

@@ -13,7 +13,7 @@ static inline layer_state_t layer_sender(
         , const layer_hint_t hint )
 {
     const int len = strlen( (data) );
-    const const_data_descriptor_t tmp_data = { (data), len, len };
+    const const_data_descriptor_t tmp_data = { (data), len, len, 0 };
     return CALL_ON_PREV_DATA_READY( context->self, ( const void* ) &tmp_data, hint );
 }
 
