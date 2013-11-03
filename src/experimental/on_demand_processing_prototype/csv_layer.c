@@ -13,6 +13,12 @@
 #include "http_layer_input.h"
 #include "layer_helpers.h"
 
+
+/** \brief holds pattern for parsing and constructing timestamp */
+static const char* const CSV_TIMESTAMP_PATTERN = "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ";
+
+//
+
 inline static int csv_encode_value(
       char* buffer
     , size_t buffer_size
@@ -250,7 +256,7 @@ const void* csv_layer_data_generator_datapoint(
             static char buffer[ 32 ] = { '\0' };
 
             snprintf( buffer, 32
-                , "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ,"
+                , CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
                 , gmtinfo->tm_mday
@@ -260,6 +266,7 @@ const void* csv_layer_data_generator_datapoint(
                 , ( int ) dp->timestamp.micro );
 
             gen_ptr_text( *state, buffer );
+            gen_static_text( *state, "," );
         }
 
         // value

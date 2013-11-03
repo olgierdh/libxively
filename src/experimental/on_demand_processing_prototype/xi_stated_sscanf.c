@@ -56,7 +56,7 @@ static inline unsigned char pass_all( const char c )
 
 static inline char safe_until_copier(
           unsigned char* dst_i
-        , unsigned char* src_i
+        , unsigned short* src_i
         , data_descriptor_t* dst
         , const const_data_descriptor_t* src
         , accept_char_t* fun )
@@ -83,7 +83,7 @@ static inline char safe_until_copier(
 short xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
-        , const const_data_descriptor_t* source
+        , const_data_descriptor_t* source
         , void** variables )
 {
     // internal tmp variables
@@ -98,16 +98,16 @@ short xi_stated_sscanf(
     {
         if( pattern->data_ptr[ s->p ] != '%' ) // check on the raw pattern basis one to one
         {
-            if( pattern->data_ptr[ s->p ] != source->data_ptr[ s->i ] )
+            if( pattern->data_ptr[ s->p ] != source->data_ptr[ source->curr_pos ] )
             {
                 return -1;
             }
             else
             {
-                s->i++;
+                source->curr_pos++;
                 s->p++;
 
-                if( s->i == source->real_size )
+                if( source->curr_pos == source->real_size )
                 {
                     // accepting should have bigger priority than more data
                     if( s->p == pattern->real_size - 1 )
@@ -117,7 +117,7 @@ short xi_stated_sscanf(
                     else
                     {
                         YIELD( s->state, 0 )
-                        s->i = 0;
+                        source->curr_pos = 0;
                         continue;
                     }
                 }
@@ -157,11 +157,11 @@ short xi_stated_sscanf(
                 do
                 {
                     data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ), 0 };
-                    res = safe_until_copier( &s->buff_len, &s->i, &dst_desc, source, &is_digit );
+                    res = safe_until_copier( &s->buff_len, &source->curr_pos, &dst_desc, source, &is_digit );
                     if( res == 0 )
                     {
                         YIELD( s->state, 0 )
-                        s->i = 0;
+                        source->curr_pos = 0;
                     }
                 } while( res == 0 );
 
@@ -181,20 +181,20 @@ short xi_stated_sscanf(
                     switch( pattern->data_ptr[ s->p ] )
                     {
                         case 's':
-                            res = safe_until_copier( &s->tmp_i, &s->i, &dst_desc, source, &is_header );
+                            res = safe_until_copier( &s->tmp_i, &source->curr_pos, &dst_desc, source, &is_header );
                             break;
                         case '.':
-                            res = safe_until_copier( &s->tmp_i, &s->i, &dst_desc, source, &is_any );
+                            res = safe_until_copier( &s->tmp_i, &source->curr_pos, &dst_desc, source, &is_any );
                             break;
                         case 'B':
-                            res = safe_until_copier( &s->tmp_i, &s->i, &dst_desc, source, &pass_all );
+                            res = safe_until_copier( &s->tmp_i, &source->curr_pos, &dst_desc, source, &pass_all );
                             break;
                     }
 
                     if( res == 0 )
                     {
                         YIELD( s->state, 0 )
-                        s->i = 0;
+                        source->curr_pos = 0;
                     }
                 } while( res == 0 );
 

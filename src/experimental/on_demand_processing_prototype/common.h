@@ -22,24 +22,19 @@ typedef struct
  */
 typedef struct
 {
-    char*   data_ptr;
-    short   data_size;
-    short   real_size;
-    short   curr_pos;
+    char*           data_ptr;
+    unsigned short  data_size;
+    unsigned short  real_size;
+    unsigned short  curr_pos;
 } data_descriptor_t;
 
 typedef struct
 {    
-    const char* data_ptr;
-    short       data_size;
-    short       real_size;
-    short       curr_pos;
+    const char*     data_ptr;
+    unsigned short  data_size;
+    unsigned short  real_size;
+    unsigned short  curr_pos;
 } const_data_descriptor_t;
-
-
-// some syntactic sugar
-#define WRAP_DATA( data_ptr, size )     { data_ptr, size }
-#define WRAP_STATIC_DATA( data_ptr )    { data_ptr, sizeof( data_ptr ) }
 
 /**
  * \brief the function creates the data buffer with requested maximum capacity

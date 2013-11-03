@@ -4,10 +4,9 @@
 typedef struct
 {
     char            buffer[ 8 ];
-    short           state;
+    unsigned short  p;
+    unsigned short  state;
     unsigned char   max_len;
-    unsigned char   p;
-    unsigned char   i;
     unsigned char   buff_len;
     unsigned char   tmp_i;
     unsigned char   vi;

@@ -15,7 +15,7 @@
 short xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
-        , const const_data_descriptor_t* source
+        , const_data_descriptor_t* source
         , void** variables );
 
 #endif // __XI_STATED_SSCANF_H__

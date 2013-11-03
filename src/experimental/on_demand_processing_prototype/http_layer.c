@@ -259,9 +259,9 @@ layer_state_t http_layer_on_data_ready(
                     xi_stated_sscanf_state_t tmp_state;
                     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
 
-                    const char tmp_status_pattern[]           = "%d";
-                    const const_data_descriptor_t tmp_v       = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ), 0 };
-                    const const_data_descriptor_t tmp_data    =
+                    const char tmp_status_pattern[]         = "%d";
+                    const const_data_descriptor_t tmp_v     = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ), 0 };
+                    const_data_descriptor_t tmp_data        =
                     {
                           http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
                         , XI_HTTP_HEADER_VALUE_MAX_SIZE
@@ -269,7 +269,7 @@ layer_state_t http_layer_on_data_ready(
                         , 0
                     };
 
-                    void*                   tmp_pv[]    = { ( void* ) &http_layer_data->content_length };
+                    void*                   tmp_pv[]        = { ( void* ) &http_layer_data->content_length };
 
                     sscanf_state = xi_stated_sscanf( &tmp_state, &tmp_v, &tmp_data, tmp_pv );
 
@@ -341,7 +341,7 @@ layer_state_t http_layer_on_data_ready(
 
         while( sscanf_state == 0 )
         {
-            short before = xi_stated_state->i;
+            short before = ( ( const_data_descriptor_t* ) data )->curr_pos;
 
             const char status_pattern[]       = "%B";
             const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ), 0 };
@@ -353,7 +353,7 @@ layer_state_t http_layer_on_data_ready(
                         , ( const_data_descriptor_t* ) data
                         , pv );
 
-            short after = xi_stated_state->i;
+            short after = ( ( const_data_descriptor_t* ) data )->curr_pos;
 
             http_layer_data->counter += ( after - before );
 
@@ -367,7 +367,6 @@ layer_state_t http_layer_on_data_ready(
             {
                 YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
                 xi_stated_state->tmp_i  = 0; // reset the value pointer
-                xi_stated_state->i      = 0; // reset the source pointer
                 xi_debug_printf( "%s", http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
                 memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
             }
