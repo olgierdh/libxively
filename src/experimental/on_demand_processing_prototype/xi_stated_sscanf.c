@@ -32,7 +32,7 @@ char xi_stated_sscanf(
                 if( source->curr_pos == source->real_size )
                 {
                     // accepting should have bigger priority than more data
-                    if( s->p == pattern->real_size - 1 )
+                    if( s->p == pattern->real_size )
                     {
                         goto accept;
                     }
