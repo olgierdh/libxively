@@ -12,7 +12,7 @@
  * @param variables
  * @return
  */
-short xi_stated_sscanf(
+char xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
         , const_data_descriptor_t* source

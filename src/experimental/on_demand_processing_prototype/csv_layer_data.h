@@ -8,6 +8,7 @@
 typedef struct
 {
     http_layer_input_t*                 http_layer_input;
+    unsigned short                      csv_datapoint_decode_state;
     xi_stated_csv_decode_value_state_t  csv_decode_state;
     xi_stated_sscanf_state_t            xi_stated_sscanf_state;
 } csv_layer_data_t;

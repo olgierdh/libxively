@@ -7,6 +7,7 @@
 #include "xi_coroutine.h"
 #include "xi_generator.h"
 #include "xi_stated_csv_decode_value_state.h"
+#include "xi_stated_sscanf.h"
 
 #include "csv_layer_data.h"
 #include "layer_api.h"
@@ -15,7 +16,7 @@
 
 
 /** \brief holds pattern for parsing and constructing timestamp */
-static const char* const CSV_TIMESTAMP_PATTERN = "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ";
+static const char* const CSV_TIMESTAMP_PATTERN    = "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ,";
 
 //
 
@@ -136,7 +137,7 @@ static const short states[][6][2] =
 
 char xi_stated_csv_decode_value(
           xi_stated_csv_decode_value_state_t* st
-        , const const_data_descriptor_t* source
+        , const_data_descriptor_t* source
         , xi_datapoint_t* p
         , layer_hint_t hint )
 {
@@ -160,7 +161,13 @@ char xi_stated_csv_decode_value(
     // clean the counter
     st->counter = 0;
 
-    char    c   = source->data_ptr[ ( st->sp )++ ];
+    // check if the buffer needs more data
+    if( source->curr_pos == source->real_size )
+    {
+        return LAYER_STATE_MORE_DATA;
+    }
+
+    char    c   = source->data_ptr[ source->curr_pos++ ];
     st->state   = XI_STATE_INITIAL;
 
     // main processing loop
@@ -187,17 +194,17 @@ char xi_stated_csv_decode_value(
         }
 
         // this is where we shall need to jump for more data
-        if( st->sp == source->real_size )
+        if( source->curr_pos == source->real_size )
         {
             // need more data
             return 0;
 data_ready:
-            st->sp = 0; // reset the counter
+            source->curr_pos = 0; // reset the counter
         }
 
         //
         ++( st->counter );
-        c = source->data_ptr[ ( st->sp )++ ];
+        c = source->data_ptr[ ( source->curr_pos )++ ];
     }
 
     // set the guard
@@ -266,7 +273,6 @@ const void* csv_layer_data_generator_datapoint(
                 , ( int ) dp->timestamp.micro );
 
             gen_ptr_text( *state, buffer );
-            gen_static_text( *state, "," );
         }
 
         // value
@@ -347,26 +353,74 @@ const void* csv_layer_data_generator_datastream_get(
  * @return
  */
 layer_state_t csv_layer_parse_datastream(
-        layer_connectivity_t* context
+        csv_layer_data_t* csv_layer_data
       , const_data_descriptor_t* data
       , const layer_hint_t hint
-      , xi_datastream_t* datastream )
+      , xi_datapoint_t* dp )
 {
-    XI_UNUSED( context );
-    XI_UNUSED( data );
     XI_UNUSED( hint );
-    XI_UNUSED( datastream );
+    XI_UNUSED( dp );
+
+    // some tmp variables
+    char ret_state                      = 0;
+
+    BEGIN_CORO( csv_layer_data->csv_datapoint_decode_state )
 
     // parse the timestamp
     {
+        static struct xi_tm gmtinfo;
+        memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
 
+        do
+        {
+            const const_data_descriptor_t pattern   = { CSV_TIMESTAMP_PATTERN, strlen( CSV_TIMESTAMP_PATTERN ), strlen( CSV_TIMESTAMP_PATTERN ), 0 };
+            void* pv[]                              = {
+                ( void* ) &( gmtinfo.tm_year )
+                , ( void* ) &( gmtinfo.tm_mon )
+                , ( void* ) &( gmtinfo.tm_mday )
+                , ( void* ) &( gmtinfo.tm_hour )
+                , ( void* ) &( gmtinfo.tm_min )
+                , ( void* ) &( gmtinfo.tm_sec )
+                , ( void* ) &( dp->timestamp.micro ) };
+
+            ret_state = xi_stated_sscanf( &( csv_layer_data->xi_stated_sscanf_state ), &pattern, data, pv );
+
+            if( ret_state == 0 )
+            {
+                // need more data
+                YIELD( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_MORE_DATA )
+                continue;
+            }
+
+        } while( ret_state == 0 );
+
+        // test the result
+        if( ret_state == -1 )
+        {
+            EXIT( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_ERROR );
+        }
     }
 
 
     // parse the value
     {
+        do
+        {
+            ret_state = xi_stated_csv_decode_value( &( csv_layer_data->csv_decode_state ), data, dp, LAYER_HINT_NONE );
 
+            if( ret_state == 0 )
+            {
+                YIELD( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_MORE_DATA )
+                continue;
+            }
+
+        } while( ret_state == 0 );
     }
+
+    // exit the function
+    EXIT( csv_layer_data->csv_datapoint_decode_state, ( ret_state == -1 ? LAYER_STATE_ERROR : LAYER_STATE_OK ) );
+
+    END_CORO()
 
     return LAYER_STATE_OK;
 }
@@ -384,7 +438,6 @@ layer_state_t csv_layer_data_ready(
     // unpack the layer data
     csv_layer_data_t* csv_layer_data = ( csv_layer_data_t* ) context->self->user_data;
 
-    // BEGIN_CORO( context->self->layer_states[ FUNCTION_ID_DATA_READY ] )
 
     //
     switch( csv_layer_data->http_layer_input->query_type )

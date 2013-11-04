@@ -194,7 +194,7 @@ layer_state_t http_layer_on_data_ready(
             while( sscanf_state == 0 )
             {
                 const char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) "s\r\n";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ), 0 };
+                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
                 void* pv[]                        = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
 
                 sscanf_state = xi_stated_sscanf(
@@ -226,7 +226,7 @@ layer_state_t http_layer_on_data_ready(
             while( sscanf_state == 0 )
             {
                 const char status_pattern[]       = "%" XI_STR( XI_HTTP_HEADER_NAME_MAX_SIZE ) "s: %" XI_STR( XI_HTTP_HEADER_VALUE_MAX_SIZE ) ".\r\n";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ), 0 };
+                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
                 void*                  pv[]       =
                 {
                       ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
@@ -260,7 +260,7 @@ layer_state_t http_layer_on_data_ready(
                     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
 
                     const char tmp_status_pattern[]         = "%d";
-                    const const_data_descriptor_t tmp_v     = { tmp_status_pattern, sizeof( tmp_status_pattern ), sizeof( tmp_status_pattern ), 0 };
+                    const const_data_descriptor_t tmp_v     = { tmp_status_pattern, sizeof( tmp_status_pattern ) - 1, sizeof( tmp_status_pattern ) - 1, 0 };
                     const_data_descriptor_t tmp_data        =
                     {
                           http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
@@ -309,7 +309,7 @@ layer_state_t http_layer_on_data_ready(
         while( sscanf_state == 0 )
         {
             const char status_pattern[]       = "\r\n";
-            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ), 0 };
+            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
@@ -344,7 +344,7 @@ layer_state_t http_layer_on_data_ready(
             short before = ( ( const_data_descriptor_t* ) data )->curr_pos;
 
             const char status_pattern[]       = "%B";
-            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ), sizeof( status_pattern ), 0 };
+            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
             void*                        pv[] = { ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value };
 
             sscanf_state = xi_stated_sscanf(

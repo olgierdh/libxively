@@ -2,7 +2,7 @@
 #include "xi_coroutine.h"
 #include "xi_stated_sscanf_helpers.h"
 
-short xi_stated_sscanf(
+char xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
         , const_data_descriptor_t* source
@@ -16,7 +16,7 @@ short xi_stated_sscanf(
     s->vi = 0;
     s->p  = 0;
 
-    for( ; s->p < pattern->real_size - 1; )
+    for( ; s->p < pattern->real_size; )
     {
         if( pattern->data_ptr[ s->p ] != '%' ) // check on the raw pattern basis one to one
         {

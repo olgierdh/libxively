@@ -3,6 +3,9 @@
 
 // local
 #include "layer.h"
+#include "common.h"
+#include "xively.h"
+#include "csv_layer_data.h"
 
 /**
  * \file   csv_layer.h
@@ -37,6 +40,13 @@ layer_state_t csv_layer_close(
  */
 layer_state_t csv_layer_on_close(
     layer_connectivity_t* context );
+
+layer_state_t csv_layer_parse_datastream(
+        csv_layer_data_t* csv_layer_data
+      , const_data_descriptor_t* data
+      , const layer_hint_t hint
+      , xi_datapoint_t* dp );
+
 
 const void* csv_layer_data_generator_datastream_get(
           const void* input
