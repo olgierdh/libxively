@@ -92,7 +92,10 @@ char xi_stated_sscanf(
                 s->p++;     // move on, finished with parsing
                 s->vi++;    // switch to the next variable
             }
-            else if( pattern->data_ptr[ s->p ] == 's' || pattern->data_ptr[ s->p ] == '.' || pattern->data_ptr[ s->p ] == 'B' )
+            else if(   pattern->data_ptr[ s->p ] == 's'
+                    || pattern->data_ptr[ s->p ] == '.'
+                    || pattern->data_ptr[ s->p ] == 'B'
+                    || pattern->data_ptr[ s->p ] == 'C' )
             {
                 s->tmp_i = 0;
 
@@ -110,6 +113,9 @@ char xi_stated_sscanf(
                             break;
                         case 'B':
                             res = safe_until_copier( &s->tmp_i, &source->curr_pos, &dst_desc, source, &pass_all );
+                            break;
+                        case 'C':
+                            res = safe_until_copier( &s->tmp_i, &source->curr_pos, &dst_desc, source, &is_channel_id );
                             break;
                     }
 

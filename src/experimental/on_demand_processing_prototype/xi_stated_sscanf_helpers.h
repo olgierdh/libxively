@@ -12,7 +12,7 @@ static inline unsigned char is_digit( const char c )
 
 static inline unsigned char is_alpha( const char c )
 {
-    return ( c >= 65 && c <= 122 ) ? 1 : 0;
+    return ( ( c >= 65 && c <= 90 ) || ( c >= 97 && c <= 122 ) ) ? 1 : 0;
 }
 
 static inline unsigned char is_header( const char c )
@@ -23,6 +23,11 @@ static inline unsigned char is_header( const char c )
 static inline unsigned char is_any( const char c )
 {
     return ( c >= 32 && c <= 122 ) ? 1 : 0;
+}
+
+static inline unsigned char is_channel_id( const char c )
+{
+    return ( is_alpha( c ) || is_digit( c ) || c == 43 || c == 45 || c == 95 ) ? 1 : 0;
 }
 
 static inline void to_int( xi_stated_sscanf_state_t* s, int* out )

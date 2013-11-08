@@ -364,7 +364,7 @@ layer_state_t csv_layer_parse_datastream(
     // some tmp variables
     char ret_state                      = 0;
 
-    BEGIN_CORO( csv_layer_data->csv_datapoint_decode_state )
+    BEGIN_CORO( csv_layer_data->datapoint_decode_state )
 
     // parse the timestamp
     {
@@ -383,12 +383,12 @@ layer_state_t csv_layer_parse_datastream(
                 , ( void* ) &( gmtinfo.tm_sec )
                 , ( void* ) &( dp->timestamp.micro ) };
 
-            ret_state = xi_stated_sscanf( &( csv_layer_data->xi_stated_sscanf_state ), &pattern, data, pv );
+            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern, data, pv );
 
             if( ret_state == 0 )
             {
                 // need more data
-                YIELD( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_MORE_DATA )
+                YIELD( csv_layer_data->datapoint_decode_state, LAYER_STATE_MORE_DATA )
                 continue;
             }
 
@@ -397,8 +397,13 @@ layer_state_t csv_layer_parse_datastream(
         // test the result
         if( ret_state == -1 )
         {
-            EXIT( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_ERROR );
+            EXIT( csv_layer_data->datapoint_decode_state, LAYER_STATE_ERROR );
         }
+
+        // here it's safe to convert the gmtinfo to timestamp
+        gmtinfo.tm_year            -= 1900;
+        gmtinfo.tm_mon             -= 1;
+        dp->timestamp.timestamp     = xi_mktime( &gmtinfo );
     }
 
 
@@ -406,11 +411,11 @@ layer_state_t csv_layer_parse_datastream(
     {
         do
         {
-            ret_state = xi_stated_csv_decode_value( &( csv_layer_data->csv_decode_state ), data, dp, LAYER_HINT_NONE );
+            ret_state = xi_stated_csv_decode_value( &( csv_layer_data->csv_decode_value_state ), data, dp, LAYER_HINT_NONE );
 
             if( ret_state == 0 )
             {
-                YIELD( csv_layer_data->csv_datapoint_decode_state, LAYER_STATE_MORE_DATA )
+                YIELD( csv_layer_data->datapoint_decode_state, LAYER_STATE_MORE_DATA )
                 continue;
             }
 
@@ -418,13 +423,103 @@ layer_state_t csv_layer_parse_datastream(
     }
 
     // exit the function
-    EXIT( csv_layer_data->csv_datapoint_decode_state, ( ret_state == -1 ? LAYER_STATE_ERROR : LAYER_STATE_OK ) );
+    EXIT( csv_layer_data->datapoint_decode_state, ( ret_state == -1 ? LAYER_STATE_ERROR : LAYER_STATE_OK ) );
 
     END_CORO()
 
     return LAYER_STATE_OK;
 }
 
+/**
+ * @brief csv_layer_parse_feed
+ * @param csv_layer_data
+ * @param data
+ * @param hint
+ * @param dp
+ * @return
+ */
+layer_state_t csv_layer_parse_feed(
+        csv_layer_data_t* csv_layer_data
+      , const_data_descriptor_t* data
+      , const layer_hint_t hint
+      , xi_feed_t* dp )
+{
+    XI_UNUSED( hint );
+    XI_UNUSED( dp );
+
+    // some tmp variables
+    char sscanf_state                      = 0;
+    layer_state_t state                    = LAYER_STATE_OK;
+
+    BEGIN_CORO( csv_layer_data->feed_decode_state )
+
+    // clear the count of datastreams that has been read so far
+    dp->datastream_count = 0;
+
+    // loop over datastreams
+    do
+    {
+        // we are expecting the patttern with datapoint id
+        {
+            do
+            {
+                const char status_pattern[]       = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
+                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
+                void* pv[]                        = { ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id };
+
+                sscanf_state = xi_stated_sscanf(
+                              &( csv_layer_data->stated_sscanf_state )
+                            , ( const_data_descriptor_t* ) &v
+                            , ( const_data_descriptor_t* ) data
+                            , pv );
+
+                if( sscanf_state == 0 )
+                {
+                    YIELD( csv_layer_data->feed_decode_state, LAYER_STATE_MORE_DATA );
+                    sscanf_state == 0;
+                    continue;
+                }
+                else if( sscanf_state == -1 )
+                {
+                    EXIT( csv_layer_data->feed_decode_state, LAYER_STATE_ERROR );
+                }
+
+            } while( sscanf_state == 0 );
+        }
+
+        // after parsing the datastream name it's time for the datastream itself
+        {
+            //
+            do
+            {
+                state = csv_layer_parse_datastream( csv_layer_data, data, hint, &( dp->datastreams[ dp->datastream_count ].datapoints[ 0 ] ) );
+
+                if( state == LAYER_STATE_MORE_DATA )
+                {
+                    YIELD( csv_layer_data->feed_decode_state, LAYER_STATE_MORE_DATA );
+                    state = LAYER_STATE_MORE_DATA;
+                    continue;
+                }
+                else if( state == LAYER_STATE_ERROR )
+                {
+                    EXIT( csv_layer_data->feed_decode_state, LAYER_STATE_ERROR );
+                }
+
+            } while( state == LAYER_STATE_MORE_DATA );
+
+            // update the counter values
+            dp->datastreams[ dp->datastream_count ].datapoint_count     = 1;
+            dp->datastream_count                                       += 1;
+        }
+
+    } while( hint == LAYER_HINT_MORE_DATA ); // stop condition
+
+    EXIT( csv_layer_data->feed_decode_state, LAYER_STATE_OK );
+
+    END_CORO()
+
+    return LAYER_STATE_OK;
+}
 
 layer_state_t csv_layer_data_ready(
       layer_connectivity_t* context
@@ -469,7 +564,8 @@ layer_state_t csv_layer_on_data_ready(
     // field that set is required
     http_layer_input_t* http_layer_input = ( http_layer_input_t* ) ( data );
 
-    // store the layer input in custom data
+    // store the layer input in custom data will need that later
+    // during the response parsing
     ( ( csv_layer_data_t* ) context->self->user_data )->http_layer_input = ( void* ) http_layer_input;
 
     switch( http_layer_input->query_type )

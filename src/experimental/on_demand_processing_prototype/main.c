@@ -12,10 +12,13 @@
 #include "layer_factory_conf.h"
 #include "layer_default_allocators.h"
 
+#include "csv_layer.h"
+
+#include "xi_stated_sscanf.h"
+
 #include "posix_io_layer.h"
 #include "http_layer.h"
 #include "http_layer_data.h"
-#include "csv_layer.h"
 
 enum LAYERS_ID
 {
@@ -79,7 +82,7 @@ int main( int argc, const char* argv[] )
           HTTP_LAYER_INPUT_DATASTREAM_GET
         , context
         , 0
-        , { { "3" } }
+        , { { "3", 0 } }
     };
 
 
@@ -90,6 +93,64 @@ int main( int argc, const char* argv[] )
 
     // prepare the xi data
     CALL_ON_SELF_DATA_READY( http_layer, ( void *) &http_layer_input, LAYER_HINT_NONE );
+
+    /*short state = 0;
+    xi_datapoint_t dp = { { 15 }, XI_VALUE_TYPE_I32, { 123233, 0 } };
+
+    while( state != 1 )
+    {
+        const const_data_descriptor_t* dd = csv_layer_data_generator_datapoint( ( void* ) &dp, &state );
+        printf( "%s", dd->data_ptr );
+    }
+
+    state = 0;
+
+    while( state != 1 )
+    {
+        const const_data_descriptor_t* dd = csv_layer_data_generator_datapoint( ( void* ) &dp, &state );
+        printf( "%s", dd->data_ptr );
+    }*/
+
+#if 0
+    {
+        xi_datapoint_t   dp;
+        csv_layer_data_t ld;
+
+        memset( &ld, 0, sizeof( csv_layer_data_t ) );
+
+        const char source[] = "2013-01-01T22:22:22.000000Z,123\0";
+
+        const_data_descriptor_t dd = { source, sizeof( source ), sizeof( source ), 0 };
+
+        csv_layer_parse_datastream( &ld, &dd, LAYER_HINT_NONE, &dp );
+    }
+#endif
+
+#if 0
+    {
+        xi_feed_t         f;
+        csv_layer_data_t ld;
+
+        memset( &ld, 0, sizeof( csv_layer_data_t ) );
+
+        const char source1[] = "datastr";
+        const char source2[] = "eam_id,2013-01";
+        const char source3[] = "-01T22:22:22.000000Z,123\0";
+
+        const_data_descriptor_t dd1 = { source1, sizeof( source1 ) - 1, sizeof( source1 ) - 1, 0 };
+        const_data_descriptor_t dd2 = { source2, sizeof( source2 ) - 1, sizeof( source2 ) - 1, 0 };
+        const_data_descriptor_t dd3 = { source3, sizeof( source3 ) - 1, sizeof( source3 ) - 1, 0 };
+
+        layer_state_t state1 = csv_layer_parse_feed( &ld, &dd1, LAYER_HINT_MORE_DATA, &f );
+        layer_state_t state2 = csv_layer_parse_feed( &ld, &dd2, LAYER_HINT_MORE_DATA, &f );
+        layer_state_t state3 = csv_layer_parse_feed( &ld, &dd3, LAYER_HINT_NONE, &f );
+
+        if( state1 == LAYER_STATE_ERROR )
+        {
+            int i = 0;
+        }
+    }
+#endif
 
 	return 0;
 }

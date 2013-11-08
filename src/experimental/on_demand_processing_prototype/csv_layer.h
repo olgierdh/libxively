@@ -47,6 +47,12 @@ layer_state_t csv_layer_parse_datastream(
       , const layer_hint_t hint
       , xi_datapoint_t* dp );
 
+layer_state_t csv_layer_parse_feed(
+        csv_layer_data_t* csv_layer_data
+      , const_data_descriptor_t* data
+      , const layer_hint_t hint
+      , xi_feed_t* dp );
+
 
 const void* csv_layer_data_generator_datastream_get(
           const void* input
