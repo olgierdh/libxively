@@ -476,7 +476,7 @@ layer_state_t csv_layer_parse_feed(
                 if( sscanf_state == 0 )
                 {
                     YIELD( csv_layer_data->feed_decode_state, LAYER_STATE_MORE_DATA );
-                    sscanf_state == 0;
+                    sscanf_state = 0;
                     continue;
                 }
                 else if( sscanf_state == -1 )
