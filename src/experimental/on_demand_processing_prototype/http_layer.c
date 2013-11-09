@@ -305,7 +305,6 @@ layer_state_t http_layer_on_data_ready(
     {
         // restore the read position
         ( ( const_data_descriptor_t* ) data )->curr_pos = prev_pos;
-        // EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
     }
 
     // STAGE 03 reading second \r\n that means that the payload should begin just right after
