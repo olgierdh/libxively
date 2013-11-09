@@ -52,7 +52,12 @@ const void* http_layer_data_generator_datastream_get(
         , short* state )
 {
     // unpack the data
-    const http_layer_input_t* const http_layer_input = ( const http_layer_input_t* const ) input;
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    // required if sending the payload
+    static unsigned short cnt_len   = 0;
+    static char buff[ 16 ]          = { '\0' };
 
     ENABLE_GENERATOR();
 
@@ -63,14 +68,12 @@ const void* http_layer_data_generator_datastream_get(
         gen_static_text( *state, "/" );
 
         {
-            static char buff[ 16 ];
             sprintf( buff, "%d", http_layer_input->xi_context->feed_id );
-
             gen_ptr_text( *state, buff ); // feed id
         }
 
         gen_static_text( *state, "/datastreams/" );
-        gen_ptr_text( *state, http_layer_input->http_layer_data_u.xi_get_datastream.datastream ); // datastream id
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_datastream.datastream ); // datastream id
         gen_static_text( *state, ".csv " );
 
         // SEND HTTP
@@ -91,15 +94,51 @@ const void* http_layer_data_generator_datastream_get(
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_ACCEPT );
         gen_ptr_text( *state, XI_HTTP_CRLF );
 
+        // if there is a payload we have to calculate it's size and then send it
+        if( http_layer_input->payload_generator )
+        {
+            short ret_state                         = 0;
+            const const_data_descriptor_t* data     = 0;
+
+            while( ret_state != 1 )
+            {
+                data        = (*http_layer_input->payload_generator)( data, &ret_state );
+                cnt_len    += data->real_size;
+            }
+
+            sprintf( buff, "%d", ( int ) cnt_len );
+
+            gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
+            gen_ptr_text( *state, buff );
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+        }
+
         // A API KEY
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_X_API_KEY );
         gen_ptr_text( *state, http_layer_input->xi_context->api_key ); // api key
         gen_ptr_text( *state, XI_HTTP_CRLF );
 
         // the end, no more data double crlf
-        gen_ptr_text_and_exit( *state, XI_HTTP_CRLF );
+        if( http_layer_input->payload_generator )
+        {
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+        }
+        else
+        {
+            gen_ptr_text_and_exit( *state, XI_HTTP_CRLF );
+        }
+
+        // if generator exists pass the execution
+        if( http_layer_input->payload_generator )
+        {
+            call_sub_gen_and_exit( *state
+                                   , ( const void* ) &http_layer_input->http_layer_data
+                                   , (*http_layer_input->payload_generator) );
+        }
 
     END_CORO()
+
+    return 0;
 }
 
 /**

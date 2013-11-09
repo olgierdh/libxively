@@ -539,7 +539,11 @@ layer_state_t csv_layer_data_ready(
     switch( csv_layer_data->http_layer_input->query_type )
     {
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
-                return csv_layer_parse_datastream( csv_layer_data, data, hint, csv_layer_data->http_layer_input->http_layer_data_u.xi_get_datastream.value );
+                return csv_layer_parse_datastream(
+                              csv_layer_data
+                            , data
+                            , hint
+                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
             break;
         default:
             break;

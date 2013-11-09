@@ -37,25 +37,25 @@ typedef struct
     xi_context_t*           xi_context;             //!< the pointer to the context of the xi library
     xi_generator_t*         payload_generator;      //!< the pointer to the payload generator, used via the http layer to construct the payload
 
-    union
+    union http_layer_data_t
     {
-        struct
+        struct xi_get_datastream_t
         {
             const char*     datastream;
             xi_datapoint_t* value;
         } xi_get_datastream;
 
-        struct
+        struct xi_update_datastream_t
         {
             const char*     datastream;
             xi_datapoint_t* value;
         } xi_update_datastream;
 
-        struct
+        struct xi_get_feed_t
         {
             xi_feed_t*      feed;
         } xi_get_feed;
-    } http_layer_data_u;                        //!< the union suppose to contain different combinations of data used in queries
+    } http_layer_data;                              //!< the union suppose to contain different combinations of data used in queries
 
 } http_layer_input_t;
 

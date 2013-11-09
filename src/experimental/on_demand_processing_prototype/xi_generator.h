@@ -58,6 +58,25 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
     } \
 }
 
+#define call_sub_gen_and_exit( state, input, sub_gen ) \
+{ \
+    static short sub_state = 0; \
+    const const_data_descriptor_t* data = 0; \
+    sub_state = 0; \
+    while( sub_state != 1 ) \
+    { \
+        data = sub_gen( input, &sub_state ); \
+        if( sub_state == 1 ) \
+        { \
+            YIELD( state, data ); \
+        } \
+        else \
+        { \
+            EXIT( state, data ); \
+        } \
+    } \
+}
+
 #define gen_static_text_and_exit( state, text ) \
 { \
     static const char* const tmp_str = text; \

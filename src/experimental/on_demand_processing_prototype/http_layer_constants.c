@@ -10,4 +10,5 @@ const char* const XI_HTTP_TEMPLATE_HOST           = "Host: ";
 const char* const XI_HTTP_TEMPLATE_USER_AGENT     = "User-Agent: ";
 const char* const XI_HTTP_TEMPLATE_X_API_KEY      = "X-ApiKey: ";
 const char* const XI_HTTP_TEMPLATE_ACCEPT         = "Accept: */*";
+const char* const XI_HTTP_CONTENT_LENGTH          = "Content-Length: ";
 
