@@ -57,12 +57,13 @@ int main( int argc, const char* argv[] )
     ( void ) argv;
 
     ///
-    http_layer_data_t http_layer_data;
+    http_layer_data_t   http_layer_data;
+    xi_datapoint_t      datapoint;
 
     memset( &http_layer_data, 0, sizeof( http_layer_data_t ) );
 
     /// context and response
-    xi_context_t* context = xi_create_context( XI_HTTP, "1", 2 );
+    xi_context_t* context = xi_create_context( XI_HTTP, argv[ 1 ], atoi( argv[ 2 ] ) );
     xi_response_t xi_response;
 
     memset( &xi_response, 0, sizeof( xi_response_t ) );
@@ -82,7 +83,7 @@ int main( int argc, const char* argv[] )
           HTTP_LAYER_INPUT_DATASTREAM_GET
         , context
         , 0
-        , { { "3", 0 } }
+        , { { argv[ 3 ], &datapoint } }
     };
 
 
