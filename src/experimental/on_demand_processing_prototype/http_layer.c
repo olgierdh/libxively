@@ -177,7 +177,8 @@ layer_state_t http_layer_on_data_ready(
     http_layer_data_t* http_layer_data = ( http_layer_data_t* ) context->self->user_data;
 
     // some tmp variables
-    short sscanf_state     = 0;
+    short sscanf_state      = 0;
+    unsigned short prev_pos = 0;
 
     xi_stated_sscanf_state_t* xi_stated_state = &http_layer_data->xi_stated_sscanf_state;
 
@@ -193,7 +194,7 @@ layer_state_t http_layer_on_data_ready(
 
             while( sscanf_state == 0 )
             {
-                const char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) "s\r\n";
+                const char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) ".\r\n";
                 const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
                 void* pv[]                        = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
 
@@ -232,6 +233,9 @@ layer_state_t http_layer_on_data_ready(
                       ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
                     , ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
                 };
+
+                // save the curr pos to be able to get back
+                prev_pos = ( ( const_data_descriptor_t* ) data )->curr_pos;
 
                 sscanf_state = xi_stated_sscanf(
                               xi_stated_state
@@ -297,9 +301,11 @@ layer_state_t http_layer_on_data_ready(
         } while( sscanf_state == 1 );
     }
 
-    if( sscanf_state == -1 )
+    if( sscanf_state == -1 ) // may not be failure yet
     {
-        EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
+        // restore the read position
+        ( ( const_data_descriptor_t* ) data )->curr_pos = prev_pos;
+        // EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
     }
 
     // STAGE 03 reading second \r\n that means that the payload should begin just right after

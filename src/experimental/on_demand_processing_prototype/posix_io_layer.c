@@ -82,6 +82,7 @@ layer_state_t posix_io_layer_on_data_ready(
         memset( buffer->data_ptr, 0, buffer->data_size );
         buffer->real_size = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size - 1 );
         buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
+        buffer->curr_pos = 0;
         state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
     } while( state == LAYER_STATE_MORE_DATA );
 

@@ -533,11 +533,13 @@ layer_state_t csv_layer_data_ready(
     // unpack the layer data
     csv_layer_data_t* csv_layer_data = ( csv_layer_data_t* ) context->self->user_data;
 
+    layer_state_t state = LAYER_STATE_OK;
 
     //
     switch( csv_layer_data->http_layer_input->query_type )
     {
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
+                return csv_layer_parse_datastream( csv_layer_data, data, hint, csv_layer_data->http_layer_input->http_layer_data_u.xi_get_datastream.value );
             break;
         default:
             break;
