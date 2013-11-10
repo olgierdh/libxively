@@ -299,61 +299,6 @@ const void* csv_layer_data_generator_datapoint(
 }
 
 /**
- * @brief csv_layer_data_generator_datastream_update
- * @param input
- * @param state
- * @return
- */
-const void* csv_layer_data_generator_datastream_update(
-          const void* input
-        , short* state )
-{
-    XI_UNUSED( input );
-
-    ENABLE_GENERATOR();
-    BEGIN_CORO( *state )
-
-        gen_static_text( *state, "sub_test0" );
-        gen_static_text( *state, "sub_test1" );
-        gen_static_text( *state, "sub_test2" );
-        gen_static_text( *state, "sub_test3" );
-
-        call_sub_gen( *state, input, csv_layer_data_generator_datapoint );
-
-        gen_static_text( *state, "sub_test4" );
-        gen_static_text_and_exit( *state, "sub_test5" );
-
-    END_CORO()
-}
-
-
-/**
- * \brief  see the layer_interface for details
- */
-const void* csv_layer_data_generator_datastream_get(
-          const void* input
-        , short* state )
-{
-    XI_UNUSED( input );
-
-    ENABLE_GENERATOR();
-    BEGIN_CORO( *state )
-
-        gen_static_text( *state, "test0" );
-        gen_static_text( *state, "test1" );
-        gen_static_text( *state, "test2" );
-
-        call_sub_gen( *state, input, csv_layer_data_generator_datastream_update );
-
-        gen_static_text( *state, "test3" );
-        gen_static_text( *state, "test4" );
-        gen_static_text_and_exit( *state, "test5" );
-
-    END_CORO()
-}
-
-
-/**
  * @brief csv_layer_parse_datastream helper function that parses the one level of the data which is the datastream itself
  *        this function suppose to parse the timestamp and the value and save it within the proper datastream field
  *
