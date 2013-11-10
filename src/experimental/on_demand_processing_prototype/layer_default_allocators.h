@@ -48,4 +48,44 @@ static inline void default_layer_heap_free( layer_type_t* type, layer_t* layer )
     xi_free( layer );
 }
 
+/**
+ * @brief stack_counter counts the layers on a stack
+ */
+static unsigned char stack_counter = 0;
+
+#define MAX_LAYERS_ON_STACK 4
+
+/**
+ * \brief   default_layer_stack_alloc
+ * \param   type simple pointer to type structure
+ * \return  pointer to allocated layer_t structure
+ */
+static inline layer_t* default_layer_stack_alloc( const layer_type_t* type )
+{
+    static layer_t layers_stack[ MAX_LAYERS_ON_STACK ];
+
+    memset( &layers_stack[ stack_counter ], 0, sizeof( layer_t ) );
+
+    layers_stack[ stack_counter ].layer_functions                = &type->layer_interface;
+    layers_stack[ stack_counter ].layer_type_id                  = type->layer_type_id;
+    layers_stack[ stack_counter ].layer_connection.self          = &layers_stack[ stack_counter ];
+
+    stack_counter += 1;
+
+    return &layers_stack[ stack_counter - 1 ];
+}
+
+/**
+ * \brief default_layer_heap_free
+ * \param type
+ * \param layer
+ */
+static inline void default_layer_stack_free( layer_type_t* type, layer_t* layer )
+{
+    XI_UNUSED( type );
+    XI_UNUSED( layer );
+
+    stack_counter -= 1;
+}
+
 #endif // __LAYER_DEFAULT_ALLOCATORS_H__

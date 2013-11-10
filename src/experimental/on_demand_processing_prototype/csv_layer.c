@@ -196,8 +196,17 @@ char xi_stated_csv_decode_value(
         // this is where we shall need to jump for more data
         if( source->curr_pos == source->real_size )
         {
-            // need more data
-            return 0;
+            if( hint == LAYER_HINT_MORE_DATA )
+            {
+                // need more data
+                return 0;
+            }
+
+            if( hint == LAYER_HINT_NONE )
+            {
+                ++( st->counter );
+                break;
+            }
 data_ready:
             source->curr_pos = 0; // reset the counter
         }
@@ -249,7 +258,8 @@ const void* csv_layer_data_generator_datapoint(
         , short* state )
 {
     // we expect input to be datapoint
-    const xi_datapoint_t* dp = ( xi_datapoint_t* ) input;
+    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+    const xi_datapoint_t* dp            = ( const xi_datapoint_t* ) ld->xi_get_datastream.value;
 
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
@@ -388,7 +398,8 @@ layer_state_t csv_layer_parse_datastream(
             if( ret_state == 0 )
             {
                 // need more data
-                YIELD( csv_layer_data->datapoint_decode_state, LAYER_STATE_MORE_DATA )
+                YIELD( csv_layer_data->datapoint_decode_state, LAYER_STATE_MORE_DATA );
+                ret_state = 0;
                 continue;
             }
 
@@ -411,7 +422,7 @@ layer_state_t csv_layer_parse_datastream(
     {
         do
         {
-            ret_state = xi_stated_csv_decode_value( &( csv_layer_data->csv_decode_value_state ), data, dp, LAYER_HINT_NONE );
+            ret_state = xi_stated_csv_decode_value( &( csv_layer_data->csv_decode_value_state ), data, dp, hint );
 
             if( ret_state == 0 )
             {
@@ -530,41 +541,6 @@ layer_state_t csv_layer_data_ready(
     XI_UNUSED( data );
     XI_UNUSED( hint );
 
-    // unpack the layer data
-    csv_layer_data_t* csv_layer_data = ( csv_layer_data_t* ) context->self->user_data;
-
-    layer_state_t state = LAYER_STATE_OK;
-
-    //
-    switch( csv_layer_data->http_layer_input->query_type )
-    {
-        case HTTP_LAYER_INPUT_DATASTREAM_GET:
-                return csv_layer_parse_datastream(
-                              csv_layer_data
-                            , data
-                            , hint
-                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
-            break;
-        default:
-            break;
-    }
-
-    return LAYER_STATE_OK;
-
-    // END_CORO()
-
-    return LAYER_STATE_OK;
-}
-
-layer_state_t csv_layer_on_data_ready(
-      layer_connectivity_t* context
-    , const void* data
-    , const layer_hint_t hint )
-{
-    XI_UNUSED( context );
-    XI_UNUSED( data );
-    XI_UNUSED( hint );
-
     // unpack the data, changing the constiness to avoid copying cause
     // these layers shares the same data and the generator suppose to be the only
     // field that set is required
@@ -581,11 +557,53 @@ layer_state_t csv_layer_on_data_ready(
             http_layer_input->payload_generator = 0;
             return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
         }
+        case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
+        {
+            http_layer_input->payload_generator = &csv_layer_data_generator_datapoint;
+            return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
+        }
         default:
             return LAYER_STATE_ERROR;
     };
 
     return LAYER_STATE_ERROR;
+}
+
+
+layer_state_t csv_layer_on_data_ready(
+      layer_connectivity_t* context
+    , const void* data
+    , const layer_hint_t hint )
+{
+    XI_UNUSED( context );
+    XI_UNUSED( data );
+    XI_UNUSED( hint );
+
+    // unpack the layer data
+    csv_layer_data_t* csv_layer_data = ( csv_layer_data_t* ) context->self->user_data;
+
+    //
+    switch( csv_layer_data->http_layer_input->query_type )
+    {
+        case HTTP_LAYER_INPUT_DATASTREAM_GET:
+                return csv_layer_parse_datastream(
+                              csv_layer_data
+                            , ( void* ) data
+                            , hint
+                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
+            break;
+        case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
+            // should not be called there should be no csv payload
+            break;
+        default:
+            break;
+    }
+
+    return LAYER_STATE_OK;
+
+    // END_CORO()
+
+    return LAYER_STATE_OK;
 }
 
 layer_state_t csv_layer_close(

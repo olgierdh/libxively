@@ -41,6 +41,83 @@ static inline http_header_type_t classify_header( const char* header )
     return XI_HTTP_HEADER_UNKNOWN;
 }
 
+const void* http_layer_data_generator_query_body(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    // required if sending the payload
+    static unsigned short cnt_len   = 0;
+    static char buff[ 16 ]          = { '\0' };
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+            // SEND HOST
+            gen_ptr_text( *state, XI_HTTP_TEMPLATE_HOST );
+            gen_static_text( *state, "api.xively.com" );
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+
+            // SEND USER AGENT
+            gen_ptr_text( *state, XI_HTTP_TEMPLATE_USER_AGENT );
+            gen_static_text( *state, "libxively-posix/experimental" );
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+
+            // SEND ACCEPT
+            gen_ptr_text( *state, XI_HTTP_TEMPLATE_ACCEPT );
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+
+            // if there is a payload we have to calculate it's size and then send it
+            if( http_layer_input->payload_generator )
+            {
+                short ret_state                         = 0;
+                const const_data_descriptor_t* data     = 0;
+
+                while( ret_state != 1 )
+                {
+                    data        = (*http_layer_input->payload_generator)( &http_layer_input->http_layer_data, &ret_state );
+                    cnt_len    += data->real_size;
+                }
+
+                sprintf( buff, "%d", ( int ) cnt_len );
+
+                gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
+                gen_ptr_text( *state, buff );
+                gen_ptr_text( *state, XI_HTTP_CRLF );
+            }
+
+            // A API KEY
+            gen_ptr_text( *state, XI_HTTP_TEMPLATE_X_API_KEY );
+            gen_ptr_text( *state, http_layer_input->xi_context->api_key ); // api key
+            gen_ptr_text( *state, XI_HTTP_CRLF );
+
+            // the end, no more data double crlf
+            if( http_layer_input->payload_generator )
+            {
+                gen_ptr_text( *state, XI_HTTP_CRLF );
+            }
+            else
+            {
+                gen_ptr_text_and_exit( *state, XI_HTTP_CRLF );
+            }
+
+            // if generator exists pass the execution
+            if( http_layer_input->payload_generator )
+            {
+                call_sub_gen_and_exit( *state
+                                       , ( const void* ) &http_layer_input->http_layer_data
+                                       , (*http_layer_input->payload_generator) );
+            }
+
+    END_CORO()
+
+    return 0;
+}
+
 /**
  * \brief http_layer_data_generator_datastream_get
  * \param input
@@ -56,7 +133,6 @@ const void* http_layer_data_generator_datastream_get(
             = ( const http_layer_input_t* const ) input;
 
     // required if sending the payload
-    static unsigned short cnt_len   = 0;
     static char buff[ 16 ]          = { '\0' };
 
     ENABLE_GENERATOR();
@@ -80,61 +156,54 @@ const void* http_layer_data_generator_datastream_get(
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
         gen_ptr_text( *state, XI_HTTP_CRLF );
 
-        // SEND HOST
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HOST );
-        gen_static_text( *state, "api.xively.com" );
-        gen_ptr_text( *state, XI_HTTP_CRLF );
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
 
-        // SEND USER AGENT
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_USER_AGENT );
-        gen_static_text( *state, "libxively-posix/experimental" );
-        gen_ptr_text( *state, XI_HTTP_CRLF );
+    END_CORO()
 
-        // SEND ACCEPT
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_ACCEPT );
-        gen_ptr_text( *state, XI_HTTP_CRLF );
+    return 0;
+}
 
-        // if there is a payload we have to calculate it's size and then send it
-        if( http_layer_input->payload_generator )
+/**
+ * \brief http_layer_data_generator_datastream_update
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_datastream_update(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    // required if sending the payload
+    static char buff[ 16 ]          = { '\0' };
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        gen_ptr_text( *state, XI_HTTP_PUT );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
         {
-            short ret_state                         = 0;
-            const const_data_descriptor_t* data     = 0;
-
-            while( ret_state != 1 )
-            {
-                data        = (*http_layer_input->payload_generator)( data, &ret_state );
-                cnt_len    += data->real_size;
-            }
-
-            sprintf( buff, "%d", ( int ) cnt_len );
-
-            gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
-            gen_ptr_text( *state, buff );
-            gen_ptr_text( *state, XI_HTTP_CRLF );
+            sprintf( buff, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buff ); // feed id
         }
 
-        // A API KEY
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_X_API_KEY );
-        gen_ptr_text( *state, http_layer_input->xi_context->api_key ); // api key
+        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_datastream.datastream ); // datastream id
+        gen_static_text( *state, ".csv " );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
         gen_ptr_text( *state, XI_HTTP_CRLF );
 
-        // the end, no more data double crlf
-        if( http_layer_input->payload_generator )
-        {
-            gen_ptr_text( *state, XI_HTTP_CRLF );
-        }
-        else
-        {
-            gen_ptr_text_and_exit( *state, XI_HTTP_CRLF );
-        }
-
-        // if generator exists pass the execution
-        if( http_layer_input->payload_generator )
-        {
-            call_sub_gen_and_exit( *state
-                                   , ( const void* ) &http_layer_input->http_layer_data
-                                   , (*http_layer_input->payload_generator) );
-        }
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
 
     END_CORO()
 
@@ -144,9 +213,10 @@ const void* http_layer_data_generator_datastream_get(
 /**
  * \brief  see the layer_interface for details
  */
-static inline layer_state_t http_layer_data_ready_datastream_get(
+static inline layer_state_t http_layer_data_ready_gen(
       layer_connectivity_t* context
-    , const http_layer_input_t* input )
+    , const http_layer_input_t* input
+    , xi_generator_t* gen )
 {
     // generator state
     short gstate = 0;
@@ -155,7 +225,7 @@ static inline layer_state_t http_layer_data_ready_datastream_get(
     while( gstate != 1 )
     {
         const const_data_descriptor_t* ret
-                = ( const const_data_descriptor_t* ) http_layer_data_generator_datastream_get( input, &gstate );
+                = ( const const_data_descriptor_t* ) ( *gen )( input, &gstate );
 
         layer_state_t state
                 = CALL_ON_PREV_DATA_READY(
@@ -189,9 +259,16 @@ layer_state_t http_layer_data_ready(
 
     switch( http_layer_input->query_type )
     {
+        case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datastream_update );
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
-            return http_layer_data_ready_datastream_get(
-                          context, http_layer_input );
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datastream_get );
         default:
             return LAYER_STATE_ERROR;
     };
@@ -377,42 +454,26 @@ layer_state_t http_layer_on_data_ready(
     // STAGE 04 reading payload
     {
         // clear the buffer
-        memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
         xi_debug_printf( "\n" );
 
         http_layer_data->counter    = 0;
         sscanf_state                = 0;
 
-        while( sscanf_state == 0 )
+        while( http_layer_data->counter < http_layer_data->content_length )
         {
-            short before = ( ( const_data_descriptor_t* ) data )->curr_pos;
+            unsigned short before = ( ( const_data_descriptor_t* ) data )->curr_pos;
+            unsigned short after  = ( ( const_data_descriptor_t* ) data )->real_size;
+            http_layer_data->counter += after - before;
 
-            const char status_pattern[]       = "%B";
-            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
-            void*                        pv[] = { ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value };
+            xi_debug_printf( "%s", ( ( const_data_descriptor_t* ) data )->data_ptr + ( ( const_data_descriptor_t* ) data )->curr_pos );
 
-            sscanf_state = xi_stated_sscanf(
-                          xi_stated_state
-                        , ( const_data_descriptor_t* ) &v
-                        , ( const_data_descriptor_t* ) data
-                        , pv );
+            layer_state_t state = CALL_ON_NEXT_ON_DATA_READY( context->self
+                                        , ( const void* ) data
+                                        , ( http_layer_data->counter < http_layer_data->content_length ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
 
-            short after = ( ( const_data_descriptor_t* ) data )->curr_pos;
-
-            http_layer_data->counter += ( after - before );
-
-            if( http_layer_data->content_length == http_layer_data->counter )
+            if( state == LAYER_STATE_MORE_DATA && http_layer_data->counter < http_layer_data->content_length )
             {
-                xi_debug_printf( "%s\n", http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
-                EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
-            }
-
-            if( sscanf_state == 0 )
-            {
-                YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA )
-                xi_stated_state->tmp_i  = 0; // reset the value pointer
-                xi_debug_printf( "%s", http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
-                memset( http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value, 0, XI_HTTP_HEADER_VALUE_MAX_SIZE );
+                YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA );
             }
         }
     }

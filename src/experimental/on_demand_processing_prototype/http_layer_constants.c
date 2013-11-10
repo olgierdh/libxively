@@ -2,6 +2,7 @@
 
 const char* const XI_HTTP_POST                    = "POST ";
 const char* const XI_HTTP_GET                     = "GET ";
+const char* const XI_HTTP_PUT                     = "PUT ";
 const char* const XI_HTTP_CRLF                    = "\r\n";
 const char* const XI_HTTP_TEMPLATE_FEED           = "/v2/feeds";
 const char* const XI_HTTP_TEMPLATE_CSV            = ".csv";

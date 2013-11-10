@@ -5,6 +5,7 @@
 // set of constants
 extern const char* const XI_HTTP_POST;
 extern const char* const XI_HTTP_GET;
+extern const char* const XI_HTTP_PUT;
 extern const char* const XI_HTTP_CRLF;
 extern const char* const XI_HTTP_TEMPLATE_FEED;
 extern const char* const XI_HTTP_TEMPLATE_CSV;

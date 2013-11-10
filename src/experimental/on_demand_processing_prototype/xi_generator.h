@@ -66,7 +66,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
     while( sub_state != 1 ) \
     { \
         data = sub_gen( input, &sub_state ); \
-        if( sub_state == 1 ) \
+        if( sub_state != 1 ) \
         { \
             YIELD( state, data ); \
         } \
