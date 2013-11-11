@@ -11,6 +11,10 @@
 #include "layer_helpers.h"
 
 
+// required if sending the payload
+static char static_buff_16[ 16 ]    = { '\0' };
+
+
 // static array of recognizable http headers
 static const char* XI_HTTP_TOKEN_NAMES[ XI_HTTP_HEADERS_COUNT ] =
     {
@@ -51,7 +55,6 @@ const void* http_layer_data_generator_query_body(
 
     // required if sending the payload
     static unsigned short cnt_len   = 0;
-    static char buff[ 16 ]          = { '\0' };
 
     ENABLE_GENERATOR();
 
@@ -83,10 +86,10 @@ const void* http_layer_data_generator_query_body(
                     cnt_len    += data->real_size;
                 }
 
-                sprintf( buff, "%d", ( int ) cnt_len );
+                sprintf( static_buff_16, "%d", ( int ) cnt_len );
 
                 gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
-                gen_ptr_text( *state, buff );
+                gen_ptr_text( *state, static_buff_16 );
                 gen_ptr_text( *state, XI_HTTP_CRLF );
             }
 
@@ -118,13 +121,7 @@ const void* http_layer_data_generator_query_body(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_datastream_get
- * \param input
- * \param state
- * \return
- */
-const void* http_layer_data_generator_datastream_get(
+const void* http_layer_data_generator_datastream_body(
           const void* input
         , short* state )
 {
@@ -132,20 +129,13 @@ const void* http_layer_data_generator_datastream_get(
     const http_layer_input_t* const http_layer_input
             = ( const http_layer_input_t* const ) input;
 
-    // required if sending the payload
-    static char buff[ 16 ]          = { '\0' };
-
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
-        gen_ptr_text( *state, XI_HTTP_GET );
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
-
         {
-            sprintf( buff, "%d", http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, buff ); // feed id
+            sprintf( static_buff_16, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, static_buff_16 ); // feed id
         }
 
         gen_static_text( *state, "/datastreams/" );
@@ -158,6 +148,33 @@ const void* http_layer_data_generator_datastream_get(
 
         // SEND THE REST THROUGH SUB GENERATOR
         call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+
+/**
+ * \brief http_layer_data_generator_datastream_get
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_datastream_get(
+          const void* input
+        , short* state )
+{
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        gen_ptr_text( *state, XI_HTTP_GET );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
 
     END_CORO()
 
@@ -174,13 +191,6 @@ const void* http_layer_data_generator_datastream_update(
           const void* input
         , short* state )
 {
-    // unpack the data
-    const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
-
-    // required if sending the payload
-    static char buff[ 16 ]          = { '\0' };
-
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
@@ -189,26 +199,40 @@ const void* http_layer_data_generator_datastream_update(
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
         gen_static_text( *state, "/" );
 
-        {
-            sprintf( buff, "%d", http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, buff ); // feed id
-        }
-
-        gen_static_text( *state, "/datastreams/" );
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_datastream.datastream ); // datastream id
-        gen_static_text( *state, ".csv " );
-
-        // SEND HTTP
-        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
-        gen_ptr_text( *state, XI_HTTP_CRLF );
-
         // SEND THE REST THROUGH SUB GENERATOR
-        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
 
     END_CORO()
 
     return 0;
 }
+
+/**
+ * \brief http_layer_data_generator_datastream_get
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_datastream_create(
+          const void* input
+        , short* state )
+{
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        gen_ptr_text( *state, XI_HTTP_POST );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
+
+    END_CORO()
+
+    return 0;
+}
+
 
 /**
  * \brief  see the layer_interface for details
@@ -448,6 +472,8 @@ layer_state_t http_layer_on_data_ready(
 
     if( sscanf_state == -1 )
     {
+        xi_debug_printf( "No double \\r\\n\n" );
+
         EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
     }
 

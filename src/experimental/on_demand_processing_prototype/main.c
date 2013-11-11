@@ -105,7 +105,7 @@ int main( int argc, const char* argv[] )
           HTTP_LAYER_INPUT_DATASTREAM_GET
         , context
         , 0
-        , { { argv[ 3 ], &datapoint } }
+        , { ( struct xi_get_datastream_t ) { argv[ 3 ], &datapoint } }
     };
 
 

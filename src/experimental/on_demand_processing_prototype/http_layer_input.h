@@ -21,6 +21,11 @@ typedef enum
       HTTP_LAYER_INPUT_DATASTREAM_GET = 0
     , HTTP_LAYER_INPUT_DATASTREAM_DELETE
     , HTTP_LAYER_INPUT_DATASTREAM_UPDATE
+    , HTTP_LAYER_INPUT_DATASTREAM_CREATE
+    , HTTP_LAYER_INPUT_DATAPOINT_DELETE
+    , HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE
+    , HTTP_LAYER_INPUT_FEED_UPDATE
+    , HTTP_LAYER_INPUT_FEED_GET
 } xi_query_type_t;
 
 
@@ -29,7 +34,7 @@ typedef enum
  *          that we shall send over network.
  *
  *\note     Version of that structure is specialized for communication with RESTful xively API
- *          so it is not fully functional generic implementation of the HTTP protoco.
+ *          so it is not fully functional generic implementation of the HTTP protocol.
  */
 typedef struct
 {
@@ -50,6 +55,12 @@ typedef struct
             const char*     datastream;
             xi_datapoint_t* value;
         } xi_update_datastream;
+
+        struct xi_create_datastream_t
+        {
+            const char*         datastream;
+            xi_datapoint_t*     value;
+        } xi_create_datastream;
 
         struct xi_get_feed_t
         {

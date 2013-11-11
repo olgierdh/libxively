@@ -298,6 +298,64 @@ const void* csv_layer_data_generator_datapoint(
     END_CORO()
 }
 
+const void* csv_layer_data_generator_datastream(
+          const void* input
+        , short* state )
+{
+    // we expect input to be datapoint
+    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+
+    ENABLE_GENERATOR();
+    BEGIN_CORO( *state )
+
+        // SEND DATAPOINT ID
+        gen_ptr_text( *state, ld->xi_create_datastream.datastream );
+        gen_static_text( *state, "," );
+
+        call_sub_gen_and_exit( *state
+                               , input
+                               , csv_layer_data_generator_datapoint );
+
+    END_CORO()
+
+    return 0;
+
+}
+
+
+const void* csv_layer_data_generator_feed(
+          const void* input
+        , short* state )
+{
+    // we expect input to be datapoint
+    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+    const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
+    static unsigned char i              = 0;
+
+    BEGIN_CORO( *state )
+
+        i = 0;
+
+        // SEND DATAPOINTS
+        {
+            for( ; i < feed->datastream_count; ++i )
+            {
+                const union http_layer_data_t tmp = { {
+                                ( char* ) feed->datastreams[ i ].datastream_id
+                              , ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ]
+                            } };
+
+                // SEND THE REST THROUGH SUB GENERATOR
+                call_sub_gen_and_exit( *state, &tmp, csv_layer_data_generator_datastream );
+            }
+        }
+
+    END_CORO()
+
+    return 0;
+}
+
+
 /**
  * @brief csv_layer_parse_datastream helper function that parses the one level of the data which is the datastream itself
  *        this function suppose to parse the timestamp and the value and save it within the proper datastream field
@@ -497,21 +555,27 @@ layer_state_t csv_layer_data_ready(
 
     switch( http_layer_input->query_type )
     {
+        case HTTP_LAYER_INPUT_DATASTREAM_DELETE:
+        case HTTP_LAYER_INPUT_DATAPOINT_DELETE:
+        case HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE:
+        case HTTP_LAYER_INPUT_FEED_GET:
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
-        {
             http_layer_input->payload_generator = 0;
-            return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
-        }
+            break;
         case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
-        {
             http_layer_input->payload_generator = &csv_layer_data_generator_datapoint;
-            return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
-        }
+            break;
+        case HTTP_LAYER_INPUT_DATASTREAM_CREATE:
+            http_layer_input->payload_generator = &csv_layer_data_generator_datastream;
+            break;
+        case HTTP_LAYER_INPUT_FEED_UPDATE:
+            http_layer_input->payload_generator = &csv_layer_data_generator_feed;
+            break;
         default:
             return LAYER_STATE_ERROR;
     };
 
-    return LAYER_STATE_ERROR;
+    return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
 }
 
 

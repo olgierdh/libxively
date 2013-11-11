@@ -11,9 +11,9 @@
  *
  * \param   input the input data, the generator will know how to interpret that
  * \param   curr_state returned through the pointer, this is where generator will return and save it's state
- *              so that the communication can be done throught that short value
+ *              so that the communication can be done throught that value
  * \warning do not change the curr_state from outside, unless you know what youre doing!
- * \return  abstract value that can be interpret via the generator caller
+ * \return  abstract value that interpreted by caller of generator
  */
 typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 
@@ -43,7 +43,7 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 #define gen_static_text( state, text ) \
 { \
     static const char* const tmp_str = text; \
-    __tmp.data_ptr = tmp_str; \
+    __tmp.data_ptr  = tmp_str; \
     __tmp.real_size = __tmp.data_size = sizeof( text ) - 1; \
     YIELD( state, ( void* ) &__tmp ); \
 }
