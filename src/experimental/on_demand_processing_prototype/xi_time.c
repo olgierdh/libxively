@@ -139,7 +139,7 @@ struct xi_tm* xi_gmtime( register const xi_time_t *timer )
     timep->tm_yday = dayno;
     timep->tm_mon = 0;
 
-    while (dayno >= _ytab[LEAPYEAR(year)][timep->tm_mon]) {
+    while (dayno >= ( unsigned int ) _ytab[LEAPYEAR(year)][timep->tm_mon]) {
             dayno -= _ytab[LEAPYEAR(year)][timep->tm_mon];
             timep->tm_mon++;
     }
