@@ -16,13 +16,19 @@ char xi_stated_sscanf(
     s->vi = 0;
     s->p  = 0;
 
+    if( source->curr_pos == source->real_size ) // check if the data not needed
+    {
+        YIELD( s->state, 0 );
+        source->curr_pos = 0;
+    }
+
     for( ; s->p < pattern->real_size; )
     {
         if( pattern->data_ptr[ s->p ] != '%' ) // check on the raw pattern basis one to one
         {
             if( pattern->data_ptr[ s->p ] != source->data_ptr[ source->curr_pos ] )
             {
-                return -1;
+                EXIT( s->state, -1 );
             }
             else
             {
