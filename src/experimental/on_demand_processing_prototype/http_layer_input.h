@@ -19,9 +19,9 @@
 typedef enum
 {
       HTTP_LAYER_INPUT_DATASTREAM_GET = 0
-    , HTTP_LAYER_INPUT_DATASTREAM_DELETE
     , HTTP_LAYER_INPUT_DATASTREAM_UPDATE
     , HTTP_LAYER_INPUT_DATASTREAM_CREATE
+    , HTTP_LAYER_INPUT_DATASTREAM_DELETE
     , HTTP_LAYER_INPUT_DATAPOINT_DELETE
     , HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE
     , HTTP_LAYER_INPUT_FEED_UPDATE
@@ -61,6 +61,24 @@ typedef struct
             const char*         datastream;
             xi_datapoint_t*     value;
         } xi_create_datastream;
+
+        struct xi_delete_datastream_t
+        {
+            const char*         datastream;
+        } xi_delete_datastream;
+
+        struct xi_delete_datapoint_t
+        {
+            const char*         datastream;
+            xi_datapoint_t*     value;
+        } xi_delete_datapoint;
+
+        struct xi_delete_datapoint_range_t
+        {
+            const char*         datastream;
+            xi_datapoint_t*     value_start;
+            xi_datapoint_t*     value_end;
+        } xi_delete_datapoint_range;
 
         struct xi_get_feed_t
         {

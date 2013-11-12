@@ -6,6 +6,7 @@
 extern const char* const XI_HTTP_POST;
 extern const char* const XI_HTTP_GET;
 extern const char* const XI_HTTP_PUT;
+extern const char* const XI_HTTP_DELETE;
 extern const char* const XI_HTTP_CRLF;
 extern const char* const XI_HTTP_TEMPLATE_FEED;
 extern const char* const XI_HTTP_TEMPLATE_CSV;
@@ -15,5 +16,7 @@ extern const char* const XI_HTTP_TEMPLATE_USER_AGENT;
 extern const char* const XI_HTTP_TEMPLATE_X_API_KEY;
 extern const char* const XI_HTTP_TEMPLATE_ACCEPT;
 extern const char* const XI_HTTP_CONTENT_LENGTH;
+extern const char* const XI_CSV_TIMESTAMP_PATTERN;
+
 
 #endif // __HTTP_LAYER_CONSTANTS_H__

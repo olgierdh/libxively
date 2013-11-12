@@ -1,18 +1,18 @@
 #include "layer_api.h"
+#include "common.h"
 #include "http_layer.h"
 #include "http_layer_constants.h"
 #include "http_layer_input.h"
 #include "http_layer_data.h"
 #include "xi_macros.h"
 #include "xi_debug.h"
-#include "common.h"
 #include "xi_stated_sscanf.h"
 #include "xi_coroutine.h"
 #include "layer_helpers.h"
 
 
 // required if sending the payload
-static char static_buff_16[ 16 ]    = { '\0' };
+static char static_buff_32[ 32 ]    = { '\0' };
 
 
 // static array of recognizable http headers
@@ -45,6 +45,12 @@ static inline http_header_type_t classify_header( const char* header )
     return XI_HTTP_HEADER_UNKNOWN;
 }
 
+/**
+ * @brief http_layer_data_generator_query_body
+ * @param input
+ * @param state
+ * @return
+ */
 const void* http_layer_data_generator_query_body(
           const void* input
         , short* state )
@@ -86,10 +92,10 @@ const void* http_layer_data_generator_query_body(
                     cnt_len    += data->real_size;
                 }
 
-                sprintf( static_buff_16, "%d", ( int ) cnt_len );
+                sprintf( static_buff_32, "%d", ( int ) cnt_len );
 
                 gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
-                gen_ptr_text( *state, static_buff_16 );
+                gen_ptr_text( *state, static_buff_32 );
                 gen_ptr_text( *state, XI_HTTP_CRLF );
             }
 
@@ -121,6 +127,12 @@ const void* http_layer_data_generator_query_body(
     return 0;
 }
 
+/**
+ * @brief http_layer_data_generator_datastream_body
+ * @param input
+ * @param state
+ * @return
+ */
 const void* http_layer_data_generator_datastream_body(
           const void* input
         , short* state )
@@ -134,8 +146,8 @@ const void* http_layer_data_generator_datastream_body(
     BEGIN_CORO( *state )
 
         {
-            sprintf( static_buff_16, "%d", http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, static_buff_16 ); // feed id
+            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, static_buff_32 ); // feed id
         }
 
         gen_static_text( *state, "/datastreams/" );
@@ -153,7 +165,6 @@ const void* http_layer_data_generator_datastream_body(
 
     return 0;
 }
-
 
 /**
  * \brief http_layer_data_generator_datastream_get
@@ -208,7 +219,44 @@ const void* http_layer_data_generator_datastream_update(
 }
 
 /**
- * \brief http_layer_data_generator_datastream_get
+ * @brief http_layer_data_generator_datastream_create_body
+ * @param input
+ * @param state
+ * @return
+ */
+const void* http_layer_data_generator_datastream_create_body(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        {
+            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, static_buff_32 ); // feed id
+        }
+
+        gen_static_text( *state, "/datastreams.csv" );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
+ * \brief http_layer_data_generator_datastream_create
  * \param input
  * \param state
  * \return
@@ -226,12 +274,293 @@ const void* http_layer_data_generator_datastream_create(
         gen_static_text( *state, "/" );
 
         // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_create_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
+ * \brief http_layer_data_generator_feed_get
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_feed_get(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    // PRECONDITIONS
+    assert( http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count > 0 );
+
+    static unsigned char i = 0;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        // after starting coro reset static counter
+        i = 1;
+
+        gen_ptr_text( *state, XI_HTTP_GET );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
+        {
+            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, static_buff_32 ); // feed id
+        }
+
+        gen_static_text( *state, ".csv?datastreams=" );
+
+        // 0 case separated
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ 0 ].datastream_id );
+
+        // iterate over all datastreams
+        {
+            for( ; i < http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count; ++i )
+            {
+                gen_static_text( *state, "," );
+                gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ i ].datastream_id );
+            }
+        }
+
+        // space
+        gen_static_text( *state, " " );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
+ * \brief http_layer_data_generator_feed_update
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_feed_update(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        gen_ptr_text( *state, XI_HTTP_PUT );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_static_text( *state, "/" );
+
+        {
+            sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, static_buff_32 ); // feed id
+        }
+
+        gen_static_text( *state, ".csv " );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
+ * @brief http_layer_data_generator_datastream_delete
+ * @param input
+ * @param state
+ * @return
+ */
+const void* http_layer_data_generator_datastream_delete(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, static_buff_32 ); // feed id
+
+        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datastream.datastream );
+        gen_static_text( *state, ".csv " );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
         call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
 
     END_CORO()
 
     return 0;
 }
+
+/**
+ * @brief http_layer_data_generator_datapoint_delete
+ * @param input
+ * @param state
+ * @return
+ */
+const void* http_layer_data_generator_datapoint_delete(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    xi_time_t stamp         = 0;
+    struct xi_tm* gmtinfo   = 0;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, static_buff_32 ); // feed id
+
+        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint.datastream );
+        gen_static_text( *state, "/datapoints/" );
+
+        {
+            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.timestamp;
+            gmtinfo = xi_gmtime( &stamp );
+
+            snprintf( static_buff_32, 32
+                , XI_CSV_TIMESTAMP_PATTERN
+                , gmtinfo->tm_year + 1900
+                , gmtinfo->tm_mon + 1
+                , gmtinfo->tm_mday
+                , gmtinfo->tm_hour
+                , gmtinfo->tm_min
+                , gmtinfo->tm_sec
+                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.micro );
+
+            gen_ptr_text( *state, static_buff_32 );
+            gen_static_text( *state, ".csv " );
+        }
+
+
+        //
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
+ * @brief http_layer_data_generator_datapoint_delete_range
+ * @param input
+ * @param state
+ * @return
+ */
+const void* http_layer_data_generator_datapoint_delete_range(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* const ) input;
+
+    xi_time_t stamp         = 0;
+    struct xi_tm* gmtinfo   = 0;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        sprintf( static_buff_32, "%d", http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, static_buff_32 ); // feed id
+
+        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint_range.datastream );
+        gen_static_text( *state, "/datapoints?start=" );
+
+        {
+            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp.timestamp;
+            gmtinfo = xi_gmtime( &stamp );
+
+            snprintf( static_buff_32, 32
+                , XI_CSV_TIMESTAMP_PATTERN
+                , gmtinfo->tm_year + 1900
+                , gmtinfo->tm_mon + 1
+                , gmtinfo->tm_mday
+                , gmtinfo->tm_hour
+                , gmtinfo->tm_min
+                , gmtinfo->tm_sec
+                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp.micro );
+
+            gen_ptr_text( *state, static_buff_32 );
+            gen_static_text( *state, "&" );
+
+            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp.timestamp;
+            gmtinfo = xi_gmtime( &stamp );
+
+            snprintf( static_buff_32, 32
+                , XI_CSV_TIMESTAMP_PATTERN
+                , gmtinfo->tm_year + 1900
+                , gmtinfo->tm_mon + 1
+                , gmtinfo->tm_mday
+                , gmtinfo->tm_hour
+                , gmtinfo->tm_min
+                , gmtinfo->tm_sec
+                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp.micro );
+
+            gen_ptr_text( *state, static_buff_32 );
+            gen_static_text( *state, ".csv " );
+        }
+
+
+        //
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
+
+    END_CORO()
+
+    return 0;
+}
+
 
 
 /**
@@ -293,6 +622,36 @@ layer_state_t http_layer_data_ready(
                           context
                         , http_layer_input
                         , &http_layer_data_generator_datastream_get );
+        case HTTP_LAYER_INPUT_DATASTREAM_CREATE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datastream_create );
+        case HTTP_LAYER_INPUT_FEED_GET:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_feed_get );
+        case HTTP_LAYER_INPUT_FEED_UPDATE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_feed_update );
+        case HTTP_LAYER_INPUT_DATASTREAM_DELETE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datastream_delete );
+        case HTTP_LAYER_INPUT_DATAPOINT_DELETE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datapoint_delete );
+        case HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_datapoint_delete_range );
         default:
             return LAYER_STATE_ERROR;
     };
