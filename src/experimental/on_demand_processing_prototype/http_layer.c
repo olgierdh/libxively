@@ -513,7 +513,7 @@ const void* http_layer_data_generator_datapoint_delete_range(
         gen_static_text( *state, "/datapoints?start=" );
 
         {
-            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp.timestamp;
+            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
             snprintf( static_buff_32, 32
@@ -524,12 +524,12 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_hour
                 , gmtinfo->tm_min
                 , gmtinfo->tm_sec
-                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp.micro );
+                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->micro );
 
             gen_ptr_text( *state, static_buff_32 );
             gen_static_text( *state, "&" );
 
-            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp.timestamp;
+            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
             snprintf( static_buff_32, 32
@@ -540,7 +540,7 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_hour
                 , gmtinfo->tm_min
                 , gmtinfo->tm_sec
-                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp.micro );
+                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->micro );
 
             gen_ptr_text( *state, static_buff_32 );
             gen_static_text( *state, ".csv " );

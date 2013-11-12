@@ -76,14 +76,19 @@ typedef struct
         struct xi_delete_datapoint_range_t
         {
             const char*         datastream;
-            xi_datapoint_t*     value_start;
-            xi_datapoint_t*     value_end;
+            xi_timestamp_t*     value_start;
+            xi_timestamp_t*     value_end;
         } xi_delete_datapoint_range;
 
         struct xi_get_feed_t
         {
             xi_feed_t*      feed;
         } xi_get_feed;
+
+        struct xi_update_feed_t
+        {
+            xi_feed_t*      feed;
+        } xi_update_feed;
     } http_layer_data;                              //!< the union suppose to contain different combinations of data used in queries
 
 } http_layer_input_t;

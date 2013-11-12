@@ -12,6 +12,7 @@ typedef struct
     unsigned short                      feed_decode_state;
     xi_stated_csv_decode_value_state_t  csv_decode_value_state;
     xi_stated_sscanf_state_t            stated_sscanf_state;
+    xi_response_t*                      response;
 } csv_layer_data_t;
 
 #endif // __CSV_LAYER_DATA_H__
