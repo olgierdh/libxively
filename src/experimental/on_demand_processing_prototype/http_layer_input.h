@@ -13,6 +13,10 @@
 #include "layer.h"
 #include "xi_generator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \enum describes the xi http layer api input function types
  */
@@ -93,5 +97,8 @@ typedef struct
 
 } http_layer_input_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HTTP_LAYER_INPUT_H__

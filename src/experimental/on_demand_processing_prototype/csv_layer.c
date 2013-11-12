@@ -15,7 +15,9 @@
 #include "http_layer_input.h"
 #include "layer_helpers.h"
 
-//
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 inline static int csv_encode_value(
       char* buffer
@@ -662,3 +664,7 @@ layer_state_t csv_layer_on_close(
 
     return LAYER_STATE_OK;
 }
+
+#ifdef __cplusplus
+}
+#endif

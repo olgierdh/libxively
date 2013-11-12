@@ -4,6 +4,10 @@
 #include <assert.h>
 #include <malloc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief the structure that describes the buffer for storing/passing
  * within the program the structure can be easly manipulated using the 
@@ -85,5 +89,9 @@ static inline void delete_data_buffer( data_buffer_t* data_buffer )
     free( data_buffer );
 }
 
- 
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif

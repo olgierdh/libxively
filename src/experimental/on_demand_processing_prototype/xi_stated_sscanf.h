@@ -4,6 +4,10 @@
 #include "xi_stated_sscanf_state.h"
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief xi_stated_sscanf
  * @param s
@@ -17,5 +21,9 @@ char xi_stated_sscanf(
         , const const_data_descriptor_t* pattern
         , const_data_descriptor_t* source
         , void** variables );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XI_STATED_SSCANF_H__

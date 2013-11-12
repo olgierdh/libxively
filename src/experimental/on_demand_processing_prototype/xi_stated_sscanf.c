@@ -2,6 +2,10 @@
 #include "xi_coroutine.h"
 #include "xi_stated_sscanf_helpers.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 char xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
@@ -148,4 +152,7 @@ accept:
     return 1;
 }
 
+#ifdef __cplusplus
+}
+#endif
 

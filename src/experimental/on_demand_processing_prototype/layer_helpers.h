@@ -3,6 +3,10 @@
 
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief layer_sender little helper to encapsulate
  *        error handling over sending data between layers
@@ -25,5 +29,9 @@ static inline layer_state_t layer_sender(
         layer_state_t ret = LAYER_STATE_OK; \
         if( ( ret = layer_sender( context, data, hint ) ) != LAYER_STATE_OK ) { return ret; } \
     }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_HELPERS_H__

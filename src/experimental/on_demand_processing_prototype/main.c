@@ -20,6 +20,10 @@
 #include "http_layer.h"
 #include "http_layer_data.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, const char* argv[] )
@@ -78,3 +82,7 @@ int main( int argc, const char* argv[] )
 
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,6 +1,10 @@
 #ifndef __XI_STATED_SSCANF_STATE_H__
 #define __XI_STATED_SSCANF_STATE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct
 {
     char            buffer[ 8 ];
@@ -12,5 +16,8 @@ typedef struct
     unsigned char   vi;
 } xi_stated_sscanf_state_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XI_STATED_SSCANF_STATE_H__

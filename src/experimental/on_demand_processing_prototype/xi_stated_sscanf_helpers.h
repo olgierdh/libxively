@@ -3,6 +3,10 @@
 
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef unsigned char ( accept_char_t )( const char c );
 
 static inline unsigned char is_digit( const char c )
@@ -85,5 +89,8 @@ static inline char safe_until_copier(
     return 1;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XI_STATED_SSCANF_HELPERS_H__

@@ -1,5 +1,9 @@
 #include "xi_time.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // used by the xi_mktime and xi_gmtime
 #define YEAR0               1900  /* the first year */
 #define EPOCH_YR            1970  /* EPOCH = Jan 1 1970 00:00:00 */
@@ -149,3 +153,7 @@ struct xi_tm* xi_gmtime( register const xi_time_t *timer )
 
     return timep;
 }
+
+#ifdef __cplusplus
+}
+#endif

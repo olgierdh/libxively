@@ -5,6 +5,10 @@
 #include "layer.h"
 #include "http_layer_input.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \file   http_layer.h
  * \author Olgierd Humenczuk
@@ -52,5 +56,8 @@ const void* http_layer_data_generator_datastream_get(
           const void* input
         , short* state );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HTTP_LAYER_H__

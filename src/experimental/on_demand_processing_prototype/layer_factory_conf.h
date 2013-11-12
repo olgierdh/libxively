@@ -8,6 +8,10 @@
  *          policies
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "layer_factory_interface.h"
 
 #define BEGIN_FACTORY_CONF() \
@@ -18,5 +22,8 @@ const layer_factory_interface_t FACTORY_ENTRIES[] = {
 
 #define END_FACTORY_CONF() };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __FACTORY_CONF_H__

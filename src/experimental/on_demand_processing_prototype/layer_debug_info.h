@@ -8,6 +8,10 @@
  *          so that it's easier to track where the layer has been created and by whom
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __DEBUG
 /**
  * \struct  layer_debug_info
@@ -27,5 +31,8 @@ typedef struct layer_debug_info
 } layer_debug_info_t;
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_DEBUG_INFO_H__

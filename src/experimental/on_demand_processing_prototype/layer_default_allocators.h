@@ -14,6 +14,10 @@
 #include "xi_allocator.h"
 #include "xi_macros.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief   default_layer_heap_alloc
  * \param   type simple pointer to type structure
@@ -87,5 +91,9 @@ static inline void default_layer_stack_free( layer_type_t* type, layer_t* layer 
 
     stack_counter -= 1;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_DEFAULT_ALLOCATORS_H__

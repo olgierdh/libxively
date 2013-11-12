@@ -11,6 +11,10 @@
 #include "xi_stated_sscanf_state.h"
 #include "xively.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  *\brief    shall contain the data needed via parsing and constructing queries
  */
@@ -24,5 +28,8 @@ typedef struct
     xi_response_t*              response;
 } http_layer_data_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HTTP_LAYER_DATA_H__

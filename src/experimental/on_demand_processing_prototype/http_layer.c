@@ -10,6 +10,9 @@
 #include "xi_coroutine.h"
 #include "layer_helpers.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // required if sending the payload
 static char static_buff_32[ 32 ]    = { '\0' };
@@ -911,3 +914,7 @@ layer_t* init_http_layer(
 
     return LAYER_STATE_OK;
 }
+
+#ifdef __cplusplus
+}
+#endif

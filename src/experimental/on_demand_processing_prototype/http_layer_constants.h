@@ -1,6 +1,9 @@
 #ifndef __HTTP_LAYER_CONSTANTS_H__
 #define __HTTP_LAYER_CONSTANTS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // set of constants
 extern const char* const XI_HTTP_POST;
@@ -18,5 +21,8 @@ extern const char* const XI_HTTP_TEMPLATE_ACCEPT;
 extern const char* const XI_HTTP_CONTENT_LENGTH;
 extern const char* const XI_CSV_TIMESTAMP_PATTERN;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __HTTP_LAYER_CONSTANTS_H__

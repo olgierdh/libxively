@@ -7,6 +7,10 @@
 // local
 #include "layer_connectivity.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \file    layer_interface.h
  * \author  Olgierd Humenczuk
@@ -94,6 +98,8 @@ typedef struct layer_interface
 
 } layer_interface_t;
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif

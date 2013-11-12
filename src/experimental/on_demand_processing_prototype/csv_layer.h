@@ -7,6 +7,10 @@
 #include "xively.h"
 #include "csv_layer_data.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \file   csv_layer.h
  * \author Olgierd Humenczuk
@@ -62,5 +66,8 @@ const void* csv_layer_data_generator_datapoint(
           const void* input
         , short* state );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __CSV_LAYER_H__

@@ -3,6 +3,10 @@
 
 #include "layer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __DEBUG
 #define LAYER_LOCAL_INSTANCE( layer_name_instance, layer_interface, layer_type_id, user_data )\
     layer_t layer_name_instance                     = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };\
@@ -104,5 +108,8 @@ typedef enum
     , FUNCTION_ID_CLOSE
 } layer_api_function_id_t;
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_API_H__

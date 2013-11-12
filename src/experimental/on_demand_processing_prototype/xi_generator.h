@@ -6,6 +6,10 @@
 #include "xi_coroutine.h"
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief  this is the generator abstract interface definition
  *
@@ -85,5 +89,8 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
     EXIT( state, ( void* ) &__tmp ); \
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __XI_GENERATOR_H__

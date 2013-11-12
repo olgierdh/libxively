@@ -19,6 +19,10 @@
 #include "layer_api.h"
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 layer_state_t posix_io_layer_data_ready(
       layer_connectivity_t* context
     , const void* data
@@ -185,3 +189,7 @@ err_handling:
 
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

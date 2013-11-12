@@ -4,6 +4,10 @@
 // local
 #include "layer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \file   posix_io_layer.h
  * \author Olgierd Humenczuk
@@ -50,5 +54,8 @@ layer_t* connect_to_endpoint(
     , const char* address
     , const int port );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

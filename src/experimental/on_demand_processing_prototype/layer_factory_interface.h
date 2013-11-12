@@ -4,6 +4,10 @@
 #include "layer.h"
 #include "xi_macros.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \author  Olgierd Humenczuk
  * \file    layer_factory_interface.h
@@ -53,6 +57,8 @@ inline static layer_t* placement_layer_pass_delete( layer_t* layer )
     return layer;
 }
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_FACTORY_INTERFACE_H__

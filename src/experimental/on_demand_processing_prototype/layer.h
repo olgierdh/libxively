@@ -7,6 +7,10 @@
  * \brief   the layer type definition used across the whole layer system
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // local
 #include "layer_connectivity.h"
 #include "layer_debug_info.h"
@@ -28,5 +32,9 @@ typedef struct layer
 #endif
 } layer_t;
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_H__

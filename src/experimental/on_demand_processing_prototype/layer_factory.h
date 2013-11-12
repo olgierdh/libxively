@@ -12,6 +12,10 @@
 #include "layer_interface.h"
 #include "layer_factory_interface.h"
 
+#ifdef __cplusplus
+}
+#endif
+
 extern const layer_factory_interface_t FACTORY_ENTRIES[ ];
 extern const layer_type_t LAYER_TYPES[];
 
@@ -53,5 +57,8 @@ err_handling:
     return 0;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_FACTORY_H__

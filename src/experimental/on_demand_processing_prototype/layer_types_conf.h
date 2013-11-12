@@ -7,6 +7,10 @@
  *\brief    containes set of macros required to create the layers types configuration
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "layer_type.h"
 
 #define BEGIN_LAYER_TYPES_CONF() \
@@ -19,5 +23,8 @@
     };
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_TYPES_CONF_H__

@@ -18,6 +18,10 @@
 #include "layer_factory.h"
 #include "xi_macros.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SIZE_SUFFIX _SIZE
 
 /**
@@ -85,5 +89,9 @@ static inline layer_chain_t create_and_connect_layers( const layer_type_id_t lay
 
     return connect_layers( layers, length );
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __LAYER_CONNECTION_H__

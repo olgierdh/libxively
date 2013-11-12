@@ -9,6 +9,10 @@
 
 #include "layer_interface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \brief   layer_type_id_t
  */
@@ -27,5 +31,8 @@ typedef struct
 #define LAYER_LOCAL_TYPE( type_name, layer_type_id, data_ready, on_read, on_close, close )\
     static layer_type_t type_name = { layer_type_id, { data_ready, on_read, on_close, close } }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
