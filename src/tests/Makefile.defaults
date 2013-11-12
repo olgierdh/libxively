@@ -1,8 +1,21 @@
 XI_UNIT_TEST_TARGET ?= native
-
 XI_COMM_LAYER ?= dummy
 
 export XI_COMM_LAYER
+
+ifndef XI_UNIT_TEST_DEFAULTS
+export XI_UNIT_TEST_DEFAULTS = ""
+
+ifeq ($(XI_UNIT_TEST_TARGET),cortex-m3-qemu)
+  CC = arm-none-eabi-gcc
+  AR = arm-none-eabi-ar
+  XI_DEBUG_ASSERT = 0
+  XI_DEBUG_OUTPUT = 1
+  XI_EXTRA_CFLAGS += -mcpu=cortex-m3 -mthumb -T generic-hosted.ld
+
+  export CC AR
+  export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT
+endif
 
 ifeq ($(XI_UNIT_TEST_TARGET),avr)
   CC = avr-gcc
@@ -22,3 +35,4 @@ else
 endif
 
 export XI_EXTRA_CFLAGS
+endif

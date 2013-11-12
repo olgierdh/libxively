@@ -669,7 +669,7 @@ end:
 }
 
 
-struct testcase_t demo_tests[] = {
+struct testcase_t core_tests[] = {
     /* Here's a really simple test: it has a name you can refer to it
        with, and a function to invoke it. */
     { "test_parse_http_status", test_parse_http_status, TT_ENABLED_, 0, 0 },
@@ -699,7 +699,7 @@ struct testcase_t demo_tests[] = {
 struct testgroup_t groups[] = {
 
     /* Every group has a 'prefix', and an array of tests.  That's it. */
-    { "csv/", demo_tests },
+    { "csv/", core_tests },
 
     END_OF_GROUPS
 };
@@ -707,12 +707,16 @@ struct testgroup_t groups[] = {
 #if XI_UNIT_TEST_NATIVE
 int main( int argc, char const *argv[] )
 {
-  return tinytest_main( argc, argv, groups );
+  int r = tinytest_main( argc, argv, groups );
+  printf( "status: %i\n", r );
+  return r;
 }
 #else
 int main() 
 {
-  const char a[] = {"avr"};
-  return tinytest_main(1, (const char **)a, groups);
+  const char a[] = {"sim"};
+  int r = tinytest_main( 1, (const char **) a, groups );
+  printf( "status: %i\n", r);
+  return r;
 }
 #endif

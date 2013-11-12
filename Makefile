@@ -11,7 +11,7 @@ clean:
 ci_msp430:
 	$(MAKE) -C src clean
 	$(MAKE) -C src libxively \
-		CC=msp430-gcc AR=msp430-ar \
+		CC=msp430-elf-gcc AR=msp430-elf-ar \
 		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
 		XI_COMM_LAYER=dummy
 
