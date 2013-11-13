@@ -32,7 +32,6 @@ ifndef XI_OVERRIDE_CFLAGS
     XI_CFLAGS += $(foreach constant,$(XI_OPTIMISE),-DXI_OPT_$(constant))
   endif
   XI_USER_AGENT ?= '"libxively-$(XI_COMM_LAYER)/0.1.x-$(shell git rev-parse --short HEAD)"'
-
   XI_CFLAGS += -DXI_USER_AGENT=$(XI_USER_AGENT)
 else
   XI_CFLAGS := $(XI_OVERRIDE_CFLAGS)
@@ -45,6 +44,18 @@ else
   XI_ARFLAGS := $(XI_OVERRIDE_ARFLAGS)
   $(warning "Overriden XI_ARFLAGS with $(XI_OVERRIDE_ARFLAGS)")
 endif # XI_OVERRIDE_ARFLAGS
+
+ifeq ($(XI_COMM_LAYER),posix)
+	XI_CFLAGS += -DXI_COMM_LAYER=0
+endif
+
+ifeq ($(XI_COMM_LAYER),dummy)
+	XI_CFLAGS += -DXI_COMM_LAYER=1
+endif
+
+ifeq ($(XI_COMM_LAYER),mbed)
+	XI_CFLAGS += -DXI_COMM_LAYER=2
+endif
 
 XI_OUTPUT ?= $(LIBXIVELY)/
 XI_OBJDIR := $(XI_OUTPUT)/obj

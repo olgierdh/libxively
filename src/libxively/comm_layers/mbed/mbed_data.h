@@ -2,18 +2,18 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file    mbed_comm_layer_data_specific.h
+ * \file    mbed_data.h
  * \author  Olgierd Humenczuk
  * \brief   Declares layer-specific data structure
  */
 
-#ifndef __MBED_COMM_LAYER_DATA_SPECIFIC_H__
-#define __MBED_COMM_LAYER_DATA_SPECIFIC_H__
+#ifndef __MBED_DATA_H__
+#define __MBED_DATA_H__
 
 #include "TCPSocketConnection.h"
 
 typedef struct {
     TCPSocketConnection* socket_ptr;
-} mbed_comm_layer_data_specific_t;
+} mbed_data_t;
 
-#endif // __MBED_COMM_LAYER_DATA_SPECIFIC_H__
+#endif // __MBED_DATA_H__
