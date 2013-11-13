@@ -2,16 +2,16 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file    dummy_comm_layer_data_specific.h
+ * \file    dummy_data.h
  * \author  Olgierd Humenczuk
  * \brief   Declares layer-specific data structure
  */
 
-#ifndef __DUMMY_COMM_LAYER_DATA_SPECIFIC_H__
-#define __DUMMY_COMM_LAYER_DATA_SPECIFIC_H__
+#ifndef __DUMMY_DATA_H__
+#define __DUMMY_DATA_H__
 
 typedef struct {
     int socket_fd;
-} dummy_comm_layer_data_specific_t;
+} dummy_data_t;
 
-#endif // __DUMMY_COMM_LAYER_DATA_SPECIFIC_H__
+#endif // __DUMMY_DATA_H__
