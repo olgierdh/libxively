@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "comm_layer.h"
 #include "xi_config.h"
 #include "xi_time.h"
+#include "layer_connection.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,9 +50,10 @@ typedef uint32_t xi_feed_id_t;
  *          that communicate with Xively API (_i.e. not helpers or utilities_)
  */
 typedef struct {
-    char *api_key; /** Xively API key */
-    xi_protocol_t protocol; /** Xively protocol */
-    xi_feed_id_t feed_id; /** Xively feed ID */
+    char *api_key;              /** Xively API key */
+    xi_protocol_t protocol;     /** Xively protocol */
+    xi_feed_id_t feed_id;       /** Xively feed ID */
+    layer_chain_t layer_chain;  /** Xively reference of layers */
 } xi_context_t;
 
 /**
@@ -102,14 +103,13 @@ typedef struct {
 } http_header_t;
 
 typedef struct {
-    int             http_version1;
-    int             http_version2;
-    int             http_status;
+    unsigned char   http_version1;
+    unsigned char   http_version2;
+    unsigned short  http_status;
     char            http_status_string[ XI_HTTP_STATUS_STRING_SIZE ];
     http_header_t*  http_headers_checklist[ XI_HTTP_HEADERS_COUNT ];
     http_header_t   http_headers[ XI_HTTP_MAX_HEADERS ];
     size_t          http_headers_size;
-    char            http_content[ XI_HTTP_MAX_CONTENT_SIZE ];
 } http_response_t;
 
 /**

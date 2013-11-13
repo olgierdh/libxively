@@ -1,5 +1,9 @@
 #include "xi_time.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // used by the xi_mktime and xi_gmtime
 #define YEAR0               1900  /* the first year */
 #define EPOCH_YR            1970  /* EPOCH = Jan 1 1970 00:00:00 */
@@ -139,7 +143,7 @@ struct xi_tm* xi_gmtime( register const xi_time_t *timer )
     timep->tm_yday = dayno;
     timep->tm_mon = 0;
 
-    while (dayno >= ( unsigned int )_ytab[LEAPYEAR(year)][timep->tm_mon]) {
+    while (dayno >= ( unsigned int ) _ytab[LEAPYEAR(year)][timep->tm_mon]) {
             dayno -= _ytab[LEAPYEAR(year)][timep->tm_mon];
             timep->tm_mon++;
     }
@@ -149,3 +153,7 @@ struct xi_tm* xi_gmtime( register const xi_time_t *timer )
 
     return timep;
 }
+
+#ifdef __cplusplus
+}
+#endif

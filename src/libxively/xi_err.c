@@ -11,6 +11,10 @@
 #include "xi_macros.h"
 #include "xi_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static xi_err_t xi_err = XI_NO_ERR;
 
 #ifndef XI_OPT_NO_ERROR_STRINGS
@@ -66,3 +70,7 @@ void xi_set_err( xi_err_t e )
 {
     xi_err = e;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -117,11 +117,11 @@ layer_t* connect_to_endpoint(
     , const int port )
 {
 
-    {
-        char msg[ 32 ];
+#ifdef XI_DEBUG_OUTPUT
+        char msg[ 64 ] = { '\0' };
         sprintf( msg, "Connecting layer [%d] to the endpoint", layer->layer_type_id );
         xi_debug_logger( msg );
-    }
+#endif
 
     posix_data_t* posix_data                    = xi_alloc( sizeof( posix_data_t ) );
 
