@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
 /**
  * \struct  layer_debug_info
  * \brief   The structure holds information related to the layer debugging. Here the original place of initialization

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
 #define LAYER_LOCAL_INSTANCE( layer_name_instance, layer_interface, layer_type_id, user_data )\
     layer_t layer_name_instance                     = { layer_interface, { 0, 0, 0 }, layer_type_id, ( void* ) user_data, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };\
     INIT_INSTANCE( layer_name_instance )
@@ -23,7 +23,7 @@ extern "C" {
     instance.layer_connection.self                  = &instance;
 #endif
 
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
 #define CONNECT_LAYERS( lp_i, ln_i )\
     ln_i->layer_connection.prev             = lp_i;\
     lp_i->layer_connection.next             = ln_i;\
@@ -40,13 +40,13 @@ extern "C" {
 #define LAYER_GET_CONTEXT_PTR( instance )\
     &instance->layer_connection
 
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
 #define SET_DEBUG_INFO_ON( layer, context )\
     context->layer_connection.layer->debug_info.debug_line_last_call = __LINE__;\
     context->layer_connection.layer->debug_info.debug_file_last_call = __FILE__;
 #endif
 
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
 #define CALL_ON( layer, target, context )\
     context->layer_connection.layer->layer_functions->target( &context->layer_connection.layer->layer_connection );\
     SET_DEBUG_INFO_ON( layer, context );

@@ -27,7 +27,7 @@ typedef struct layer
     layer_type_id_t             layer_type_id;
     void*                       user_data;
     short                       layer_states[ 4 ];
-#ifdef __DEBUG
+#ifdef XI_DEBUG_LAYER_API
     layer_debug_info_t          debug_info;
 #endif
 } layer_t;
