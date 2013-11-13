@@ -9,9 +9,6 @@
 // c
 #include <assert.h>
 #include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdint.h>
