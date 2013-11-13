@@ -2,8 +2,8 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file 	mbed_comm.h
- * \author 	Olgierd Humenczuk
+ * \file     mbed_comm.h
+ * \author     Olgierd Humenczuk
  * \brief   Implements mbed _communication layer_ functions [see comm_layer.h and mbed_comm.cpp]
  */
 

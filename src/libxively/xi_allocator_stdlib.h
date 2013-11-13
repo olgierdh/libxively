@@ -2,7 +2,7 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file	xi_allocator_stdlib.h
+ * \file    xi_allocator_stdlib.h
  * \author  Olgierd Humenczuk
  * \brief   Our custom `alloc()` and `free()` [see xi_allocator.h]
  */

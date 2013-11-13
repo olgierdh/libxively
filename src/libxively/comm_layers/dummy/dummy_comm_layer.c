@@ -4,8 +4,8 @@
 #include "dummy_comm.h"
 
 /**
- * \file 	dummy_comm_layer.c
- * \author 	Olgierd Humenczuk
+ * \file     dummy_comm_layer.c
+ * \author     Olgierd Humenczuk
  * \brief   Implements DUMMY _communication layer_ functions [see comm_layer.h]
  */
 

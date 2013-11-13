@@ -2,8 +2,8 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file 	dummy_comm.h
- * \author 	Olgierd Humenczuk
+ * \file     dummy_comm.h
+ * \author     Olgierd Humenczuk
  * \brief   Implements DUMMY _communication layer_ functions [see comm_layer.h and dummy_comm.c]
  */
 

@@ -2,7 +2,7 @@
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 /**
- * \file	xi_allocator.h
+ * \file    xi_allocator.h
  * \author  Olgierd Humenczuk
  * \brief   Our custom `alloc()` and `free()`
  *
@@ -21,7 +21,7 @@ extern "C" {
 
 /**
  * \brief   Behaves like usual `malloc()`, which is supposed to allocate a chunk
- * 		    of memory and return the pointer to it.
+ *             of memory and return the pointer to it.
  *
  * \return  Pointer to allocated memory or null in case of any error.
  */
@@ -29,7 +29,7 @@ static inline void* xi_alloc( size_t b );
 
 /**
  * \brief   Behaves like usual `free()`, it frees previously allocated chunk of
- * 		    of memory.
+ *             of memory.
  */
 static inline void xi_free( void* p );
 
