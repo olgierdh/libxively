@@ -26,7 +26,6 @@
 #include "layer_factory.h"
 #include "layer_factory_conf.h"
 #include "layer_default_allocators.h"
-#include "posix_io_layer.h"
 #include "http_layer.h"
 #include "http_layer_data.h"
 
@@ -177,39 +176,44 @@ uint32_t xi_get_network_timeout( void )
 // LAYERS SETTINGS
 //-----------------------------------------------------------------------
 
-enum LAYERS_ID
-{
-      IO_LAYER = 0
-    , HTTP_LAYER
-    , CSV_LAYER
-};
+#if XI_COMM_LAYER == posix
+    // posix io layer
+    #include "posix_io_layer.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    enum LAYERS_ID
+    {
+          IO_LAYER = 0
+        , HTTP_LAYER
+        , CSV_LAYER
+    };
 
-#define CONNECTION_SCHEME_1_DATA IO_LAYER, HTTP_LAYER, CSV_LAYER
-DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #define CONNECTION_SCHEME_1_DATA IO_LAYER, HTTP_LAYER, CSV_LAYER
+    DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
 
-BEGIN_LAYER_TYPES_CONF()
-      LAYER_TYPE( IO_LAYER, &posix_io_layer_data_ready, &posix_io_layer_on_data_ready
-                          , &posix_io_layer_close, &posix_io_layer_on_close )
-    , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
-                            , &http_layer_close, &http_layer_on_close )
-    , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
-                        , &csv_layer_close, &csv_layer_on_close )
-END_LAYER_TYPES_CONF()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BEGIN_LAYER_TYPES_CONF()
+          LAYER_TYPE( IO_LAYER, &posix_io_layer_data_ready, &posix_io_layer_on_data_ready
+                              , &posix_io_layer_close, &posix_io_layer_on_close )
+        , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
+                                , &http_layer_close, &http_layer_on_close )
+        , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
+                            , &csv_layer_close, &csv_layer_on_close )
+    END_LAYER_TYPES_CONF()
 
-BEGIN_FACTORY_CONF()
-      FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                             , &default_layer_stack_alloc, &default_layer_stack_free )
-    , FACTORY_ENTRY( HTTP_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    BEGIN_FACTORY_CONF()
+          FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
+                                 , &default_layer_stack_alloc, &default_layer_stack_free )
+        , FACTORY_ENTRY( HTTP_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
+                                   , &default_layer_stack_alloc, &default_layer_stack_free )
+        , FACTORY_ENTRY( CSV_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
                                , &default_layer_stack_alloc, &default_layer_stack_free )
-    , FACTORY_ENTRY( CSV_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                           , &default_layer_stack_alloc, &default_layer_stack_free )
-END_FACTORY_CONF()
+    END_FACTORY_CONF()
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
