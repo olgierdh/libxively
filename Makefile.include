@@ -12,7 +12,7 @@ ifndef XI_OVERRIDE_CFLAGS
   XI_CFLAGS += $(XI_WARN_CFLAGS) $(XI_EXTRA_CFLAGS)
   ifeq ($(XI_BUILD_TYPE),release)
     XI_OPTLEVEL ?= -O2
-    XI_CFLAGS += $(XI_OPTLEVEL) -combine -fwhole-program
+    XI_CFLAGS += $(XI_OPTLEVEL)
   endif
   ifeq ($(XI_BUILD_TYPE),debug)
     XI_OPTLEVEL ?= -O0
