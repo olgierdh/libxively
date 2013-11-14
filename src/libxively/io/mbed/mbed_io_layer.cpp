@@ -33,9 +33,7 @@ layer_state_t mbed_io_layer_data_ready(
     , const layer_hint_t hint )
 {
     // extract the layer specific data
-    mbed_data_t* mbed_data
-        = ( mbed_data_t* ) context->self->user_data;
-
+    mbed_data_t* mbed_data                  = ( mbed_data_t* ) context->self->user_data;
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
     if( buffer != 0 && buffer->data_size > 0 )
@@ -63,8 +61,11 @@ layer_state_t mbed_io_layer_on_data_ready(
     , const layer_hint_t hint )
 {
     // extract the layer specific data
-    mbed_data_t* mbed_data
-        = ( mbed_data_t* ) context->self->user_data;
+    mbed_data_t* mbed_data  = ( mbed_data_t* ) context->self->user_data;
+
+    XI_UNUSED( hint );
+
+    data_descriptor_t* buffer = 0;
 
     if( data )
     {
