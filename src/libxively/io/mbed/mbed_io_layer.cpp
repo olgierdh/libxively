@@ -23,6 +23,7 @@
 #include "xi_macros.h"
 #include "xi_globals.h"
 #include "layer_api.h"
+#include "common.h"
 
 extern "C" {
 
