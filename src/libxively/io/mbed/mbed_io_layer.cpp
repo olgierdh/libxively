@@ -38,9 +38,6 @@ layer_state_t mbed_io_layer_data_ready(
 
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
-    // Why not const char* ???
-    int bytes_written = mbed_data->socket_ptr->send_all( ( char* ) data, size );
-
     if( buffer != 0 && buffer->data_size > 0 )
     {
         int len = mbed_data->socket_ptr->send_all( ( char* ) buffer->data_ptr, buffer->data_size );
