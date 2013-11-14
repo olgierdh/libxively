@@ -7,7 +7,6 @@
  * \brief   Implements DUMMY _io layer_ abstraction interface [see layer.h]
  */
 // c
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>

@@ -1,8 +1,9 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#include <assert.h>
 #include <stdlib.h>
+
+#include "xi_debug.h"
 
 #ifdef __cplusplus
 extern "C" {

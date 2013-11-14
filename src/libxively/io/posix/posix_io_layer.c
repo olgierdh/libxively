@@ -1,5 +1,4 @@
 // c
-#include <assert.h>
 #include <stdio.h>
 #include <netdb.h>
 #include <netinet/in.h>

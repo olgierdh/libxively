@@ -8,15 +8,13 @@
  *          of the layer system so that the layers connection can be pre - defined
  */
 
-// C
-#include <assert.h>
-
 // local
+#include "xi_macros.h"
+#include "xi_debug.h"
 #include "layer_api.h"
 #include "layer.h"
 #include "layer_type.h"
 #include "layer_factory.h"
-#include "xi_macros.h"
 
 #ifdef __cplusplus
 extern "C" {
