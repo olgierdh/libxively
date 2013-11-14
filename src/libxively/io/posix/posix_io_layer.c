@@ -1,10 +1,17 @@
 // c
 #include <stdio.h>
+#if (!defined(XI_IO_LAYER_POSIX_COMPAT)) || (XI_IO_LAYER_POSIX_COMPAT == 0)
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <string.h>
 #include <unistd.h>
+#elif XI_IO_LAYER_POSIX_COMPAT == 1
+#define LWIP_COMPAT_SOCKETS 1
+#define LWIP_POSIX_SOCKETS_IO_NAMES 1
+#include <lwip/netdb.h>
+#include <lwip/sockets.h>
+#endif
+#include <string.h>
 #include <stdint.h>
 
 // local
