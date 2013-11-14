@@ -38,17 +38,17 @@ layer_state_t mbed_io_layer_data_ready(
     assert( size != 0 );
 
     // extract the layer specific data
-    mbed_data_t* pos_comm_data
+    mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
 
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
     // Why not const char* ???
-    int bytes_written = pos_comm_data->socket_ptr->send_all( ( char* ) data, size );
+    int bytes_written = mbed_data->socket_ptr->send_all( ( char* ) data, size );
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
-        int len = pos_comm_data->socket_ptr->send_all( ( char* ) buffer->data_ptr, buffer->data_size );
+        int len = mbed_data->socket_ptr->send_all( ( char* ) buffer->data_ptr, buffer->data_size );
 
         if( len < buffer->data_size )
         {
@@ -77,7 +77,7 @@ layer_state_t mbed_io_layer_on_data_ready(
     assert( buffer_size != 0 );
 
     // extract the layer specific data
-    mbed_data_t* pos_comm_data
+    mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
 
     if( data )
@@ -97,7 +97,7 @@ layer_state_t mbed_io_layer_on_data_ready(
     do
     {
         memset( buffer->data_ptr, 0, buffer->data_size );
-        buffer->real_size = pos_comm_data->socket_ptr->receive( buffer->data_ptr, buffer->data_size - 1 );
+        buffer->real_size = mbed_data->socket_ptr->receive( buffer->data_ptr, buffer->data_size - 1 );
         buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
         buffer->curr_pos = 0;
         state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
@@ -120,11 +120,11 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
     assert( context->self->user_data != 0 );
 
     // extract the layer specific data
-    mbed_data_t* pos_comm_data
+    mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
 
     // close the connection & the socket
-    if( pos_comm_data->socket_ptr->close() == -1 )
+    if( mbed_data->socket_ptr->close() == -1 )
     {
         xi_set_err( XI_SOCKET_CLOSE_ERROR );
         goto err_handling;
@@ -133,10 +133,10 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
     // cleanup the memory
 err_handling:
     // safely destroy the object
-    if ( pos_comm_data && pos_comm_data->socket_ptr )
+    if ( mbed_data && mbed_data->socket_ptr )
     {
-        delete pos_comm_data->socket_ptr;
-        pos_comm_data->socket_ptr = 0;
+        delete mbed_data->socket_ptr;
+        mbed_data->socket_ptr = 0;
     }
     if( context ) { XI_SAFE_FREE( conn->layer_specific ); }
     return LAYER_STATE_ERROR;
@@ -151,7 +151,7 @@ layer_t* connect_to_endpoint(
     assert( address != 0 );
 
     // variables
-    mbed_data_t* pos_comm_data = 0;
+    mbed_data_t* mbed_data = 0;
 
     // allocation of the socket connector
     TCPSocketConnection* socket_ptr = new TCPSocketConnection();
@@ -161,18 +161,18 @@ layer_t* connect_to_endpoint(
     socket_ptr->set_blocking( true, xi_globals.network_timeout );
 
     // allocate memory for the mbed data specific structure
-    pos_comm_data = ( mbed_data_t* )
+    mbed_data = ( mbed_data_t* )
             xi_alloc( sizeof( mbed_data_t ) );
-    XI_CHECK_MEMORY( pos_comm_data );
+    XI_CHECK_MEMORY( mbed_data );
 
     { // to prevent the skip initializtion warning
-        pos_comm_data->socket_ptr = socket_ptr;
+        mbed_data->socket_ptr = socket_ptr;
 
         // assign the layer specific data
-        layer->user_data = ( void* ) pos_comm_data;
+        layer->user_data = ( void* ) mbed_data;
 
         // try to connect
-        int s = pos_comm_data->socket_ptr->connect( address, port );
+        int s = mbed_data->socket_ptr->connect( address, port );
 
         // check if not failed
         if( s == -1 )
@@ -183,19 +183,19 @@ layer_t* connect_to_endpoint(
     }
 
     // POSTCONDITIONS
-    assert( pos_comm_data->socket_ptr != 0 );
+    assert( mbed_data->socket_ptr != 0 );
 
     return layer;
 
     // cleanup the memory
 err_handling:
     // safely destroy the object
-    if ( pos_comm_data && pos_comm_data->socket_ptr )
+    if ( mbed_data && mbed_data->socket_ptr )
     {
-        delete pos_comm_data->socket_ptr;
-        pos_comm_data->socket_ptr = 0;
+        delete mbed_data->socket_ptr;
+        mbed_data->socket_ptr = 0;
     }
-    if( pos_comm_data ) { XI_SAFE_FREE( pos_comm_data ); }
+    if( mbed_data ) { XI_SAFE_FREE( mbed_data ); }
 
     return 0;
 }

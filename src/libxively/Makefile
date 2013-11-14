@@ -1,13 +1,13 @@
 LIBXIVELY := $(shell git rev-parse --show-toplevel)
 include $(LIBXIVELY)/Makefile.include
 
-XI_LAYER_DIRS := comm_layers/$(XI_COMM_LAYER)
+XI_LAYER_DIRS := io/$(XI_IO_LAYER)
 
 XI_EXTRA_CFLAGS += -I./ \
 	$(foreach layerdir,$(XI_LAYER_DIRS),-I./$(layerdir))
 
 XI_SOURCES = $(wildcard *.c) \
-	$(wildcard comm_layers/$(XI_COMM_LAYER)/*.c)
+	$(wildcard io/$(XI_IO_LAYER)/*.c)
 
 all: $(XI)
 

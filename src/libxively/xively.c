@@ -195,7 +195,7 @@ enum LAYERS_ID
 #define CONNECTION_SCHEME_1_DATA IO_LAYER, HTTP_LAYER, CSV_LAYER
 DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
 
-#if XI_COMM_LAYER == XI_IO_POSIX
+#if XI_IO_LAYER == XI_IO_POSIX
 
     // posix io layer
     #include "posix_io_layer.h"
@@ -211,7 +211,7 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
                             , &csv_layer_close, &csv_layer_on_close )
     END_LAYER_TYPES_CONF()
 
-#elif XI_COMM_LAYER == XI_IO_DUMMY
+#elif XI_IO_LAYER == XI_IO_DUMMY
     // dummy io layer
     #include "dummy_io_layer.h"
 
@@ -226,7 +226,7 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
                             , &csv_layer_close, &csv_layer_on_close )
     END_LAYER_TYPES_CONF()
 
-#elif XI_COMM_LAYER == XI_IO_MBED
+#elif XI_IO_LAYER == XI_IO_MBED
     // mbed io layer
     #include "mbed_io_layer.h"
 

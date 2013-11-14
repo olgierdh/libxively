@@ -6,9 +6,9 @@ ifeq ($(MAKECMDGOALS),tests)
   include tests/Makefile.defaults
 endif
 
-XI_COMM_LAYER ?= posix
+XI_IO_LAYER ?= posix
 
-export XI_COMM_LAYER
+export XI_IO_LAYER
 
 export XI_BINDIR
 export XI_OBJDIR
