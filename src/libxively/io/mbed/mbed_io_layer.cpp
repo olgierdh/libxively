@@ -32,12 +32,6 @@ layer_state_t mbed_io_layer_data_ready(
     , const void* data
     , const layer_hint_t hint )
 {
-    // PRECONDITIONS
-    assert( conn != 0 );
-    assert( conn->layer_specific != 0 );
-    assert( data != 0 );
-    assert( size != 0 );
-
     // extract the layer specific data
     mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
@@ -71,12 +65,6 @@ layer_state_t mbed_io_layer_on_data_ready(
     , const void* data
     , const layer_hint_t hint )
 {
-    // PRECONDITIONS
-    assert( conn != 0 );
-    assert( conn->layer_specific != 0 );
-    assert( buffer != 0 );
-    assert( buffer_size != 0 );
-
     // extract the layer specific data
     mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
@@ -116,10 +104,6 @@ layer_state_t mbed_io_layer_close(
 
 layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
 {
-    // PRECONDITIONS
-    assert( context != 0 );
-    assert( context->self->user_data != 0 );
-
     // extract the layer specific data
     mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
@@ -148,9 +132,6 @@ layer_t* connect_to_endpoint(
     , const char* address
     , const int port )
 {
-    // PRECONDITIONS
-    assert( address != 0 );
-
     // variables
     mbed_data_t* mbed_data = 0;
 
