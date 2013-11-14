@@ -25,7 +25,7 @@ ci_avr:
 MBED_HEAD ?= HEAD
 MBED_TEMP ?= mbed_mercurial
 MBED_USER ?= xively
-MBED_REPO ?= libxively
+MBED_REPO ?= libxively-develop
 
 MBED_URL := https://$(MBED_USER)@mbed.org/users/$(MBED_USER)/code/$(MBED_REPO)/
 
@@ -38,7 +38,7 @@ update_mbed_repo:
 	-rm -rf $(MBED_TEMP)/src
 	git archive $(MBED_REV) \
 		"src/libxively/*.[ch]" \
-		"src/libxively/comm_layers/mbed/" \
+		"src/libxively/io/mbed/" \
 		| tar x -C $(MBED_TEMP)
 	echo "#define XI_VERSION \"0.1.x-${rev}\"" \
 		> $(MBED_TEMP)/src/libxively/xi_version.h
