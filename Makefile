@@ -40,7 +40,7 @@ update_mbed_repo:
 		"src/libxively/*.[ch]" \
 		"src/libxively/comm_layers/mbed/" \
 		| tar x -C $(MBED_TEMP)
-	echo "#define XI_VERSION \"0.1.x-${rev}\"" \
+	echo "#define XI_VERSION \"0.1.x-$(MBED_REV)\"" \
 		> $(MBED_TEMP)/src/libxively/xi_version.h
 	hg commit --repository $(MBED_TEMP) --addremove \
 		--user $(MBED_USER) --message $(MBED_MSG)
