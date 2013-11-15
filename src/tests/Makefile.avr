@@ -2,7 +2,7 @@ AVRTEST_SRCDIR ?= ../import/avrtest/
 AVRTEST_CFLAGS += -I$(AVRTEST_SRCDIR)
 AVRTEST_CFLAGS += -W -Wall -Wno-unused-parameter -Wno-attributes
 
-XI_EXTRA_CFLAGS += -I$(AVRTEST_SRCDIR)
+XI_CFLAGS += -I$(AVRTEST_SRCDIR)
 
 XI_TEST_ELF := $(XI_BINDIR)/libxively_avr_unit_test.elf
 XI_TEST_SIM := $(XI_BINDIR)/avrtest
