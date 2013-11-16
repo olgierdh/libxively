@@ -32,7 +32,7 @@ inline static int csv_encode_value(
     switch( p->value_type )
     {
         case XI_VALUE_TYPE_I32:
-            return snprintf( buffer, buffer_size, "%d", p->value.i32_value );
+            return snprintf( buffer, buffer_size, "%"PRIi32, p->value.i32_value );
         case XI_VALUE_TYPE_F32:
             return snprintf( buffer, buffer_size, "%f", p->value.f32_value );
         case XI_VALUE_TYPE_STR:
