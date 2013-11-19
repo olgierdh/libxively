@@ -21,35 +21,40 @@ extern "C" {
  */
 typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 
+// there can be only one descriptor cause it's not needed after single use
+extern const_data_descriptor_t __xi_tmp_desc;
+
+// holds the len only and it's used to make difference between normal functions
+// and generator once
 #define ENABLE_GENERATOR() \
-    static const_data_descriptor_t __tmp = { 0, 0, 0, 0 }; \
+    unsigned char __xi_len = 0; 
 
 // couple of macros
 #define gen_ptr_text( state, ptr_text ) \
 { \
-    size_t len = strlen( ptr_text ); \
-    __tmp.data_ptr = ptr_text; \
-    __tmp.data_size = len; \
-    __tmp.real_size = len; \
-    YIELD( state, ( void* ) &__tmp ); \
+    __xi_len = strlen( ptr_text ); \
+    __xi_tmp_desc.data_ptr = ptr_text; \
+    __xi_tmp_desc.data_size = __xi_len; \
+    __xi_tmp_desc.real_size = __xi_len; \
+    YIELD( state, ( void* ) &__xi_tmp_desc ); \
 }
 
 #define gen_ptr_text_and_exit( state, ptr_text ) \
 { \
-    size_t len = strlen( ptr_text ); \
-    __tmp.data_ptr  = ptr_text; \
-    __tmp.data_size = len; \
-    __tmp.real_size = len; \
-    EXIT( state, ( void* ) &__tmp ); \
+    __xi_len = strlen( ptr_text ); \
+    __xi_tmp_desc.data_ptr  = ptr_text; \
+    __xi_tmp_desc.data_size = __xi_len; \
+    __xi_tmp_desc.real_size = __xi_len; \
+    EXIT( state, ( void* ) &__xi_tmp_desc ); \
 }
 
 // couple of macros
 #define gen_static_text( state, text ) \
 { \
     static const char* const tmp_str = text; \
-    __tmp.data_ptr  = tmp_str; \
-    __tmp.real_size = __tmp.data_size = sizeof( text ) - 1; \
-    YIELD( state, ( void* ) &__tmp ); \
+    __xi_tmp_desc.data_ptr  = tmp_str; \
+    __xi_tmp_desc.real_size = __xi_tmp_desc.data_size = sizeof( text ) - 1; \
+    YIELD( state, ( void* ) &__xi_tmp_desc ); \
 }
 
 #define call_sub_gen( state, input, sub_gen ) \
@@ -84,9 +89,9 @@ typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 #define gen_static_text_and_exit( state, text ) \
 { \
     static const char* const tmp_str = text; \
-    __tmp.data_ptr = tmp_str; \
-    __tmp.real_size = __tmp.data_size = sizeof( text ) - 1; \
-    EXIT( state, ( void* ) &__tmp ); \
+    __xi_tmp_desc.data_ptr = tmp_str; \
+    __xi_tmp_desc.real_size = __xi_tmp_desc.data_size = sizeof( text ) - 1; \
+    EXIT( state, ( void* ) &__xi_tmp_desc ); \
 }
 
 #ifdef __cplusplus
