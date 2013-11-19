@@ -293,7 +293,7 @@ const void* csv_layer_data_generator_datapoint(
                 , ( int ) dp->timestamp.micro );
 
             gen_ptr_text( *state, buffer_32 );
-            gen_ptr_text( *state, XI_CSV_SLASH );
+            gen_ptr_text( *state, XI_CSV_COMMA );
         }
 
         // value
