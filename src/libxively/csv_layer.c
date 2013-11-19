@@ -399,7 +399,7 @@ layer_state_t csv_layer_parse_datastream(
     XI_UNUSED( dp );
 
     // some tmp variables
-    char ret_state                      = 0;
+    signed char ret_state = 0;
 
     BEGIN_CORO( csv_layer_data->datapoint_decode_state )
 
