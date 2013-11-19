@@ -121,7 +121,6 @@ err_handling:
         delete mbed_data->socket_ptr;
         mbed_data->socket_ptr = 0;
     }
-    if( context ) { XI_SAFE_FREE( conn->layer_specific ); }
     return LAYER_STATE_ERROR;
 }
 
