@@ -353,6 +353,9 @@ const void* csv_layer_data_generator_feed(
     const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
     const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
     static unsigned char i              = 0;                                            // local global index required to be static cause used via the persistent for
+                                                                                        // 
+    union http_layer_data_t tmp_http_data;
+    memset( &tmp_http_data, 0, sizeof( union http_layer_data_t ) );
 
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
@@ -363,13 +366,11 @@ const void* csv_layer_data_generator_feed(
         {
             for( ; i < feed->datastream_count; ++i )
             {
-                const union http_layer_data_t tmp = { {
-                                ( char* ) feed->datastreams[ i ].datastream_id
-                              , ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ]
-                            } };
+                tmp_http_data.xi_get_datastream.datastream  = feed->datastreams[ i ].datastream_id;
+                tmp_http_data.xi_get_datastream.value       = ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ];
 
                 // SEND THE REST THROUGH SUB GENERATOR
-                call_sub_gen_and_exit( *state, &tmp, csv_layer_data_generator_datastream );
+                call_sub_gen_and_exit( *state, &tmp_http_data, csv_layer_data_generator_datastream );
             }
         }
 
