@@ -16,6 +16,9 @@
 
 #ifdef MBED_USERNAME
 #include "xi_config_mbed.h"
+#ifndef XI_IO_LAYER
+#define XI_IO_LAYER XI_IO_MBED
+#endif
 #endif
 
 #if XI_USER_CONFIG
