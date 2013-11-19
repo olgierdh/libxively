@@ -27,7 +27,12 @@ extern const_data_descriptor_t __xi_tmp_desc;
 // holds the len only and it's used to make difference between normal functions
 // and generator once
 #define ENABLE_GENERATOR() \
-    unsigned char __xi_len = 0; 
+    unsigned char __xi_len = 0; \
+    static short __xi_gen_sub_state = 0; \
+    const const_data_descriptor_t* __xi_gen_data = 0; \
+    ( void )( __xi_len ); \
+    ( void )( __xi_gen_sub_state ); \
+    ( void )( __xi_gen_data );
 
 // couple of macros
 #define gen_ptr_text( state, ptr_text ) \
@@ -59,29 +64,26 @@ extern const_data_descriptor_t __xi_tmp_desc;
 
 #define call_sub_gen( state, input, sub_gen ) \
 { \
-    static short sub_state = 0; \
-    sub_state = 0; \
-    while( sub_state != 1 ) \
+    __xi_gen_sub_state = 0; \
+    while( __xi_gen_sub_state != 1 ) \
     { \
-        YIELD( state, sub_gen( input, &sub_state) ); \
+        YIELD( state, sub_gen( input, &__xi_gen_sub_state) ); \
     } \
 }
 
 #define call_sub_gen_and_exit( state, input, sub_gen ) \
 { \
-    static short sub_state = 0; \
-    const const_data_descriptor_t* data = 0; \
-    sub_state = 0; \
-    while( sub_state != 1 ) \
+    __xi_gen_sub_state = 0; \
+    while( __xi_gen_sub_state != 1 ) \
     { \
-        data = sub_gen( input, &sub_state ); \
-        if( sub_state != 1 ) \
+        __xi_gen_data = sub_gen( input, &__xi_gen_sub_state ); \
+        if( __xi_gen_sub_state != 1 ) \
         { \
-            YIELD( state, data ); \
+            YIELD( state, __xi_gen_data ); \
         } \
         else \
         { \
-            EXIT( state, data ); \
+            EXIT( state, __xi_gen_data ); \
         } \
     } \
 }
