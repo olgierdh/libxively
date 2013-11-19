@@ -274,9 +274,9 @@ const void* csv_layer_data_generator_datapoint(
             xi_time_t stamp = dp->timestamp.timestamp;
             struct xi_tm* gmtinfo = xi_gmtime( &stamp );
 
-            static char buffer[ 32 ] = { '\0' };
+            memset( buffer_32, 0, 32 );
 
-            snprintf( buffer, 32
+            snprintf( buffer_32, 32
                 , XI_CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
@@ -286,19 +286,19 @@ const void* csv_layer_data_generator_datapoint(
                 , gmtinfo->tm_sec
                 , ( int ) dp->timestamp.micro );
 
-            gen_ptr_text( *state, buffer );
-            gen_static_text( *state, "," );
+            gen_ptr_text( *state, buffer_32 );
+            gen_ptr_text( *state, XI_CSV_SLASH );
         }
 
         // value
         {
-            static char buffer[ 32 ] = { '\0' };
-            csv_encode_value( buffer, sizeof( buffer ), dp );
-            gen_ptr_text( *state, buffer );
+            memset( buffer_32, 0, 32 );
+            csv_encode_value( buffer_32, 32, dp );
+            gen_ptr_text( *state, buffer_32 );
         }
 
         // end of line
-        gen_static_text_and_exit( *state, "\n" );
+        gen_ptr_text_and_exit( *state, XI_HTTP_NEWLINE );
 
     END_CORO()
 }
@@ -321,7 +321,7 @@ const void* csv_layer_data_generator_datastream(
 
         // SEND DATAPOINT ID
         gen_ptr_text( *state, ld->xi_create_datastream.datastream );
-        gen_static_text( *state, "," );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         call_sub_gen_and_exit( *state
                                , input
