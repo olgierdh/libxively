@@ -100,7 +100,7 @@ layer_state_t mbed_io_layer_close(
 }
 
 
-layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
+layer_state_t mbed_io_layer_on_close( layer_connectivity_t* context )
 {
     // extract the layer specific data
     mbed_data_t* mbed_data
