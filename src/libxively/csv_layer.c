@@ -269,14 +269,16 @@ const void* csv_layer_data_generator_datapoint(
     const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
     const xi_datapoint_t* dp            = ( const xi_datapoint_t* ) ld->xi_get_datastream.value;
 
+    // tmp
+    struct xi_tm* gmtinfo               = 0;
+
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
 
         // if there is a timestamp encode it
         if( dp->timestamp.timestamp != 0 )
         {
-            xi_time_t stamp = dp->timestamp.timestamp;
-            struct xi_tm* gmtinfo = xi_gmtime( &stamp );
+            gmtinfo = xi_gmtime( &dp->timestamp.timestamp );
 
             memset( buffer_32, 0, 32 );
 
