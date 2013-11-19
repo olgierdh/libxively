@@ -293,7 +293,7 @@ const void* csv_layer_data_generator_datapoint(
                 , ( int ) dp->timestamp.micro );
 
             gen_ptr_text( *state, buffer_32 );
-            gen_ptr_text( *state, XI_CSV_SLASH );
+            gen_ptr_text( *state, XI_CSV_COMMA );
         }
 
         // value
@@ -327,10 +327,10 @@ const void* csv_layer_data_generator_datastream(
 
         // SEND DATAPOINT ID
         gen_ptr_text( *state, ld->xi_create_datastream.datastream );
-        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_COMMA );
 
         call_sub_gen_and_exit( *state
-                               , input
+                               , ld
                                , csv_layer_data_generator_datapoint );
 
     END_CORO()
@@ -354,11 +354,12 @@ const void* csv_layer_data_generator_feed(
     const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
     static unsigned char i              = 0;                                            // local global index required to be static cause used via the persistent for
                                                                                         // 
-    union http_layer_data_t tmp_http_data;
-    memset( &tmp_http_data, 0, sizeof( union http_layer_data_t ) );
+    static union http_layer_data_t tmp_http_data;
 
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
+
+        memset( &tmp_http_data, 0, sizeof( union http_layer_data_t ) );
 
         i = 0;
 
@@ -370,8 +371,10 @@ const void* csv_layer_data_generator_feed(
                 tmp_http_data.xi_get_datastream.value       = ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ];
 
                 // SEND THE REST THROUGH SUB GENERATOR
-                call_sub_gen_and_exit( *state, &tmp_http_data, csv_layer_data_generator_datastream );
+                call_sub_gen( *state, &tmp_http_data, csv_layer_data_generator_datastream );
             }
+
+            gen_ptr_text_and_exit( *state, XI_HTTP_EMPTY );
         }
 
     END_CORO()

@@ -339,7 +339,7 @@ const void* http_layer_data_generator_feed_get(
         {
             for( ; i < http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count; ++i )
             {
-                gen_ptr_text( *state, XI_CSV_SLASH );
+                gen_ptr_text( *state, XI_CSV_COMMA );
                 gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ i ].datastream_id );
             }
         }
@@ -717,12 +717,12 @@ layer_state_t http_layer_on_data_ready(
     layer_state_t state     = LAYER_STATE_OK;
     unsigned short before   = 0;
     unsigned short after    = 0;
+
     xi_stated_sscanf_state_t tmp_state;
     memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
     
-
     xi_stated_sscanf_state_t* xi_stated_state = &http_layer_data->xi_stated_sscanf_state;
-    
+
     // patterns    
     const char status_pattern1[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) ".\r\n";
     const const_data_descriptor_t v1   = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
@@ -750,7 +750,6 @@ layer_state_t http_layer_on_data_ready(
     const char status_pattern4[]       = "\r\n";
     const const_data_descriptor_t v4   = { status_pattern4, sizeof( status_pattern4 ) - 1, sizeof( status_pattern4 ) - 1, 0 };
     
-
     BEGIN_CORO( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ] )
 
     memset( xi_stated_state, 0, sizeof( xi_stated_sscanf_state_t ) );
