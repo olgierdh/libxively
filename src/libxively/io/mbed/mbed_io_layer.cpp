@@ -96,7 +96,7 @@ layer_state_t mbed_io_layer_on_data_ready(
 layer_state_t mbed_io_layer_close(
     layer_connectivity_t* context )
 {
-    return CALL_ON_NEXT_CLOSE( context->self->layer_connection );
+    return CALL_ON_NEXT_CLOSE( context->self );
 }
 
 
