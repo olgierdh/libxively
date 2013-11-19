@@ -153,6 +153,10 @@ char xi_stated_csv_decode_value(
     assert( source != 0 );
     assert( p != 0 );
 
+    // tmp 
+    char c = 0;   
+    xi_char_type_t ct = XI_CHAR_UNKNOWN;
+
     // if not the first run jump into the proper label
     if( st->state != XI_STATE_INITIAL )
     {
@@ -171,7 +175,7 @@ char xi_stated_csv_decode_value(
         return LAYER_STATE_MORE_DATA;
     }
 
-    char    c   = source->data_ptr[ source->curr_pos++ ];
+    c           = source->data_ptr[ source->curr_pos++ ];
     st->state   = XI_STATE_INITIAL;
 
     // main processing loop
@@ -183,8 +187,8 @@ char xi_stated_csv_decode_value(
             return 0;
         }
 
-        xi_char_type_t ct = csv_classify_char( c );
-        st->state = states[ ct ][ st->state ][ 1 ];
+        ct          = csv_classify_char( c );
+        st->state   = states[ ct ][ st->state ][ 1 ];
 
         switch( st->state )
         {
