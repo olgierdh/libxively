@@ -16,7 +16,7 @@ extern "C" {
  * @param variables
  * @return
  */
-char xi_stated_sscanf(
+signed char xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
         , const_data_descriptor_t* source

@@ -21,7 +21,6 @@ extern const char* const XI_HTTP_TEMPLATE_ACCEPT;
 extern const char* const XI_HTTP_CONTENT_LENGTH;
 extern const char* const XI_CSV_TIMESTAMP_PATTERN;
 extern const char* const XI_CSV_SLASH;
-extern const char* const XI_CSV_COMMA;
 extern const char* const XI_CSV_DATASTREAMS;
 extern const char* const XI_CSV_DATAPOINTS;
 extern const char* const XI_CSV_DOT_CSV_SPACE;

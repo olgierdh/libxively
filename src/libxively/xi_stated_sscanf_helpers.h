@@ -64,7 +64,7 @@ static inline unsigned char pass_all( const char c )
 }
 
 
-static inline char safe_until_copier(
+static inline signed char safe_until_copier(
           unsigned char* dst_i
         , unsigned short* src_i
         , data_descriptor_t* dst

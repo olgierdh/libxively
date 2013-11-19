@@ -19,7 +19,6 @@ const char* const XI_HTTP_TEMPLATE_ACCEPT         = "Accept: */*";
 const char* const XI_HTTP_CONTENT_LENGTH          = "Content-Length: ";
 const char* const XI_CSV_TIMESTAMP_PATTERN        = "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ";
 const char* const XI_CSV_SLASH                    = "/";
-const char* const XI_CSV_COMMA                    = ",";
 const char* const XI_CSV_DATASTREAMS              = "datastreams";
 const char* const XI_CSV_DATAPOINTS               = "datapoints";
 const char* const XI_CSV_DOT_CSV_SPACE            = ".csv "; 

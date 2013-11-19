@@ -293,7 +293,7 @@ const void* csv_layer_data_generator_datapoint(
                 , ( int ) dp->timestamp.micro );
 
             gen_ptr_text( *state, buffer_32 );
-            gen_ptr_text( *state, XI_CSV_COMMA );
+            gen_ptr_text( *state, XI_CSV_SLASH );
         }
 
         // value
@@ -399,29 +399,34 @@ layer_state_t csv_layer_parse_datastream(
     XI_UNUSED( dp );
 
     // some tmp variables
-    signed char ret_state = 0;
+    signed char ret_state = 0;   
+    static struct xi_tm gmtinfo;
+    memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
+    
+    // patterns
+    const const_data_descriptor_t pattern1   = { XI_CSV_TIMESTAMP_PATTERN, strlen( XI_CSV_TIMESTAMP_PATTERN ), strlen( XI_CSV_TIMESTAMP_PATTERN ), 0 };
+    void* pv1[]                              = {
+        ( void* ) &( gmtinfo.tm_year )
+        , ( void* ) &( gmtinfo.tm_mon )
+        , ( void* ) &( gmtinfo.tm_mday )
+        , ( void* ) &( gmtinfo.tm_hour )
+        , ( void* ) &( gmtinfo.tm_min )
+        , ( void* ) &( gmtinfo.tm_sec )
+        , ( void* ) &( dp->timestamp.micro ) };
+        
+    const const_data_descriptor_t pattern2   = { ",", 1, 1, 0 };
+
 
     BEGIN_CORO( csv_layer_data->datapoint_decode_state )
 
     // parse the timestamp
     {
-        static struct xi_tm gmtinfo;
-        memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
 
         // read timestamp
         do
         {
-            const const_data_descriptor_t pattern   = { XI_CSV_TIMESTAMP_PATTERN, strlen( XI_CSV_TIMESTAMP_PATTERN ), strlen( XI_CSV_TIMESTAMP_PATTERN ), 0 };
-            void* pv[]                              = {
-                ( void* ) &( gmtinfo.tm_year )
-                , ( void* ) &( gmtinfo.tm_mon )
-                , ( void* ) &( gmtinfo.tm_mday )
-                , ( void* ) &( gmtinfo.tm_hour )
-                , ( void* ) &( gmtinfo.tm_min )
-                , ( void* ) &( gmtinfo.tm_sec )
-                , ( void* ) &( dp->timestamp.micro ) };
 
-            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern, data, pv );
+            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern1, data, pv1 );
 
             if( ret_state == 0 )
             {
@@ -436,9 +441,7 @@ layer_state_t csv_layer_parse_datastream(
         // read comma
         do
         {
-            const const_data_descriptor_t pattern   = { ",", 1, 1, 0 };
-
-            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern, data, 0 );
+            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern2, data, 0 );
 
             if( ret_state == 0 )
             {
@@ -483,7 +486,7 @@ layer_state_t csv_layer_parse_datastream(
 
     END_CORO()
 
-    return LAYER_STATE_OK;
+    //return LAYER_STATE_OK;
 }
 
 /**
@@ -504,9 +507,14 @@ layer_state_t csv_layer_parse_feed(
     XI_UNUSED( dp );
 
     // some tmp variables
-    char sscanf_state                      = 0;
+    signed char sscanf_state               = 0;
     layer_state_t state                    = LAYER_STATE_OK;
-
+    
+    // patterns
+    const char status_pattern1[]       = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
+    const const_data_descriptor_t v1   = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
+    void* pv1[]                        = { ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id };
+    
     BEGIN_CORO( csv_layer_data->feed_decode_state )
 
     // clear the count of datastreams that has been read so far
@@ -519,15 +527,12 @@ layer_state_t csv_layer_parse_feed(
         {
             do
             {
-                const char status_pattern[]       = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
-                void* pv[]                        = { ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id };
 
                 sscanf_state = xi_stated_sscanf(
                               &( csv_layer_data->stated_sscanf_state )
-                            , ( const_data_descriptor_t* ) &v
+                            , ( const_data_descriptor_t* ) &v1
                             , ( const_data_descriptor_t* ) data
-                            , pv );
+                            , pv1 );
 
                 if( sscanf_state == 0 )
                 {
@@ -574,7 +579,7 @@ layer_state_t csv_layer_parse_feed(
 
     END_CORO()
 
-    return LAYER_STATE_OK;
+    //return LAYER_STATE_OK;
 }
 
 layer_state_t csv_layer_data_ready(
@@ -642,7 +647,6 @@ layer_state_t csv_layer_on_data_ready(
                             , ( void* ) data
                             , hint
                             , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
-            break;
         case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
             // should not be called there should be no csv payload
             break;
@@ -654,7 +658,7 @@ layer_state_t csv_layer_on_data_ready(
 
     // END_CORO()
 
-    return LAYER_STATE_OK;
+    // return LAYER_STATE_OK;
 }
 
 layer_state_t csv_layer_close(
