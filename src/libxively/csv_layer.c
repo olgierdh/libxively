@@ -354,6 +354,7 @@ const void* csv_layer_data_generator_feed(
     const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
     static unsigned char i              = 0;                                            // local global index required to be static cause used via the persistent for
 
+    ENABLE_GENERATOR();
     BEGIN_CORO( *state )
 
         i = 0;
