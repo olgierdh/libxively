@@ -139,7 +139,7 @@ static const short states[][6][2] =
  * @param hint
  * @return
  */
-char xi_stated_csv_decode_value(
+signed char xi_stated_csv_decode_value(
           xi_stated_csv_decode_value_state_t* st
         , const_data_descriptor_t* source
         , xi_datapoint_t* p
@@ -172,7 +172,7 @@ char xi_stated_csv_decode_value(
     // check if the buffer needs more data
     if( source->curr_pos == source->real_size )
     {
-        return LAYER_STATE_MORE_DATA;
+        return 0;
     }
 
     c           = source->data_ptr[ source->curr_pos++ ];
@@ -251,6 +251,8 @@ data_ready:
         default:
             p->value_type       = XI_VALUE_TYPE_STR;
     }
+
+    st->state = XI_STATE_INITIAL;
 
     return 1;
 }
@@ -404,7 +406,6 @@ layer_state_t csv_layer_parse_datastream(
     // some tmp variables
     signed char ret_state = 0;   
     static struct xi_tm gmtinfo;
-    memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
     
     // patterns
     const const_data_descriptor_t pattern1   = { XI_CSV_TIMESTAMP_PATTERN, strlen( XI_CSV_TIMESTAMP_PATTERN ), strlen( XI_CSV_TIMESTAMP_PATTERN ), 0 };
@@ -421,6 +422,8 @@ layer_state_t csv_layer_parse_datastream(
 
 
     BEGIN_CORO( csv_layer_data->datapoint_decode_state )
+
+    memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
 
     // parse the timestamp
     {
@@ -514,10 +517,10 @@ layer_state_t csv_layer_parse_feed(
     layer_state_t state                    = LAYER_STATE_OK;
     
     // patterns
-    const char status_pattern1[]       = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
-    const const_data_descriptor_t v1   = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
-    void* pv1[]                        = { ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id };
-    
+    const char status_pattern1[]        = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
+    const const_data_descriptor_t v1    = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
+    void* pv1[1];
+
     BEGIN_CORO( csv_layer_data->feed_decode_state )
 
     // clear the count of datastreams that has been read so far
@@ -530,6 +533,7 @@ layer_state_t csv_layer_parse_feed(
         {
             do
             {
+                pv1[ 0 ] = ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id;
 
                 sscanf_state = xi_stated_sscanf(
                               &( csv_layer_data->stated_sscanf_state )
@@ -575,8 +579,7 @@ layer_state_t csv_layer_parse_feed(
             dp->datastreams[ dp->datastream_count ].datapoint_count     = 1;
             dp->datastream_count                                       += 1;
         }
-
-    } while( hint == LAYER_HINT_MORE_DATA ); // stop condition
+    } while( hint == LAYER_HINT_MORE_DATA ); // continuation condition
 
     EXIT( csv_layer_data->feed_decode_state, LAYER_STATE_OK );
 
@@ -650,9 +653,11 @@ layer_state_t csv_layer_on_data_ready(
                             , ( void* ) data
                             , hint
                             , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
-        case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
-            // should not be called there should be no csv payload
-            break;
+        case HTTP_LAYER_INPUT_FEED_GET:
+            return csv_layer_parse_feed(
+                              csv_layer_data
+                            , ( void* ) data, hint
+                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_feed.feed );
         default:
             break;
     }
