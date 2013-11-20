@@ -38,7 +38,9 @@ layer_state_t mbed_io_layer_data_ready(
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
+        xi_debug_printf( "sending: [%s]\n", buffer->data_ptr );
         int len = mbed_data->socket_ptr->send_all( ( char* ) buffer->data_ptr, buffer->data_size );
+        xi_debug_printf( "sent: %d bytes\n", len );
 
         if( len < buffer->data_size )
         {
@@ -49,6 +51,7 @@ layer_state_t mbed_io_layer_data_ready(
 
     if( hint == LAYER_HINT_NONE )
     {
+        xi_debug_printf( "recv..\n" );
         CALL_ON_SELF_ON_DATA_READY( context->self, 0, LAYER_HINT_NONE );
     }
 
@@ -85,6 +88,9 @@ layer_state_t mbed_io_layer_on_data_ready(
     {
         memset( buffer->data_ptr, 0, buffer->data_size );
         buffer->real_size = mbed_data->socket_ptr->receive( buffer->data_ptr, buffer->data_size - 1 );
+        
+        xi_debug_printf( "received: %d\n", buffer->real_size );
+        
         buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
         buffer->curr_pos = 0;
         state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
@@ -96,22 +102,32 @@ layer_state_t mbed_io_layer_on_data_ready(
 layer_state_t mbed_io_layer_close(
     layer_connectivity_t* context )
 {
-    return CALL_ON_NEXT_CLOSE( context->self );
-}
-
-
-layer_state_t mbed_io_layer_on_close( layer_connectivity_t* context )
-{
     // extract the layer specific data
     mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
 
+    xi_debug_printf( "closing socket...\n" );
+    
     // close the connection & the socket
     if( mbed_data->socket_ptr->close() == -1 )
     {
+        xi_debug_printf( "error closing socket...\n" );
         xi_set_err( XI_SOCKET_CLOSE_ERROR );
         goto err_handling;
     }
+    
+    // safely destroy the object
+    if ( mbed_data && mbed_data->socket_ptr )
+    {
+        xi_debug_printf( "deleting socket...\n" );
+        
+        delete mbed_data->socket_ptr;
+        mbed_data->socket_ptr = 0;
+    }
+    
+    if( mbed_data ) { XI_SAFE_FREE( mbed_data ); }    
+    
+    return LAYER_STATE_OK;
 
     // cleanup the memory
 err_handling:
@@ -121,7 +137,16 @@ err_handling:
         delete mbed_data->socket_ptr;
         mbed_data->socket_ptr = 0;
     }
+    
+    if( mbed_data ) { XI_SAFE_FREE( mbed_data ); }
+    
     return LAYER_STATE_ERROR;
+}
+
+
+layer_state_t mbed_io_layer_on_close( layer_connectivity_t* context )
+{
+    return CALL_ON_NEXT_CLOSE( context->self );
 }
 
 layer_t* connect_to_endpoint(
@@ -137,7 +162,7 @@ layer_t* connect_to_endpoint(
     XI_CHECK_MEMORY( socket_ptr );
 
     // set the timeout for blocking operations
-    socket_ptr->set_blocking( true, xi_globals.network_timeout );
+    socket_ptr->set_blocking( false, xi_globals.network_timeout );
 
     // allocate memory for the mbed data specific structure
     mbed_data = ( mbed_data_t* )
