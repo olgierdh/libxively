@@ -71,6 +71,9 @@ const void* http_layer_data_generator_query_body(
 
     BEGIN_CORO( *state )
 
+            // reset the content lenght
+            cnt_len = 0;
+            
             // SEND HOST
             gen_ptr_text( *state, XI_HTTP_TEMPLATE_HOST );
             gen_ptr_text( *state, p1 );
