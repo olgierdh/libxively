@@ -6,15 +6,16 @@
 extern "C" {
 #endif
 
-char xi_stated_sscanf(
+signed char xi_stated_sscanf(
           xi_stated_sscanf_state_t* s
         , const const_data_descriptor_t* pattern
         , const_data_descriptor_t* source
         , void** variables )
 {
     // internal tmp variables
-    char res     = 0;
-
+    signed char res     = 0;
+    data_descriptor_t dst_desc;
+    
     BEGIN_CORO( s->state )
 
     s->vi = 0;
@@ -66,7 +67,11 @@ char xi_stated_sscanf(
                 s->buff_len = 0;
 
                 {
-                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ), 0 };
+                    dst_desc.data_ptr   = s->buffer;
+                    dst_desc.data_size  = sizeof( s->buffer ); 
+                    dst_desc.real_size  = sizeof( s->buffer );
+                    dst_desc.curr_pos   = 0;
+                    
                     res = safe_until_copier( &s->buff_len, &s->p, &dst_desc, pattern, &is_digit );
                 }
 
@@ -88,7 +93,12 @@ char xi_stated_sscanf(
 
                 do
                 {
-                    data_descriptor_t dst_desc = { s->buffer, sizeof( s->buffer ), sizeof( s->buffer ), 0 };
+                    dst_desc.data_ptr   = s->buffer;
+                    dst_desc.data_size  = sizeof( s->buffer ); 
+                    dst_desc.real_size  = sizeof( s->buffer );
+                    dst_desc.curr_pos   = 0;
+                    
+                    
                     res = safe_until_copier( &s->buff_len, &source->curr_pos, &dst_desc, source, &is_digit );
                     if( res == 0 )
                     {
@@ -110,8 +120,12 @@ char xi_stated_sscanf(
                 s->tmp_i = 0;
 
                 do
-                {
-                    data_descriptor_t dst_desc = { ( char* ) variables[ s->vi ], s->max_len, s->max_len - 1, 0 };
+                {                    
+                    dst_desc.data_ptr   = ( char* ) variables[ s->vi ];
+                    dst_desc.data_size  = s->max_len; 
+                    dst_desc.real_size  = s->max_len - 1;
+                    dst_desc.curr_pos   = 0;
+
 
                     switch( pattern->data_ptr[ s->p ] )
                     {
@@ -148,8 +162,6 @@ accept:
     RESTART( s->state, 1 )
 
     END_CORO()
-
-    return 1;
 }
 
 #ifdef __cplusplus

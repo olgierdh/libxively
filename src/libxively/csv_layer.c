@@ -139,7 +139,7 @@ static const short states[][6][2] =
  * @param hint
  * @return
  */
-char xi_stated_csv_decode_value(
+signed char xi_stated_csv_decode_value(
           xi_stated_csv_decode_value_state_t* st
         , const_data_descriptor_t* source
         , xi_datapoint_t* p
@@ -152,6 +152,10 @@ char xi_stated_csv_decode_value(
     assert( st != 0 );
     assert( source != 0 );
     assert( p != 0 );
+
+    // tmp 
+    char c = 0;   
+    xi_char_type_t ct = XI_CHAR_UNKNOWN;
 
     // if not the first run jump into the proper label
     if( st->state != XI_STATE_INITIAL )
@@ -168,10 +172,10 @@ char xi_stated_csv_decode_value(
     // check if the buffer needs more data
     if( source->curr_pos == source->real_size )
     {
-        return LAYER_STATE_MORE_DATA;
+        return 0;
     }
 
-    char    c   = source->data_ptr[ source->curr_pos++ ];
+    c           = source->data_ptr[ source->curr_pos++ ];
     st->state   = XI_STATE_INITIAL;
 
     // main processing loop
@@ -183,8 +187,8 @@ char xi_stated_csv_decode_value(
             return 0;
         }
 
-        xi_char_type_t ct = csv_classify_char( c );
-        st->state = states[ ct ][ st->state ][ 1 ];
+        ct          = csv_classify_char( c );
+        st->state   = states[ ct ][ st->state ][ 1 ];
 
         switch( st->state )
         {
@@ -248,6 +252,8 @@ data_ready:
             p->value_type       = XI_VALUE_TYPE_STR;
     }
 
+    st->state = XI_STATE_INITIAL;
+
     return 1;
 }
 
@@ -265,18 +271,20 @@ const void* csv_layer_data_generator_datapoint(
     const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
     const xi_datapoint_t* dp            = ( const xi_datapoint_t* ) ld->xi_get_datastream.value;
 
+    // tmp
+    struct xi_tm* gmtinfo               = 0;
+
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
 
         // if there is a timestamp encode it
         if( dp->timestamp.timestamp != 0 )
         {
-            xi_time_t stamp = dp->timestamp.timestamp;
-            struct xi_tm* gmtinfo = xi_gmtime( &stamp );
+            gmtinfo = xi_gmtime( &dp->timestamp.timestamp );
 
-            static char buffer[ 32 ] = { '\0' };
+            memset( buffer_32, 0, 32 );
 
-            snprintf( buffer, 32
+            snprintf( buffer_32, 32
                 , XI_CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
@@ -286,19 +294,19 @@ const void* csv_layer_data_generator_datapoint(
                 , gmtinfo->tm_sec
                 , ( int ) dp->timestamp.micro );
 
-            gen_ptr_text( *state, buffer );
-            gen_static_text( *state, "," );
+            gen_ptr_text( *state, buffer_32 );
+            gen_ptr_text( *state, XI_CSV_COMMA );
         }
 
         // value
         {
-            static char buffer[ 32 ] = { '\0' };
-            csv_encode_value( buffer, sizeof( buffer ), dp );
-            gen_ptr_text( *state, buffer );
+            memset( buffer_32, 0, 32 );
+            csv_encode_value( buffer_32, 32, dp );
+            gen_ptr_text( *state, buffer_32 );
         }
 
         // end of line
-        gen_static_text_and_exit( *state, "\n" );
+        gen_ptr_text_and_exit( *state, XI_HTTP_NEWLINE );
 
     END_CORO()
 }
@@ -321,10 +329,10 @@ const void* csv_layer_data_generator_datastream(
 
         // SEND DATAPOINT ID
         gen_ptr_text( *state, ld->xi_create_datastream.datastream );
-        gen_static_text( *state, "," );
+        gen_ptr_text( *state, XI_CSV_COMMA );
 
         call_sub_gen_and_exit( *state
-                               , input
+                               , ld
                                , csv_layer_data_generator_datapoint );
 
     END_CORO()
@@ -347,8 +355,13 @@ const void* csv_layer_data_generator_feed(
     const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
     const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
     static unsigned char i              = 0;                                            // local global index required to be static cause used via the persistent for
+                                                                                        // 
+    static union http_layer_data_t tmp_http_data;
 
+    ENABLE_GENERATOR();
     BEGIN_CORO( *state )
+
+        memset( &tmp_http_data, 0, sizeof( union http_layer_data_t ) );
 
         i = 0;
 
@@ -356,14 +369,14 @@ const void* csv_layer_data_generator_feed(
         {
             for( ; i < feed->datastream_count; ++i )
             {
-                const union http_layer_data_t tmp = { {
-                                ( char* ) feed->datastreams[ i ].datastream_id
-                              , ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ]
-                            } };
+                tmp_http_data.xi_get_datastream.datastream  = feed->datastreams[ i ].datastream_id;
+                tmp_http_data.xi_get_datastream.value       = ( xi_datapoint_t* ) &feed->datastreams[ i ].datapoints[ 0 ];
 
                 // SEND THE REST THROUGH SUB GENERATOR
-                call_sub_gen_and_exit( *state, &tmp, csv_layer_data_generator_datastream );
+                call_sub_gen( *state, &tmp_http_data, csv_layer_data_generator_datastream );
             }
+
+            gen_ptr_text_and_exit( *state, XI_HTTP_EMPTY );
         }
 
     END_CORO()
@@ -391,29 +404,35 @@ layer_state_t csv_layer_parse_datastream(
     XI_UNUSED( dp );
 
     // some tmp variables
-    char ret_state                      = 0;
+    signed char ret_state = 0;   
+    static struct xi_tm gmtinfo;
+    
+    // patterns
+    const const_data_descriptor_t pattern1   = { XI_CSV_TIMESTAMP_PATTERN, strlen( XI_CSV_TIMESTAMP_PATTERN ), strlen( XI_CSV_TIMESTAMP_PATTERN ), 0 };
+    void* pv1[]                              = {
+        ( void* ) &( gmtinfo.tm_year )
+        , ( void* ) &( gmtinfo.tm_mon )
+        , ( void* ) &( gmtinfo.tm_mday )
+        , ( void* ) &( gmtinfo.tm_hour )
+        , ( void* ) &( gmtinfo.tm_min )
+        , ( void* ) &( gmtinfo.tm_sec )
+        , ( void* ) &( dp->timestamp.micro ) };
+        
+    const const_data_descriptor_t pattern2   = { ",", 1, 1, 0 };
+
 
     BEGIN_CORO( csv_layer_data->datapoint_decode_state )
 
+    memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
+
     // parse the timestamp
     {
-        static struct xi_tm gmtinfo;
-        memset( &gmtinfo, 0, sizeof( struct xi_tm ) );
 
         // read timestamp
         do
         {
-            const const_data_descriptor_t pattern   = { XI_CSV_TIMESTAMP_PATTERN, strlen( XI_CSV_TIMESTAMP_PATTERN ), strlen( XI_CSV_TIMESTAMP_PATTERN ), 0 };
-            void* pv[]                              = {
-                ( void* ) &( gmtinfo.tm_year )
-                , ( void* ) &( gmtinfo.tm_mon )
-                , ( void* ) &( gmtinfo.tm_mday )
-                , ( void* ) &( gmtinfo.tm_hour )
-                , ( void* ) &( gmtinfo.tm_min )
-                , ( void* ) &( gmtinfo.tm_sec )
-                , ( void* ) &( dp->timestamp.micro ) };
 
-            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern, data, pv );
+            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern1, data, pv1 );
 
             if( ret_state == 0 )
             {
@@ -428,9 +447,7 @@ layer_state_t csv_layer_parse_datastream(
         // read comma
         do
         {
-            const const_data_descriptor_t pattern   = { ",", 1, 1, 0 };
-
-            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern, data, 0 );
+            ret_state = xi_stated_sscanf( &( csv_layer_data->stated_sscanf_state ), &pattern2, data, 0 );
 
             if( ret_state == 0 )
             {
@@ -475,7 +492,7 @@ layer_state_t csv_layer_parse_datastream(
 
     END_CORO()
 
-    return LAYER_STATE_OK;
+    //return LAYER_STATE_OK;
 }
 
 /**
@@ -496,8 +513,13 @@ layer_state_t csv_layer_parse_feed(
     XI_UNUSED( dp );
 
     // some tmp variables
-    char sscanf_state                      = 0;
+    signed char sscanf_state               = 0;
     layer_state_t state                    = LAYER_STATE_OK;
+    
+    // patterns
+    const char status_pattern1[]        = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
+    const const_data_descriptor_t v1    = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
+    void* pv1[1];
 
     BEGIN_CORO( csv_layer_data->feed_decode_state )
 
@@ -511,15 +533,13 @@ layer_state_t csv_layer_parse_feed(
         {
             do
             {
-                const char status_pattern[]       = "%" XI_STR( XI_MAX_DATASTREAM_NAME ) "C,";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
-                void* pv[]                        = { ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id };
+                pv1[ 0 ] = ( void* ) dp->datastreams[ dp->datastream_count ].datastream_id;
 
                 sscanf_state = xi_stated_sscanf(
                               &( csv_layer_data->stated_sscanf_state )
-                            , ( const_data_descriptor_t* ) &v
+                            , ( const_data_descriptor_t* ) &v1
                             , ( const_data_descriptor_t* ) data
-                            , pv );
+                            , pv1 );
 
                 if( sscanf_state == 0 )
                 {
@@ -559,14 +579,13 @@ layer_state_t csv_layer_parse_feed(
             dp->datastreams[ dp->datastream_count ].datapoint_count     = 1;
             dp->datastream_count                                       += 1;
         }
-
-    } while( hint == LAYER_HINT_MORE_DATA ); // stop condition
+    } while( hint == LAYER_HINT_MORE_DATA ); // continuation condition
 
     EXIT( csv_layer_data->feed_decode_state, LAYER_STATE_OK );
 
     END_CORO()
 
-    return LAYER_STATE_OK;
+    //return LAYER_STATE_OK;
 }
 
 layer_state_t csv_layer_data_ready(
@@ -634,10 +653,11 @@ layer_state_t csv_layer_on_data_ready(
                             , ( void* ) data
                             , hint
                             , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
-            break;
-        case HTTP_LAYER_INPUT_DATASTREAM_UPDATE:
-            // should not be called there should be no csv payload
-            break;
+        case HTTP_LAYER_INPUT_FEED_GET:
+            return csv_layer_parse_feed(
+                              csv_layer_data
+                            , ( void* ) data, hint
+                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_feed.feed );
         default:
             break;
     }
@@ -646,15 +666,13 @@ layer_state_t csv_layer_on_data_ready(
 
     // END_CORO()
 
-    return LAYER_STATE_OK;
+    // return LAYER_STATE_OK;
 }
 
 layer_state_t csv_layer_close(
     layer_connectivity_t* context )
 {
-    XI_UNUSED( context );
-
-    return LAYER_STATE_OK;
+    return CALL_ON_PREV_CLOSE( context->self );
 }
 
 layer_state_t csv_layer_on_close(

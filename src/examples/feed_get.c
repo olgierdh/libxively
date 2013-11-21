@@ -98,17 +98,22 @@ int main( int argc, const char* argv[] )
         }
     }
 
-    xi_feed_get( xi_context, &f );
-
-    for( size_t i = 0; i < f.datastream_count; ++i )
+    while( 1 )
     {
-        xi_datastream_t* d = &f.datastreams[ i ];
-        printf( "datasream_id: %s ", d->datastream_id );
+        xi_feed_get( xi_context, &f );
 
-        for( size_t j = 0; j < d->datapoint_count; ++j )
+        printf( "\n" );
+
+        for( size_t i = 0; i < f.datastream_count; ++i )
         {
-            xi_datapoint_t* p = &d->datapoints[ j ];
-            print_datapoint( p );
+            xi_datastream_t* d = &f.datastreams[ i ];
+            printf( "datasream_id: %s ", d->datastream_id );
+
+            for( size_t j = 0; j < d->datapoint_count; ++j )
+            {
+                xi_datapoint_t* p = &d->datapoints[ j ];
+                print_datapoint( p );
+            }
         }
     }
 

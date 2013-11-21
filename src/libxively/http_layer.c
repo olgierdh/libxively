@@ -14,9 +14,6 @@
 extern "C" {
 #endif
 
-// required if sending the payload
-static char static_buff_32[ 32 ]    = { '\0' };
-
 
 // static array of recognizable http headers
 static const char* XI_HTTP_TOKEN_NAMES[ XI_HTTP_HEADERS_COUNT ] =
@@ -60,23 +57,31 @@ const void* http_layer_data_generator_query_body(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     // required if sending the payload
     static unsigned short cnt_len   = 0;
+    static const char* const p1     = XI_HOST;
+    static const char* const p2     = XI_USER_AGENT;
+    
+    short ret_state                         = 0;
+    const const_data_descriptor_t* data     = 0;
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
+            // reset the content lenght
+            cnt_len = 0;
+            
             // SEND HOST
             gen_ptr_text( *state, XI_HTTP_TEMPLATE_HOST );
-            gen_static_text( *state, "api.xively.com" );
+            gen_ptr_text( *state, p1 );
             gen_ptr_text( *state, XI_HTTP_CRLF );
 
             // SEND USER AGENT
             gen_ptr_text( *state, XI_HTTP_TEMPLATE_USER_AGENT );
-            gen_static_text( *state, "libxively-posix/experimental" );
+            gen_ptr_text( *state, p2 );
             gen_ptr_text( *state, XI_HTTP_CRLF );
 
             // SEND ACCEPT
@@ -86,19 +91,17 @@ const void* http_layer_data_generator_query_body(
             // if there is a payload we have to calculate it's size and then send it
             if( http_layer_input->payload_generator )
             {
-                short ret_state                         = 0;
-                const const_data_descriptor_t* data     = 0;
-
                 while( ret_state != 1 )
                 {
                     data        = (*http_layer_input->payload_generator)( &http_layer_input->http_layer_data, &ret_state );
                     cnt_len    += data->real_size;
                 }
 
-                sprintf( static_buff_32, "%d", ( int ) cnt_len );
+                memset( buffer_32, 0, 32 );
+                sprintf( buffer_32, "%d", ( int ) cnt_len );
 
                 gen_ptr_text( *state, XI_HTTP_CONTENT_LENGTH );
-                gen_ptr_text( *state, static_buff_32 );
+                gen_ptr_text( *state, buffer_32 );
                 gen_ptr_text( *state, XI_HTTP_CRLF );
             }
 
@@ -142,20 +145,24 @@ const void* http_layer_data_generator_datastream_body(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
         {
-            sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, static_buff_32 ); // feed id
+            memset( buffer_32, 0, 32 );
+            sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buffer_32 ); // feed id
         }
 
-        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATASTREAMS );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+
         gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_datastream.datastream ); // datastream id
-        gen_static_text( *state, ".csv " );
+        gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -185,7 +192,7 @@ const void* http_layer_data_generator_datastream_get(
 
         gen_ptr_text( *state, XI_HTTP_GET );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         // SEND THE REST THROUGH SUB GENERATOR
         call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
@@ -211,7 +218,7 @@ const void* http_layer_data_generator_datastream_update(
 
         gen_ptr_text( *state, XI_HTTP_PUT );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         // SEND THE REST THROUGH SUB GENERATOR
         call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_body );
@@ -233,18 +240,21 @@ const void* http_layer_data_generator_datastream_create_body(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
         {
-            sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, static_buff_32 ); // feed id
+            memset( buffer_32, 0, 32 );
+            sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buffer_32 ); // feed id
         }
 
-        gen_static_text( *state, "/datastreams.csv" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATASTREAMS );
+        gen_static_text( *state, ".csv" );
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -274,7 +284,7 @@ const void* http_layer_data_generator_datastream_create(
 
         gen_ptr_text( *state, XI_HTTP_POST );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         // SEND THE REST THROUGH SUB GENERATOR
         call_sub_gen_and_exit( *state, input, http_layer_data_generator_datastream_create_body );
@@ -296,7 +306,10 @@ const void* http_layer_data_generator_feed_get(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
+
+    // local patterns
+    static const char* const p1 = ".csv?datastreams=";
 
     // PRECONDITIONS
     assert( http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count > 0 );
@@ -312,14 +325,15 @@ const void* http_layer_data_generator_feed_get(
 
         gen_ptr_text( *state, XI_HTTP_GET );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         {
-            sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, static_buff_32 ); // feed id
+            memset( buffer_32, 0, 32 );
+            sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buffer_32 ); // feed id
         }
 
-        gen_static_text( *state, ".csv?datastreams=" );
+        gen_ptr_text( *state, p1 );
 
         // 0 case separated
         gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ 0 ].datastream_id );
@@ -328,13 +342,13 @@ const void* http_layer_data_generator_feed_get(
         {
             for( ; i < http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count; ++i )
             {
-                gen_static_text( *state, "," );
+                gen_ptr_text( *state, XI_CSV_COMMA );
                 gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ i ].datastream_id );
             }
         }
 
         // space
-        gen_static_text( *state, " " );
+        gen_ptr_text( *state, XI_HTTP_SPACE );
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -360,7 +374,7 @@ const void* http_layer_data_generator_feed_update(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     ENABLE_GENERATOR();
 
@@ -368,14 +382,15 @@ const void* http_layer_data_generator_feed_update(
 
         gen_ptr_text( *state, XI_HTTP_PUT );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
-        gen_static_text( *state, "/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         {
-            sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-            gen_ptr_text( *state, static_buff_32 ); // feed id
+            memset( buffer_32, 0, 32 );
+            sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buffer_32 ); // feed id
         }
 
-        gen_static_text( *state, ".csv " );
+        gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -401,18 +416,22 @@ const void* http_layer_data_generator_datastream_delete(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-        gen_ptr_text( *state, static_buff_32 ); // feed id
+        memset( buffer_32, 0, 32 );
+        sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, buffer_32 ); // feed id
 
-        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
+        gen_ptr_text( *state, XI_CSV_SLASH );
+
         gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datastream.datastream );
-        gen_static_text( *state, ".csv " );
+        gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -438,7 +457,7 @@ const void* http_layer_data_generator_datapoint_delete(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     xi_time_t stamp         = 0;
     struct xi_tm* gmtinfo   = 0;
@@ -447,18 +466,26 @@ const void* http_layer_data_generator_datapoint_delete(
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-        gen_ptr_text( *state, static_buff_32 ); // feed id
+        memset( buffer_32, 0, 32 );
+        sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, buffer_32 ); // feed id
 
-        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
+        gen_ptr_text( *state, XI_CSV_SLASH );
+
         gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint.datastream );
-        gen_static_text( *state, "/datapoints/" );
+
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATAPOINTS );        
+        gen_ptr_text( *state, XI_CSV_SLASH );
 
         {
             stamp   = http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
-            snprintf( static_buff_32, 32
+            memset( buffer_32, 0, 32 );
+            snprintf( buffer_32, 32
                 , XI_CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
@@ -468,8 +495,8 @@ const void* http_layer_data_generator_datapoint_delete(
                 , gmtinfo->tm_sec
                 , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.micro );
 
-            gen_ptr_text( *state, static_buff_32 );
-            gen_static_text( *state, ".csv " );
+            gen_ptr_text( *state, buffer_32 );
+            gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
         }
 
 
@@ -499,27 +526,37 @@ const void* http_layer_data_generator_datapoint_delete_range(
 {
     // unpack the data
     const http_layer_input_t* const http_layer_input
-            = ( const http_layer_input_t* const ) input;
+            = ( const http_layer_input_t* ) input;
 
     xi_time_t stamp         = 0;
     struct xi_tm* gmtinfo   = 0;
+
+    static const char* const p1 = "?start=";
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
 
-        sprintf( static_buff_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
-        gen_ptr_text( *state, static_buff_32 ); // feed id
+        memset( buffer_32, 0, 32 );
+        sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+        gen_ptr_text( *state, buffer_32 ); // feed id
 
-        gen_static_text( *state, "/datastreams/" );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
+        gen_ptr_text( *state, XI_CSV_SLASH );
+
         gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint_range.datastream );
-        gen_static_text( *state, "/datapoints?start=" );
+
+        gen_ptr_text( *state, XI_CSV_SLASH );
+        gen_ptr_text( *state, XI_CSV_DATAPOINTS );        
+        gen_ptr_text( *state, p1 );
 
         {
             stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
-            snprintf( static_buff_32, 32
+            memset( buffer_32, 0, 32 );
+            snprintf( buffer_32, 32
                 , XI_CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
@@ -529,13 +566,14 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_sec
                 , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->micro );
 
-            gen_ptr_text( *state, static_buff_32 );
-            gen_static_text( *state, "&" );
+            gen_ptr_text( *state, buffer_32 );
+            gen_ptr_text( *state, XI_HTTP_AMPERSAND );
 
             stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
-            snprintf( static_buff_32, 32
+            memset( buffer_32, 0, 32 );
+            snprintf( buffer_32, 32
                 , XI_CSV_TIMESTAMP_PATTERN
                 , gmtinfo->tm_year + 1900
                 , gmtinfo->tm_mon + 1
@@ -545,8 +583,8 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_sec
                 , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->micro );
 
-            gen_ptr_text( *state, static_buff_32 );
-            gen_static_text( *state, ".csv " );
+            gen_ptr_text( *state, buffer_32 );
+            gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
         }
 
 
@@ -658,8 +696,6 @@ layer_state_t http_layer_data_ready(
         default:
             return LAYER_STATE_ERROR;
     };
-
-    return LAYER_STATE_ERROR;
 }
 
 
@@ -681,9 +717,42 @@ layer_state_t http_layer_on_data_ready(
     // some tmp variables
     short sscanf_state      = 0;
     unsigned short prev_pos = 0;
+    layer_state_t state     = LAYER_STATE_OK;
+    unsigned short before   = 0;
+    unsigned short after    = 0;
 
+    xi_stated_sscanf_state_t tmp_state;
+    memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
+    
     xi_stated_sscanf_state_t* xi_stated_state = &http_layer_data->xi_stated_sscanf_state;
 
+    // patterns    
+    const char status_pattern1[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) ".\r\n";
+    const const_data_descriptor_t v1   = { status_pattern1, sizeof( status_pattern1 ) - 1, sizeof( status_pattern1 ) - 1, 0 };
+    void* pv1[]                        = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
+    
+    const char status_pattern2[]       = "%" XI_STR( XI_HTTP_HEADER_NAME_MAX_SIZE ) "s: %" XI_STR( XI_HTTP_HEADER_VALUE_MAX_SIZE ) ".\r\n";
+    const const_data_descriptor_t v2   = { status_pattern2, sizeof( status_pattern2 ) - 1, sizeof( status_pattern2 ) - 1, 0 };
+    void*                  pv2[]       =
+    {
+          ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
+        , ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+    };
+    
+    const char status_pattern3[]         = "%d";
+    const const_data_descriptor_t v3     = { status_pattern3, sizeof( status_pattern3 ) - 1, sizeof( status_pattern3 ) - 1, 0 };
+    const_data_descriptor_t data3        =
+    {
+          http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+        , XI_HTTP_HEADER_VALUE_MAX_SIZE
+        , XI_HTTP_HEADER_VALUE_MAX_SIZE
+        , 0
+    };    
+    void*                   pv3[]        = { ( void* ) &http_layer_data->content_length };
+        
+    const char status_pattern4[]       = "\r\n";
+    const const_data_descriptor_t v4   = { status_pattern4, sizeof( status_pattern4 ) - 1, sizeof( status_pattern4 ) - 1, 0 };
+    
     BEGIN_CORO( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ] )
 
     memset( xi_stated_state, 0, sizeof( xi_stated_sscanf_state_t ) );
@@ -696,15 +765,11 @@ layer_state_t http_layer_on_data_ready(
 
             while( sscanf_state == 0 )
             {
-                const char status_pattern[]       = "HTTP/1.1 %d %" XI_STR( XI_HTTP_STATUS_STRING_SIZE ) ".\r\n";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
-                void* pv[]                        = { ( void* ) &( http_layer_data->response->http.http_status ), ( void* ) http_layer_data->response->http.http_status_string };
-
                 sscanf_state = xi_stated_sscanf(
                               xi_stated_state
-                            , ( const_data_descriptor_t* ) &v
+                            , ( const_data_descriptor_t* ) &v1
                             , ( const_data_descriptor_t* ) data
-                            , pv );
+                            , pv1 );
 
                 if( sscanf_state == 0 )
                 {
@@ -728,22 +793,14 @@ layer_state_t http_layer_on_data_ready(
 
             while( sscanf_state == 0 )
             {
-                const char status_pattern[]       = "%" XI_STR( XI_HTTP_HEADER_NAME_MAX_SIZE ) "s: %" XI_STR( XI_HTTP_HEADER_VALUE_MAX_SIZE ) ".\r\n";
-                const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
-                void*                  pv[]       =
-                {
-                      ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
-                    , ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
-                };
-
                 // save the curr pos to be able to get back
                 prev_pos = ( ( const_data_descriptor_t* ) data )->curr_pos;
 
                 sscanf_state = xi_stated_sscanf(
                               xi_stated_state
-                            , ( const_data_descriptor_t* ) &v
+                            , ( const_data_descriptor_t* ) &v2
                             , ( const_data_descriptor_t* ) data
-                            , pv );
+                            , pv2 );
 
                 if( sscanf_state == 0 )
                 {
@@ -762,22 +819,7 @@ layer_state_t http_layer_on_data_ready(
 
                 if( header_type == XI_HTTP_HEADER_CONTENT_LENGTH )
                 {
-                    xi_stated_sscanf_state_t tmp_state;
-                    memset( &tmp_state, 0, sizeof( xi_stated_sscanf_state_t ) );
-
-                    const char tmp_status_pattern[]         = "%d";
-                    const const_data_descriptor_t tmp_v     = { tmp_status_pattern, sizeof( tmp_status_pattern ) - 1, sizeof( tmp_status_pattern ) - 1, 0 };
-                    const_data_descriptor_t tmp_data        =
-                    {
-                          http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
-                        , XI_HTTP_HEADER_VALUE_MAX_SIZE
-                        , XI_HTTP_HEADER_VALUE_MAX_SIZE
-                        , 0
-                    };
-
-                    void*                   tmp_pv[]        = { ( void* ) &http_layer_data->content_length };
-
-                    sscanf_state = xi_stated_sscanf( &tmp_state, &tmp_v, &tmp_data, tmp_pv );
+                    sscanf_state = xi_stated_sscanf( &tmp_state, &v3, &data3, pv3 );
 
                     if( sscanf_state == -1 )
                     {
@@ -815,12 +857,10 @@ layer_state_t http_layer_on_data_ready(
 
         while( sscanf_state == 0 )
         {
-            const char status_pattern[]       = "\r\n";
-            const const_data_descriptor_t v   = { status_pattern, sizeof( status_pattern ) - 1, sizeof( status_pattern ) - 1, 0 };
 
             sscanf_state = xi_stated_sscanf(
                           xi_stated_state
-                        , ( const_data_descriptor_t* ) &v
+                        , ( const_data_descriptor_t* ) &v4
                         , ( const_data_descriptor_t* ) data
                         , 0 );
 
@@ -849,13 +889,13 @@ layer_state_t http_layer_on_data_ready(
 
         while( http_layer_data->counter < http_layer_data->content_length )
         {
-            unsigned short before = ( ( const_data_descriptor_t* ) data )->curr_pos;
-            unsigned short after  = ( ( const_data_descriptor_t* ) data )->real_size;
+            before = ( ( const_data_descriptor_t* ) data )->curr_pos;
+            after  = ( ( const_data_descriptor_t* ) data )->real_size;
             http_layer_data->counter += after - before;
 
             xi_debug_printf( "%s", ( ( const_data_descriptor_t* ) data )->data_ptr + ( ( const_data_descriptor_t* ) data )->curr_pos );
 
-            layer_state_t state = CALL_ON_NEXT_ON_DATA_READY( context->self
+            state = CALL_ON_NEXT_ON_DATA_READY( context->self
                                         , ( const void* ) data
                                         , ( http_layer_data->counter < http_layer_data->content_length ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
 
@@ -874,8 +914,6 @@ layer_state_t http_layer_on_data_ready(
     EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_OK )
 
     END_CORO()
-
-    return LAYER_STATE_ERROR;
 }
 
 
@@ -885,9 +923,7 @@ layer_state_t http_layer_on_data_ready(
 layer_state_t http_layer_close(
     layer_connectivity_t* context )
 {
-    XI_UNUSED( context );
-
-    return LAYER_STATE_OK;
+    return CALL_ON_PREV_CLOSE( context->self );
 }
 
 /**
@@ -896,9 +932,7 @@ layer_state_t http_layer_close(
 layer_state_t http_layer_on_close(
     layer_connectivity_t* context )
 {
-    XI_UNUSED( context );
-
-    return LAYER_STATE_OK;
+    return  CALL_ON_NEXT_CLOSE( context->self );
 }
 
 

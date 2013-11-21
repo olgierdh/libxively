@@ -13,7 +13,7 @@
 #include "layer_factory_interface.h"
 
 #ifdef __cplusplus
-}
+extern "C" {
 #endif
 
 extern const layer_factory_interface_t FACTORY_ENTRIES[ ];
