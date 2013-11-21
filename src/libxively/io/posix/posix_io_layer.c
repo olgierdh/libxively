@@ -51,12 +51,6 @@ layer_state_t posix_io_layer_data_ready(
         }
     }
 
-    if( hint == LAYER_HINT_NONE )
-    {
-        xi_debug_logger( "recv:..." );
-        CALL_ON_SELF_ON_DATA_READY( context->self, 0, LAYER_HINT_NONE );
-    }
-
     return LAYER_STATE_OK;
 }
 

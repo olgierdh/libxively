@@ -54,6 +54,7 @@ typedef struct {
     xi_protocol_t protocol;     /** Xively protocol */
     xi_feed_id_t feed_id;       /** Xively feed ID */
     layer_chain_t layer_chain;  /** Xively reference of layers */
+    void*         input;        /** Xively ptr to the input data */
 } xi_context_t;
 
 /**
@@ -376,6 +377,79 @@ extern const xi_response_t* xi_datapoint_delete(
 extern const xi_response_t* xi_datapoint_delete_range(
           const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
+
+//-----------------------------------------------------------------------
+// MAIN LIBRARY NON BLOCKING FUNCTIONS
+//-----------------------------------------------------------------------
+
+#ifdef XI_NOB_ENABLED
+
+/**
+ * \brief   Update Xively feed
+ */
+extern const xi_context_t* xi_nob_feed_update(
+          xi_context_t* xi
+        , const xi_feed_t* value );
+
+/**
+ * \brief   Retrieve Xively feed
+ */
+extern const xi_context_t* xi_nob_feed_get(
+          xi_context_t* xi
+        , xi_feed_t* value );
+
+/**
+ * \brief   Create a datastream with given value using server timestamp
+ */
+extern const xi_context_t* xi_nob_datastream_create(
+          xi_context_t* xi, xi_feed_id_t feed_id
+        , const char * datastream_id
+        , const xi_datapoint_t* value);
+
+/**
+ * \brief   Update a datastream with given datapoint using server or local timestamp
+ */
+extern const xi_context_t* xi_nob_datastream_update(
+          xi_context_t* xi, xi_feed_id_t feed_id
+        , const char * datastream_id
+        , const xi_datapoint_t* value );
+
+/**
+ * \brief   Retrieve latest datapoint from a given datastream
+ */
+extern const xi_context_t* xi_nob_datastream_get(
+          xi_context_t* xi, xi_feed_id_t feed_id
+        , const char * datastream_id, xi_datapoint_t* dp );
+
+/**
+ * \brief   Delete datastream
+ * \warning This function destroys the data in Xively and there is no way to restore it!
+ */
+extern const xi_context_t* xi_nob_datastream_delete(
+          xi_context_t* xi, xi_feed_id_t feed_id
+          , const char* datastream_id );
+
+/**
+ * \brief   Delete datapoint at a given timestamp
+ * \warning This function destroys the data in Xively and there is no way to restore it!
+ * \note    You need to provide exact timestamp value to guarantee successful response
+ *          from the API, i.e. it will respond with error 404 if datapoint didn't exist.
+ *          If you need to determine the exact timestamp, it may be easier to call
+ *          `xi_datapoint_delete_range()` with short range instead.
+ */
+extern const xi_context_t* xi_nob_datapoint_delete(
+          const xi_context_t* xi, xi_feed_id_t feed_id
+        , const char * datastream_id
+        , const xi_datapoint_t* dp );
+
+/**
+ * \brief   Delete all datapoints in given time range
+ * \warning This function destroys the data in Xively and there is no way to restore it!
+ */
+extern const xi_context_t* xi_nob_datapoint_delete_range(
+          const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+        , const xi_timestamp_t* start, const xi_timestamp_t* end );
+#endif // XI_NOB_ENABLED
 
 #ifdef __cplusplus
 }
