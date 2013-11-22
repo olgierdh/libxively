@@ -54,7 +54,7 @@ layer_state_t posix_asynch_io_layer_on_data_ready(
     , const void* data
     , const layer_hint_t hint )
 {
-    //xi_debug_logger( "[posix_asynch_io_layer_on_data_ready]" );
+    xi_debug_logger( "[posix_asynch_io_layer_on_data_ready]" );
 
     posix_asynch_data_t* posix_asynch_data = ( posix_asynch_data_t* ) context->self->user_data;
 
