@@ -811,7 +811,7 @@ layer_state_t http_layer_on_data_ready(
 
             if( sscanf_state == 1 )
             {
-                xi_debug_printf( "%s: %s\n"
+                xi_debug_format( "%s: %s"
                                  , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].name
                                  , http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value );
 
@@ -874,7 +874,7 @@ layer_state_t http_layer_on_data_ready(
 
     if( sscanf_state == -1 )
     {
-        xi_debug_printf( "No double \\r\\n\n" );
+        xi_debug_logger( "No double \\r\\n" );
 
         EXIT( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_ERROR )
     }
@@ -882,7 +882,7 @@ layer_state_t http_layer_on_data_ready(
     // STAGE 04 reading payload
     {
         // clear the buffer
-        xi_debug_printf( "\n" );
+        xi_debug_logger( "" );
 
         http_layer_data->counter    = 0;
         sscanf_state                = 0;

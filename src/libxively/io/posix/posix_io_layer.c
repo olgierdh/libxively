@@ -37,6 +37,7 @@ layer_state_t posix_io_layer_data_ready(
     posix_data_t* posix_data                = ( posix_data_t* ) context->self->user_data;
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
+    xi_debug_logger( "buffer->data_ptr:" );
     xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );
@@ -117,11 +118,7 @@ layer_t* connect_to_endpoint(
     , const int port )
 {
 
-#ifdef XI_DEBUG_OUTPUT
-        char msg[ 64 ] = { '\0' };
-        sprintf( msg, "Connecting layer [%d] to the endpoint", layer->layer_type_id );
-        xi_debug_logger( msg );
-#endif
+    xi_debug_format( "Connecting layer [%d] to the endpoint", layer->layer_type_id );
 
     posix_data_t* posix_data                    = xi_alloc( sizeof( posix_data_t ) );
 

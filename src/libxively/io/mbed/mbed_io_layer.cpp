@@ -38,9 +38,9 @@ layer_state_t mbed_io_layer_data_ready(
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
-        xi_debug_printf( "sending: [%s]\n", buffer->data_ptr );
+        xi_debug_format( "sending: [%s]", buffer->data_ptr );
         int len = mbed_data->socket_ptr->send_all( ( char* ) buffer->data_ptr, buffer->data_size );
-        xi_debug_printf( "sent: %d bytes\n", len );
+        xi_debug_format( "sent: %d bytes", len );
 
         if( len < buffer->data_size )
         {
@@ -83,7 +83,7 @@ layer_state_t mbed_io_layer_on_data_ready(
         memset( buffer->data_ptr, 0, buffer->data_size );
         buffer->real_size = mbed_data->socket_ptr->receive( buffer->data_ptr, buffer->data_size - 1 );
         
-        xi_debug_printf( "received: %d\n", buffer->real_size );
+        xi_debug_format( "received: %d", buffer->real_size );
         
         buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
         buffer->curr_pos = 0;
@@ -100,12 +100,12 @@ layer_state_t mbed_io_layer_close(
     mbed_data_t* mbed_data
         = ( mbed_data_t* ) context->self->user_data;
 
-    xi_debug_printf( "closing socket...\n" );
+    xi_debug_logger( "closing socket..." );
     
     // close the connection & the socket
     if( mbed_data->socket_ptr->close() == -1 )
     {
-        xi_debug_printf( "error closing socket...\n" );
+        xi_debug_logger( "error closing socket..." );
         xi_set_err( XI_SOCKET_CLOSE_ERROR );
         goto err_handling;
     }
@@ -113,7 +113,7 @@ layer_state_t mbed_io_layer_close(
     // safely destroy the object
     if ( mbed_data && mbed_data->socket_ptr )
     {
-        xi_debug_printf( "deleting socket...\n" );
+        xi_debug_logger( "deleting socket..." );
         
         delete mbed_data->socket_ptr;
         mbed_data->socket_ptr = 0;
