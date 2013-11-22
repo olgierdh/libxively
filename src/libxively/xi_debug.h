@@ -25,9 +25,11 @@ extern "C" {
 
 #if XI_DEBUG_OUTPUT
     #define xi_debug_logger(msg) __xi_printf( "[%s:%d] %s\r\n", __FILE__, __LINE__, msg )
+    #define xi_debug_format(fmt, ...) __xi_printf( "[%s:%d] "fmt"\r\n", __FILE__, __LINE__, __VA_ARGS__ )
     #define xi_debug_printf(...) __xi_printf( __VA_ARGS__ )
 #else
     #define xi_debug_logger(...)
+    #define xi_debug_format(...)
     #define xi_debug_printf(...)
 #endif
 
