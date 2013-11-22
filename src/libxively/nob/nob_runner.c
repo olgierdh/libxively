@@ -25,7 +25,7 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
             YIELD( state, layer_state );
         }
 
-    } while( layer_state != LAYER_STATE_NOT_READY );
+    } while( layer_state == LAYER_STATE_NOT_READY );
 
     if( layer_state == LAYER_STATE_ERROR )
     {
@@ -44,7 +44,7 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
             YIELD( state, layer_state );
         }
 
-    } while( layer_state != LAYER_STATE_NOT_READY );
+    } while( layer_state == LAYER_STATE_NOT_READY );
 
     EXIT( state, layer_state );
 

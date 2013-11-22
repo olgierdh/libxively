@@ -66,6 +66,10 @@ ifeq ($(XI_IO_LAYER),mbed)
   XI_CONFIG += XI_IO_LAYER=2
 endif
 
+ifeq ($(XI_IO_LAYER),posix_asynch)
+	XI_CFLAGS += -DXI_IO_LAYER=3
+endif
+
 ifeq ($(XI_NOB_ENABLED),true)
   XI_CONFIG += XI_NOB_ENABLED
 endif

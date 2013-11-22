@@ -179,6 +179,7 @@ uint32_t xi_get_network_timeout( void )
 #define XI_IO_POSIX 0
 #define XI_IO_DUMMY 1
 #define XI_IO_MBED  2
+#define XI_IO_POSIX_ASYNCH 3
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief The LAYERS_ID enum
@@ -241,6 +242,20 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
                             , &csv_layer_close, &csv_layer_on_close )
     END_LAYER_TYPES_CONF()
 
+#elif XI_IO_LAYER == XI_IO_POSIX_ASYNCH
+    // mbed io layer
+    #include "posix_asynch_io_layer.h"
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    BEGIN_LAYER_TYPES_CONF()
+          LAYER_TYPE( IO_LAYER, &posix_asynch_io_layer_data_ready, &posix_asynch_io_layer_on_data_ready
+                              , &posix_asynch_io_layer_close, &posix_asynch_io_layer_on_close )
+        , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
+                                , &http_layer_close, &http_layer_on_close )
+        , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
+                            , &csv_layer_close, &csv_layer_on_close )
+    END_LAYER_TYPES_CONF()
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -875,7 +890,7 @@ const xi_context_t* xi_nob_datastream_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete(
-         const xi_context_t* xi, xi_feed_id_t feed_id
+         xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id
        , const xi_datapoint_t* dp )
 {
@@ -912,7 +927,7 @@ const xi_context_t* xi_nob_datapoint_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete_range(
-        const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+        xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
       , const xi_timestamp_t* start, const xi_timestamp_t* end )
 {
     XI_UNUSED( feed_id );

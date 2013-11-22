@@ -51,19 +51,19 @@ typedef struct
         struct xi_get_datastream_t
         {
             const char*     datastream;
-            xi_datapoint_t* value;
+            const xi_datapoint_t* value;
         } xi_get_datastream;
 
         struct xi_update_datastream_t
         {
             const char*     datastream;
-            xi_datapoint_t* value;
+            const xi_datapoint_t* value;
         } xi_update_datastream;
 
         struct xi_create_datastream_t
         {
             const char*         datastream;
-            xi_datapoint_t*     value;
+            const xi_datapoint_t*     value;
         } xi_create_datastream;
 
         struct xi_delete_datastream_t
@@ -74,24 +74,24 @@ typedef struct
         struct xi_delete_datapoint_t
         {
             const char*         datastream;
-            xi_datapoint_t*     value;
+            const xi_datapoint_t*     value;
         } xi_delete_datapoint;
 
         struct xi_delete_datapoint_range_t
         {
             const char*         datastream;
-            xi_timestamp_t*     value_start;
-            xi_timestamp_t*     value_end;
+            const xi_timestamp_t*     value_start;
+            const xi_timestamp_t*     value_end;
         } xi_delete_datapoint_range;
 
         struct xi_get_feed_t
         {
-            xi_feed_t*      feed;
+            const xi_feed_t*      feed;
         } xi_get_feed;
 
         struct xi_update_feed_t
         {
-            xi_feed_t*      feed;
+            const xi_feed_t*      feed;
         } xi_update_feed;
     } http_layer_data;                              //!< the union suppose to contain different combinations of data used in queries
 

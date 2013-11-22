@@ -613,27 +613,34 @@ static inline layer_state_t http_layer_data_ready_gen(
     , xi_generator_t* gen )
 {
     // generator state
-    short gstate = 0;
+    static short gstate         = 0;
+    static short local_state    = 0;
 
-    // send the data through the next layer
-    while( gstate != 1 )
-    {
-        const const_data_descriptor_t* ret
-                = ( const const_data_descriptor_t* ) ( *gen )( input, &gstate );
+    BEGIN_CORO( local_state )
 
-        layer_state_t state
-                = CALL_ON_PREV_DATA_READY(
-                      context->self
-                    , ( const void* ) ret
-                    , ( gstate != 1 ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
+        gstate = 0;
 
-        if( state != LAYER_STATE_OK )
+        // send the data through the next layer
+        while( gstate != 1 )
         {
-            return state;
-        }
-    }
+            const const_data_descriptor_t* ret
+                    = ( const const_data_descriptor_t* ) ( *gen )( input, &gstate );
 
-    return LAYER_STATE_OK;
+            layer_state_t state
+                    = CALL_ON_PREV_DATA_READY(
+                          context->self
+                        , ( const void* ) ret
+                        , ( gstate != 1 ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
+
+            if( state != LAYER_STATE_OK )
+            {
+                YIELD( local_state, state );
+            }
+        }
+
+        EXIT( local_state, LAYER_STATE_OK )
+
+    END_CORO()
 }
 
 /**
