@@ -15,7 +15,6 @@ XI_SOURCES = $(wildcard *.c) \
 
 ifeq ($(XI_NOB_ENABLED),true)
     XI_SOURCES += $(wildcard nob/*.c)
-	XI_CFLAGS += -DXI_NOB_ENABLED
 endif
 
 all: $(XI)
