@@ -12,9 +12,6 @@
  * c) gracefully close xi library
  *
  */
-
-#define XI_NOB_ENABLED
-
 #include <xively.h>
 #include <xi_helpers.h>
 
@@ -36,6 +33,9 @@ void print_usage()
 
 int main( int argc, const char* argv[] )
 {
+
+    XI_UNUSED( argc );
+    XI_UNUSED( argv );
 
 #ifdef XI_NOB_ENABLED
     if( argc < 4 )
