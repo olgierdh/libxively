@@ -5,7 +5,6 @@ AR ?= ar
 
 XI_BUILD_TYPE ?= debug
 
-
 ifndef XI_OVERRIDE_CFLAGS
   XI_WARN_CFLAGS ?= -Wall -Wextra
   XI_CFLAGS += -std=gnu99 -Iinclude -fstrict-aliasing
