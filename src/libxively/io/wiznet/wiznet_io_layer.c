@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-layer_state_t posix_io_layer_data_ready(
+layer_state_t wiznet_io_layer_data_ready(
       layer_connectivity_t* context
     , const void* data
     , const layer_hint_t hint )
@@ -45,12 +45,12 @@ layer_state_t posix_io_layer_data_ready(
     return LAYER_STATE_NOT_READY;
 }
 
-layer_state_t posix_io_layer_on_data_ready(
+layer_state_t wiznet_io_layer_on_data_ready(
       layer_connectivity_t* context
     , const void* data
     , const layer_hint_t hint )
 {
-    //xi_debug_logger( "[posix_io_layer_on_data_ready]" );
+    //xi_debug_logger( "[wiznet_io_layer_on_data_ready]" );
 
     wiznet_data_t* wiznet_data = ( wiznet_data_t* ) context->self->user_data;
 
@@ -94,13 +94,13 @@ layer_state_t posix_io_layer_on_data_ready(
     return LAYER_STATE_OK;
 }
 
-layer_state_t posix_io_layer_close( layer_connectivity_t* context )
+layer_state_t wiznet_io_layer_close( layer_connectivity_t* context )
 {
     XI_UNUSED( context );
     return LAYER_STATE_OK;
 }
 
-layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
+layer_state_t wiznet_io_layer_on_close( layer_connectivity_t* context )
 {
     TCP_CloseSocket( ( ( wiznet_data_t* ) context->self->user_data )->socket_fd );
     return LAYER_STATE_OK;
@@ -132,7 +132,7 @@ layer_t* connect_to_endpoint(
 
     // POSTCONDITIONS
     assert( layer != 0 );
-    assert( posix_data->socket_fd != -1 );
+    assert( wiznet_data->socket_fd != -1 );
 
     return layer;
 }
