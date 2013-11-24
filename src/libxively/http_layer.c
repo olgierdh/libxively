@@ -10,6 +10,8 @@
 #include "xi_coroutine.h"
 #include "layer_helpers.h"
 
+#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -654,6 +656,7 @@ layer_state_t http_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
+    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
 
     // unpack the data
     const http_layer_input_t* http_layer_input = ( const http_layer_input_t* ) data;

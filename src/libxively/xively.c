@@ -32,6 +32,8 @@
 
 #include "csv_layer.h"
 
+#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -180,7 +182,7 @@ uint32_t xi_get_network_timeout( void )
 #define XI_IO_DUMMY 1
 #define XI_IO_MBED  2
 #define XI_IO_POSIX_ASYNCH 3
-#define XI_IO_WIZNET 3
+#define XI_IO_WIZNET 4
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief The LAYERS_ID enum
@@ -805,6 +807,8 @@ extern const xi_context_t* xi_nob_datastream_update(
        , const char * datastream_id
        , const xi_datapoint_t* value )
 {
+    XI_UNUSED( feed_id );
+
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
@@ -841,13 +845,16 @@ const xi_context_t* xi_nob_datastream_get(
 {
     XI_UNUSED( feed_id );
 
+    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
     {
+        dbgPrintf("%s: io_layer==0\r\n", __func__);
         // we are in trouble
         return 0;
     }
+    dbgPrintf("%s: io_layer != 0\r\n", __func__);
 
     // extract the input layer
     layer_t* input_layer = xi->layer_chain.top;

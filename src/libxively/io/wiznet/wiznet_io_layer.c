@@ -11,6 +11,8 @@
 #include "layer_api.h"
 #include "common.h"
 
+#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,10 +28,13 @@ layer_state_t wiznet_io_layer_data_ready(
     //xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );
+    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
+        dbgPrintf("%s: abour to call TCP_Send\r\n", __func__);
         int len = TCP_Send( wiznet_data->socket_fd, ( uint8_t* ) buffer->data_ptr, buffer->data_size );
+        dbgPrintf("%s: len=%d\r\n", __func__, len);
 
         if( len < 0 )
         {
@@ -120,15 +125,15 @@ layer_t* connect_to_endpoint(
 
     layer->user_data                            = ( void* ) &wiznet_data;
 
-    //xi_debug_logger( "Creating socket..." );
-    wiznet_data.socket_fd                       = XI_WIZ_SOCK_NO;
-    //xi_debug_logger( "Socket creation [ok]" );
+    dbgPrintf( "Creating socket...\r\n" );
+    wiznet_data.socket_fd                       = 5;
+    dbgPrintf( "Socket creation [ok]\r\n" );
 
     uint8_t ip[ 4 ] = XI_IP;
 
-    //xi_debug_logger( "Connecting to the endpoint..." );
-    TCP_OpenClientSocket( wiznet_data.socket_fd, XI_PORT, ip, XI_PORT );
-    // xi_debug_logger( "Connecting to the endpoint [ok]" );
+    dbgPrintf( "Connecting to the endpoint...\r\n" );
+    TCP_OpenClientSocket( wiznet_data.socket_fd, 0, ip, XI_PORT );
+    dbgPrintf( "Connecting to the endpoint [ok]\r\n" );
 
     // POSTCONDITIONS
     assert( layer != 0 );

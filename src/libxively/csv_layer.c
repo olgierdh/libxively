@@ -15,6 +15,8 @@
 #include "http_layer_input.h"
 #include "layer_helpers.h"
 
+#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -596,6 +598,7 @@ layer_state_t csv_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
+    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
 
     // unpack the data, changing the constiness to avoid copying cause
     // these layers shares the same data and the generator suppose to be the only
