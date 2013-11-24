@@ -70,6 +70,11 @@ ifeq ($(XI_IO_LAYER),posix_asynch)
 	XI_NOB_ENABLED := true
 endif
 
+ifeq ($(XI_IO_LAYER),wiznet)
+	XI_CFLAGS += -DXI_IO_LAYER=4
+	XI_NOB_ENABLED := true
+endif
+
 ifeq ($(XI_NOB_ENABLED),true)
   XI_CONFIG += XI_NOB_ENABLED
 endif
