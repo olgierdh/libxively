@@ -300,7 +300,10 @@ xi_context_t* xi_create_context(
     , xi_feed_id_t feed_id )
 {
     // allocate the structure to store new context
+    dbgPrintf("protocol=%d\r\n", (int)protocol);
     xi_context_t* ret = ( xi_context_t* ) xi_alloc( sizeof( xi_context_t ) );
+    dbgPrintf("protocol=%d\r\n", (int)protocol);
+    dbgPrintf("xi_alloc\r\n");
 
     XI_CHECK_MEMORY( ret );
 
@@ -313,6 +316,7 @@ xi_context_t* xi_create_context(
     {
         // duplicate the string
         ret->api_key  = xi_str_dup( api_key );
+        dbgPrintf("xi_str_dup\r\n");
 
         XI_CHECK_MEMORY( ret->api_key );
     }
@@ -321,9 +325,9 @@ xi_context_t* xi_create_context(
         ret->api_key  = 0;
     }
 
-    switch( protocol )
-    {
-        case XI_HTTP:
+    //switch( protocol )
+    //{
+    //    case XI_HTTP:
             {
                 // @TODO make a configurable pool of these
                 // static structures allocated statically
@@ -347,10 +351,11 @@ xi_context_t* xi_create_context(
                 // create and connect layers store the information in layer_chain member
                 ret->layer_chain = create_and_connect_layers( CONNECTION_SCHEME_1, user_datas, CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
             }
-            break;
-        default:
-            goto err_handling;
-    }
+    //        break;
+    //    default:
+    //        dbgPrintf("Wot?\r\n");
+    //        goto err_handling;
+    //}
 
 
     return ret;
@@ -846,6 +851,8 @@ const xi_context_t* xi_nob_datastream_get(
     XI_UNUSED( feed_id );
 
     dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
+    if( xi == 0 ) dbgPrintf("XXX\r\n");
+    if( xi->layer_chain.bottom == 0 ) dbgPrintf("Damnt it.");
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )

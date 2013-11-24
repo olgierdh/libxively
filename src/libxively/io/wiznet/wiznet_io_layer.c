@@ -119,6 +119,8 @@ layer_t* connect_to_endpoint(
     XI_UNUSED( address );
     XI_UNUSED( port );
 
+    if( layer == 0 ) dbgPrintf("It is zero already!\r\n");
+
     // just a static data for now
     static wiznet_data_t wiznet_data;
     memset( &wiznet_data, 0, sizeof( wiznet_data_t ) );
@@ -136,9 +138,12 @@ layer_t* connect_to_endpoint(
     dbgPrintf( "Connecting to the endpoint [ok]\r\n" );
 
     // POSTCONDITIONS
-    assert( layer != 0 );
-    assert( wiznet_data->socket_fd != -1 );
+    //assert( layer != 0 );
+    //assert( wiznet_data->socket_fd != -1 );
 
+    dbgPrintf("fd=%d\r\n", ((wiznet_data_t *) layer->user_data)->socket_fd);
+
+    if( layer == 0 ) dbgPrintf("It is zero.\r\n");
     return layer;
 }
 

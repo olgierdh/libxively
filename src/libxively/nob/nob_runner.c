@@ -18,6 +18,9 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
     // write data to the endpoint
     do
     {
+      // context->layer_connection.layer->layer_functions->target()
+      if( xi->layer_chain.top->layer_connection.self == 0 ) dbgPrintf("(%s:%d) layer not initialiesed?\r\n", __func__, __LINE__);
+
         layer_state = CALL_ON_SELF_DATA_READY(
                       xi->layer_chain.top
                     , xi->input, LAYER_HINT_NONE );

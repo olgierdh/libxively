@@ -30,7 +30,7 @@ extern "C" {
  */
 typedef enum {
     /** `http://api.xively.com` */
-    XI_HTTP,
+    XI_HTTP = 0,
     /** `https://api.xively.com` */
     XI_HTTPS,
     /** `telnet api.xively.com 8081` */
