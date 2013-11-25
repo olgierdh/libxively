@@ -32,7 +32,7 @@
 
 #include "csv_layer.h"
 
-#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -281,11 +281,11 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
 
 BEGIN_FACTORY_CONF()
       FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                             , &default_layer_stack_alloc, &default_layer_stack_free )
+                             , &default_layer_heap_alloc, &default_layer_heap_free )
     , FACTORY_ENTRY( HTTP_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                               , &default_layer_stack_alloc, &default_layer_stack_free )
+                               , &default_layer_heap_alloc, &default_layer_heap_free )
     , FACTORY_ENTRY( CSV_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                           , &default_layer_stack_alloc, &default_layer_stack_free )
+                           , &default_layer_heap_alloc, &default_layer_heap_free )
 END_FACTORY_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

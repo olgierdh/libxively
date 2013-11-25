@@ -10,7 +10,7 @@
 #include "xi_coroutine.h"
 #include "layer_helpers.h"
 
-#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {

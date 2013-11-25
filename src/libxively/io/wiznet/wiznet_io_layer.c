@@ -11,7 +11,7 @@
 #include "layer_api.h"
 #include "common.h"
 
-#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {

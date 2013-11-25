@@ -1,7 +1,7 @@
 #ifndef __POSIX_DATA_H__
 #define __POSIX_DATA_H__
 
-#include "tcp.h"
+#include "tcpip/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {

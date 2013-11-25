@@ -1,7 +1,7 @@
 #include "nob_runner.h"
 #include "layer_api.h"
 #include "xi_coroutine.h"
-#include "/home/ilya/libxively-avr-wiznet/gateway_and_device/apps/Gateway/util/debug.h"
+#include "util/debug.h"
 
 
 layer_state_t process_xively_nob_step( xi_context_t* xi )
