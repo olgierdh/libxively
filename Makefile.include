@@ -18,18 +18,18 @@ ifndef XI_OVERRIDE_CFLAGS
     XI_OPTLEVEL ?= -O0
 	XI_CFLAGS += -g
     XI_CFLAGS += $(XI_OPTLEVEL)
-    XI_CFLAGS += -DXI_DEBUG_LAYER_API
+    XI_CONFIG += XI_DEBUG_LAYER_API
     XI_DEBUG_OUTPUT ?= 1
     XI_DEBUG_ASSERT ?= 1
-    XI_CFLAGS += -DXI_DEBUG_OUTPUT=$(XI_DEBUG_OUTPUT)
-    XI_CFLAGS += -DXI_DEBUG_ASSERT=$(XI_DEBUG_ASSERT)
+    XI_CONFIG += XI_DEBUG_OUTPUT=$(XI_DEBUG_OUTPUT)
+    XI_CFLAGS += XI_DEBUG_ASSERT=$(XI_DEBUG_ASSERT)
   endif
   ifdef XI_DEBUG_PRINTF
-    XI_CFLAGS += -DXI_DEBUG_PRINTF=$(XI_DEBUG_PRINTF)
+    XI_CONFIG += XI_DEBUG_PRINTF=$(XI_DEBUG_PRINTF)
   endif
   XI_CFLAGS += $(foreach constant,$(XI_OVERRIDE_CONSTANTS),-D$(constant))
   ifdef XI_OPTIMISE
-    XI_CFLAGS += $(foreach constant,$(XI_OPTIMISE),-DXI_OPT_$(constant))
+    XI_CONFIG += $(foreach constant,$(XI_OPTIMISE),XI_OPT_$(constant))
   endif
   XI_USER_AGENT ?= '"libxively-$(XI_IO_LAYER)/0.1.x-$(shell git rev-parse --short HEAD)"'
   XI_CFLAGS += -DXI_USER_AGENT=$(XI_USER_AGENT)
@@ -46,19 +46,30 @@ else
 endif # XI_OVERRIDE_ARFLAGS
 
 ifeq ($(XI_IO_LAYER),posix)
-	XI_CFLAGS += -DXI_IO_LAYER=0
+  XI_CONFIG += XI_IO_LAYER=0
 endif
 
 ifeq ($(XI_IO_LAYER),dummy)
-	XI_CFLAGS += -DXI_IO_LAYER=1
+  XI_CONFIG += XI_IO_LAYER=1
 endif
 
 ifeq ($(XI_IO_LAYER),mbed)
-	XI_CFLAGS += -DXI_IO_LAYER=2
+  XI_CONFIG += XI_IO_LAYER=2
 endif
 
 ifeq ($(XI_NOB_ENABLED),true)
-	XI_CFALGS += -DXI_NOB_ENABLED
+  XI_CONFIG += XI_NOB_ENABLED
+endif
+
+ifndef XI_USER_CONFIG
+  XI_CFLAGS += $(foreach constant,$(XI_CONFIG),-D$(constant))
+else
+  $(warning "Using XI_USER_CONFIG instead of: '$(XI_CONFIG)'")
+  XI_CFLAGS += -DXI_USER_CONFIG=1
+  ifdef XI_USER_CONFIG_PATH
+    $(info "Will include '$(XI_USER_CONFIG_PATH)/xi_user_config.h'")
+    XI_CFLAGS += -I$(XI_USER_CONFIG_PATH)
+  endif
 endif
 
 XI_OUTPUT ?= $(LIBXIVELY)/
