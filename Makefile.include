@@ -13,19 +13,28 @@ ifndef XI_OVERRIDE_CFLAGS
   ifeq ($(XI_BUILD_TYPE),release)
     XI_OPTLEVEL ?= -O2
     XI_CFLAGS += $(XI_OPTLEVEL)
+    XI_DEBUG_OUTPUT ?= 0
+    XI_DEBUG_ASSERT ?= 0
   endif
   ifeq ($(XI_BUILD_TYPE),debug)
     XI_OPTLEVEL ?= -O0
-	XI_CFLAGS += -g
     XI_CFLAGS += $(XI_OPTLEVEL)
-    XI_CONFIG += XI_DEBUG_LAYER_API
+    XI_CFLAGS += -g
     XI_DEBUG_OUTPUT ?= 1
     XI_DEBUG_ASSERT ?= 1
+    XI_DEBUG_LAYER_API ?= 1
+  endif
+  ifdef XI_DEBUG_OUTPUT
     XI_CONFIG += XI_DEBUG_OUTPUT=$(XI_DEBUG_OUTPUT)
-    XI_CFLAGS += XI_DEBUG_ASSERT=$(XI_DEBUG_ASSERT)
+  endif
+  ifdef XI_DEBUG_ASSERT
+    XI_CONFIG += XI_DEBUG_ASSERT=$(XI_DEBUG_ASSERT)
   endif
   ifdef XI_DEBUG_PRINTF
     XI_CONFIG += XI_DEBUG_PRINTF=$(XI_DEBUG_PRINTF)
+  endif
+  ifdef XI_DEBUG_LAYER_API
+    XI_CONFIG += XI_DEBUG_LAYER_API
   endif
   XI_CFLAGS += $(foreach constant,$(XI_OVERRIDE_CONSTANTS),-D$(constant))
   ifdef XI_OPTIMISE
