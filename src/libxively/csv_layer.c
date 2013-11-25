@@ -9,13 +9,10 @@
 #include "xi_stated_csv_decode_value_state.h"
 #include "xi_stated_sscanf.h"
 #include "http_layer_constants.h"
-
 #include "csv_layer_data.h"
 #include "layer_api.h"
 #include "http_layer_input.h"
 #include "layer_helpers.h"
-
-#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -598,7 +595,7 @@ layer_state_t csv_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
-    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
+    xi_debug_function_entered();
 
     // unpack the data, changing the constiness to avoid copying cause
     // these layers shares the same data and the generator suppose to be the only

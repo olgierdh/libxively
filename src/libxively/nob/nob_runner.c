@@ -1,8 +1,6 @@
 #include "nob_runner.h"
 #include "layer_api.h"
 #include "xi_coroutine.h"
-#include "util/debug.h"
-
 
 layer_state_t process_xively_nob_step( xi_context_t* xi )
 {
@@ -12,36 +10,40 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
     static int16_t state                = 0;
     static layer_state_t layer_state    = LAYER_STATE_OK;
 
+    xi_debug_format("state=%d layer_state=%d", state, layer_state);
+
     BEGIN_CORO( state )
 
-    dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+    xi_debug_format("state=%d layer_state=%d", state, layer_state);
     // write data to the endpoint
     do
     {
       // context->layer_connection.layer->layer_functions->target()
-      if( xi->layer_chain.top->layer_connection.self == 0 ) dbgPrintf("(%s:%d) layer not initialiesed?\r\n", __func__, __LINE__);
+      if( xi->layer_chain.top->layer_connection.self == 0 ) xi_debug_logger("top layer not initialiesed?");
+      //if( xi->layer_chain.bottom->layer_connection.self == 0 ) xi_debug_logger("bottom layer not initialiesed?");
 
         layer_state = CALL_ON_SELF_DATA_READY(
                       xi->layer_chain.top
                     , xi->input, LAYER_HINT_NONE );
 
-        dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+        xi_debug_format("state=%d layer_state=%d", state, layer_state);
         if( layer_state == LAYER_STATE_NOT_READY )
         {
-            dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+            xi_debug_format("state=%d layer_state=%d", state, layer_state);
             YIELD( state, layer_state );
+            xi_debug_format("state=%d layer_state=%d", state, layer_state);
         }
 
     } while( layer_state == LAYER_STATE_NOT_READY );
 
-    dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+    xi_debug_format("state=%d layer_state=%d", state, layer_state);
     if( layer_state == LAYER_STATE_ERROR )
     {
-        dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+        xi_debug_format("state=%d layer_state=%d", state, layer_state);
         EXIT( state, layer_state);
     }
 
-    dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+    xi_debug_format("state=%d layer_state=%d", state, layer_state);
     // now read the data from the endpoint
     do
     {
@@ -51,13 +53,14 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
 
         if( layer_state == LAYER_STATE_NOT_READY )
         {
-            dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+            xi_debug_format("state=%d layer_state=%d", state, layer_state);
             YIELD( state, layer_state );
+            xi_debug_format("state=%d layer_state=%d", state, layer_state);
         }
 
     } while( layer_state == LAYER_STATE_NOT_READY );
 
-    dbgPrintf("(%s:%d) state=%d layer_state=%d\r\n", __func__, __LINE__, state, layer_state);
+    xi_debug_format("state=%d layer_state=%d", state, layer_state);
     EXIT( state, layer_state );
 
     END_CORO()

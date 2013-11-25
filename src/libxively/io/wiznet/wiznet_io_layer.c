@@ -7,11 +7,8 @@
 #include "wiznet_io_layer.h"
 #include "wiznet_data.h"
 #include "xi_macros.h"
-
 #include "layer_api.h"
 #include "common.h"
-
-#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,13 +25,13 @@ layer_state_t wiznet_io_layer_data_ready(
     //xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );
-    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
+    xi_debug_function_entered();
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
-        dbgPrintf("%s: abour to call TCP_Send\r\n", __func__);
+        xi_debug_logger("about to call TCP_Send");
         int len = TCP_Send( wiznet_data->socket_fd, ( uint8_t* ) buffer->data_ptr, buffer->data_size );
-        dbgPrintf("%s: len=%d\r\n", __func__, len);
+        xi_debug_format("len=%d", len);
 
         if( len < 0 )
         {
@@ -119,7 +116,7 @@ layer_t* connect_to_endpoint(
     XI_UNUSED( address );
     XI_UNUSED( port );
 
-    if( layer == 0 ) dbgPrintf("It is zero already!\r\n");
+    if( layer == 0 ) xi_debug_logger("layer==0");
 
     // just a static data for now
     static wiznet_data_t wiznet_data;
@@ -127,23 +124,23 @@ layer_t* connect_to_endpoint(
 
     layer->user_data                            = ( void* ) &wiznet_data;
 
-    dbgPrintf( "Creating socket...\r\n" );
-    wiznet_data.socket_fd                       = 5;
-    dbgPrintf( "Socket creation [ok]\r\n" );
+    xi_debug_logger( "Creating socket..." );
+    wiznet_data.socket_fd                       = 3;
+    xi_debug_logger( "Socket creation [ok]" );
 
     uint8_t ip[ 4 ] = XI_IP;
 
-    dbgPrintf( "Connecting to the endpoint...\r\n" );
+    xi_debug_logger( "Connecting to the endpoint..." );
     TCP_OpenClientSocket( wiznet_data.socket_fd, 0, ip, XI_PORT );
-    dbgPrintf( "Connecting to the endpoint [ok]\r\n" );
+    xi_debug_logger( "Connecting to the endpoint [ok]" );
 
     // POSTCONDITIONS
     //assert( layer != 0 );
     //assert( wiznet_data->socket_fd != -1 );
 
-    dbgPrintf("fd=%d\r\n", ((wiznet_data_t *) layer->user_data)->socket_fd);
+    xi_debug_format("fd=%d", ((wiznet_data_t *) layer->user_data)->socket_fd);
 
-    if( layer == 0 ) dbgPrintf("It is zero.\r\n");
+    if( layer == 0 ) xi_debug_logger("It is zero.");
     return layer;
 }
 

@@ -17,7 +17,6 @@
 #include "xi_helpers.h"
 #include "xi_err.h"
 #include "xi_globals.h"
-
 #include "common.h"
 #include "layer_api.h"
 #include "layer_interface.h"
@@ -28,11 +27,7 @@
 #include "layer_default_allocators.h"
 #include "http_layer.h"
 #include "http_layer_data.h"
-
-
 #include "csv_layer.h"
-
-#include "util/debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -300,10 +295,10 @@ xi_context_t* xi_create_context(
     , xi_feed_id_t feed_id )
 {
     // allocate the structure to store new context
-    dbgPrintf("protocol=%d\r\n", (int)protocol);
+    xi_debug_format("protocol=%d", (int)protocol);
     xi_context_t* ret = ( xi_context_t* ) xi_alloc( sizeof( xi_context_t ) );
-    dbgPrintf("protocol=%d\r\n", (int)protocol);
-    dbgPrintf("xi_alloc\r\n");
+    xi_debug_format("protocol=%d", (int)protocol);
+    xi_debug_logger("xi_alloc");
 
     XI_CHECK_MEMORY( ret );
 
@@ -316,7 +311,7 @@ xi_context_t* xi_create_context(
     {
         // duplicate the string
         ret->api_key  = xi_str_dup( api_key );
-        dbgPrintf("xi_str_dup\r\n");
+        xi_debug_logger("xi_str_dup");
 
         XI_CHECK_MEMORY( ret->api_key );
     }
@@ -353,7 +348,6 @@ xi_context_t* xi_create_context(
             }
     //        break;
     //    default:
-    //        dbgPrintf("Wot?\r\n");
     //        goto err_handling;
     //}
 
@@ -850,20 +844,23 @@ const xi_context_t* xi_nob_datastream_get(
 {
     XI_UNUSED( feed_id );
 
-    dbgPrintf("(%s:%d) -> entered\r\n", __func__, __LINE__);
-    if( xi == 0 ) dbgPrintf("XXX\r\n");
-    if( xi->layer_chain.bottom == 0 ) dbgPrintf("Damnt it.");
+    xi_debug_function_entered();
+
+    if( xi == 0 ) xi_debug_logger("xi == 0");
+    if( xi->layer_chain.bottom == 0 ) xi_debug_logger("xi->layer_chain.bottom == 0");
+
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
     {
-        dbgPrintf("%s: io_layer==0\r\n", __func__);
+        xi_debug_logger("io_layer == 0");
         // we are in trouble
         return 0;
     }
-    dbgPrintf("%s: io_layer != 0\r\n", __func__);
+    xi_debug_logger("io_layer != 0");
 
     // extract the input layer
+    if( xi->layer_chain.top == 0 ) xi_debug_logger("xi->layer_chain.top == 0");
     layer_t* input_layer = xi->layer_chain.top;
 
     // clean the response before writing to it
