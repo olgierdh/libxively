@@ -654,7 +654,7 @@ layer_state_t http_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
-    xi_debug_function_entered();
+    //xi_debug_function_entered();
 
     // unpack the data
     const http_layer_input_t* http_layer_input = ( const http_layer_input_t* ) data;

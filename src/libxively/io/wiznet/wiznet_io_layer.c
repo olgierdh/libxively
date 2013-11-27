@@ -29,7 +29,7 @@ layer_state_t wiznet_io_layer_data_ready(
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
-        xi_debug_logger("about to call TCP_Send");
+        //xi_debug_logger("about to call TCP_Send");
         int len = TCP_Send( wiznet_data->socket_fd, ( uint8_t* ) buffer->data_ptr, buffer->data_size );
         xi_debug_format("len=%d", len);
 
@@ -116,31 +116,28 @@ layer_t* connect_to_endpoint(
     XI_UNUSED( address );
     XI_UNUSED( port );
 
-    if( layer == 0 ) xi_debug_logger("layer==0");
-
     // just a static data for now
     static wiznet_data_t wiznet_data;
     memset( &wiznet_data, 0, sizeof( wiznet_data_t ) );
 
     layer->user_data                            = ( void* ) &wiznet_data;
 
-    xi_debug_logger( "Creating socket..." );
-    wiznet_data.socket_fd                       = 3;
-    xi_debug_logger( "Socket creation [ok]" );
+    //xi_debug_logger( "Creating socket..." );
+    wiznet_data.socket_fd                       = XI_WIZ_SOCK_NO;
+    //xi_debug_logger( "Socket creation [ok]" );
 
     uint8_t ip[ 4 ] = XI_IP;
 
-    xi_debug_logger( "Connecting to the endpoint..." );
+    //xi_debug_logger( "Connecting to the endpoint..." );
     TCP_OpenClientSocket( wiznet_data.socket_fd, 0, ip, XI_PORT );
-    xi_debug_logger( "Connecting to the endpoint [ok]" );
+    //xi_debug_logger( "Connecting to the endpoint [ok]" );
 
     // POSTCONDITIONS
     //assert( layer != 0 );
     //assert( wiznet_data->socket_fd != -1 );
 
-    xi_debug_format("fd=%d", ((wiznet_data_t *) layer->user_data)->socket_fd);
+    //i_debug_format("fd=%d", ((wiznet_data_t *) layer->user_data)->socket_fd);
 
-    if( layer == 0 ) xi_debug_logger("It is zero.");
     return layer;
 }
 

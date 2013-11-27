@@ -595,7 +595,7 @@ layer_state_t csv_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
-    xi_debug_function_entered();
+    //xi_debug_function_entered();
 
     // unpack the data, changing the constiness to avoid copying cause
     // these layers shares the same data and the generator suppose to be the only

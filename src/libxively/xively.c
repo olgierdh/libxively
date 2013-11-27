@@ -295,10 +295,7 @@ xi_context_t* xi_create_context(
     , xi_feed_id_t feed_id )
 {
     // allocate the structure to store new context
-    xi_debug_format("protocol=%d", (int)protocol);
     xi_context_t* ret = ( xi_context_t* ) xi_alloc( sizeof( xi_context_t ) );
-    xi_debug_format("protocol=%d", (int)protocol);
-    xi_debug_logger("xi_alloc");
 
     XI_CHECK_MEMORY( ret );
 
@@ -311,7 +308,6 @@ xi_context_t* xi_create_context(
     {
         // duplicate the string
         ret->api_key  = xi_str_dup( api_key );
-        xi_debug_logger("xi_str_dup");
 
         XI_CHECK_MEMORY( ret->api_key );
     }
@@ -320,9 +316,9 @@ xi_context_t* xi_create_context(
         ret->api_key  = 0;
     }
 
-    //switch( protocol )
-    //{
-    //    case XI_HTTP:
+    switch( protocol )
+    {
+        case XI_HTTP:
             {
                 // @TODO make a configurable pool of these
                 // static structures allocated statically
@@ -346,10 +342,10 @@ xi_context_t* xi_create_context(
                 // create and connect layers store the information in layer_chain member
                 ret->layer_chain = create_and_connect_layers( CONNECTION_SCHEME_1, user_datas, CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
             }
-    //        break;
-    //    default:
-    //        goto err_handling;
-    //}
+            break;
+        default:
+            goto err_handling;
+    }
 
 
     return ret;
@@ -846,21 +842,15 @@ const xi_context_t* xi_nob_datastream_get(
 
     xi_debug_function_entered();
 
-    if( xi == 0 ) xi_debug_logger("xi == 0");
-    if( xi->layer_chain.bottom == 0 ) xi_debug_logger("xi->layer_chain.bottom == 0");
-
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
     {
-        xi_debug_logger("io_layer == 0");
         // we are in trouble
         return 0;
     }
-    xi_debug_logger("io_layer != 0");
 
     // extract the input layer
-    if( xi->layer_chain.top == 0 ) xi_debug_logger("xi->layer_chain.top == 0");
     layer_t* input_layer = xi->layer_chain.top;
 
     // clean the response before writing to it
