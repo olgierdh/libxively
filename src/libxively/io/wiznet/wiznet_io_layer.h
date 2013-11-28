@@ -8,12 +8,6 @@
 extern "C" {
 #endif
 
-#define XI_WIZ_SOCK_NO 5
-#define XI_IP { 173,203,98,29 }
-//#define XI_IP {216,52,233,120}
-//#define XI_IP {192,168,1,100}
-//#define XI_IP {192,168,60,142}
-
 /**
  * \file   posix_io_layer.h
  * \author Olgierd Humenczuk

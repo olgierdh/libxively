@@ -9,6 +9,7 @@
 #include "xi_macros.h"
 #include "layer_api.h"
 #include "common.h"
+#include "xi_user_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,13 +26,13 @@ layer_state_t wiznet_io_layer_data_ready(
     //xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );
-    xi_debug_function_entered();
+    //xi_debug_function_entered();
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
         //xi_debug_logger("about to call TCP_Send");
         int len = TCP_Send( wiznet_data->socket_fd, ( uint8_t* ) buffer->data_ptr, buffer->data_size );
-        xi_debug_format("len=%d", len);
+        xi_debug_format("sent len=%d", len);
 
         if( len < 0 )
         {
@@ -76,6 +77,8 @@ layer_state_t wiznet_io_layer_on_data_ready(
 
     memset( buffer->data_ptr, 0, buffer->data_size );
     int len = TCP_Recv( wiznet_data->socket_fd, ( uint8_t* ) buffer->data_ptr, buffer->data_size - 1 );
+    xi_debug_format("recv len=%d", len);
+
 
     if( len < 0 )
     {

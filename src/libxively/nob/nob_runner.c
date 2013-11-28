@@ -43,6 +43,7 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
         EXIT( state, layer_state);
     }
 
+    YIELD( state, LAYER_STATE_OK );
     //xi_debug_format("state=%d layer_state=%d", state, layer_state);
     // now read the data from the endpoint
     do
