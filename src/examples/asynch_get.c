@@ -12,12 +12,14 @@
  * c) gracefully close xi library
  *
  */
+
 #include <xively.h>
 #include <xi_helpers.h>
 
 #include <time.h>
 #include <stdio.h>
 #include <sys/select.h>
+#include <stdbool.h>
 
 #include "io/posix_asynch/posix_asynch_data.h"
 #include "nob/nob_runner.h"
@@ -65,7 +67,8 @@ int main( int argc, const char* argv[] )
 
     fd_set rfds;
     struct timeval tv;
-    int retval = 0;
+    int retval = 0, i;
+    bool sent = false;
 
     /* Watch stdin (fd 0) to see when it has input. */
     FD_ZERO( &rfds );
@@ -74,20 +77,33 @@ int main( int argc, const char* argv[] )
     while( 1 )
     {
         /* Wait up to five seconds. */
-        tv.tv_sec = 5;
+        tv.tv_sec = 15;
         tv.tv_usec = 0;
 
-        retval = select( posix_data->socket_fd + 1, &rfds, &rfds, NULL, &tv );
+        if ( !sent )
+        {
+          retval = select( posix_data->socket_fd + 1, NULL, &rfds, NULL, &tv );
+        }
 
+        if ( sent )
+        {
+          retval = select( posix_data->socket_fd + 1, &rfds, NULL, NULL, &tv );
+        }
         if ( retval == -1 )
         {
             perror("error in select()");
         }
         else if ( retval )
         {
-            if( process_xively_nob_step( xi_context ) != LAYER_STATE_NOT_READY )
-            {
+
+            i = process_xively_nob_step( xi_context );
+            switch( i ) {
+              case LAYER_STATE_OK:
+                sent = true;
                 break;
+              case LAYER_STATE_ERROR:
+                printf("error in send\r\n");
+                while(1){};
             }
         }
         else
