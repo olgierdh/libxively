@@ -10,6 +10,7 @@ extern "C" {
 typedef struct
 {
     uint8_t socket_fd;
+    uint8_t ip_addr[4];
 } wiznet_data_t;
 
 #ifdef __cplusplus

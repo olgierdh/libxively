@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+extern wiznet_data_t XI_IO_WIZNET_DATA;
+
 layer_state_t wiznet_io_layer_data_ready(
       layer_connectivity_t* context
     , const void* data
@@ -124,20 +126,23 @@ layer_t* connect_to_endpoint(
     XI_UNUSED( address );
     XI_UNUSED( port );
 
-    // just a static data for now
-    static wiznet_data_t wiznet_data;
-    memset( &wiznet_data, 0, sizeof( wiznet_data_t ) );
+    //if( XI_IO_WIZNET_DATA )
+    //{
+    //    static wiznet_data_t wiznet_data = XI_IO_WIZNET_DATA;
+    //}
+    //else
+    //{
+        static wiznet_data_t wiznet_data = { XI_IO_WIZNET_SOCKET_FD, { 173, 203, 98, 29 }};
+    //}
 
     layer->user_data                            = ( void* ) &wiznet_data;
 
     //xi_debug_logger( "Creating socket..." );
-    wiznet_data.socket_fd                       = XI_WIZ_SOCK_NO;
+
     //xi_debug_logger( "Socket creation [ok]" );
 
-    uint8_t ip[ 4 ] = XI_IP;
-
     //xi_debug_logger( "Connecting to the endpoint..." );
-    TCP_OpenClientSocket( wiznet_data.socket_fd, 0, ip, XI_PORT );
+    TCP_OpenClientSocket( wiznet_data.socket_fd, 0, wiznet_data.ip_addr, XI_PORT );
     //xi_debug_logger( "Connecting to the endpoint [ok]" );
 
     // POSTCONDITIONS
