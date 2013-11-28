@@ -85,6 +85,11 @@ layer_state_t wiznet_io_layer_on_data_ready(
         return LAYER_STATE_ERROR;
     }
 
+    if( len == 0 )
+    {
+        return LAYER_STATE_NOT_READY;
+    }
+
     buffer->real_size = len;
 
     buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
@@ -96,7 +101,7 @@ layer_state_t wiznet_io_layer_on_data_ready(
         return LAYER_STATE_NOT_READY;
     }
 
-    return LAYER_STATE_OK;
+    return state;
 }
 
 layer_state_t wiznet_io_layer_close( layer_connectivity_t* context )
