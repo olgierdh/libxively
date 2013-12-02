@@ -327,7 +327,7 @@ extern const xi_response_t* xi_feed_get(
         , xi_feed_t* feed );
 
 /**
- * \brief   Retrieve Xively feed's it takes all feeds assigned to the context
+ * \brief   Retrieve Xively feed all datastreams
  */
 extern const xi_response_t* xi_feed_get_all(
           xi_context_t* xi
@@ -406,6 +406,13 @@ extern const xi_context_t* xi_nob_feed_get(
         , xi_feed_t* value );
 
 /**
+ * \brief   Retrieve Xively feed all datastreams
+ */
+extern const xi_context_t* xi_nob_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* value );
+
+/**
  * \brief   Create a datastream with given value using server timestamp
  */
 extern const xi_context_t* xi_nob_datastream_create(
@@ -445,7 +452,7 @@ extern const xi_context_t* xi_nob_datastream_delete(
  *          `xi_datapoint_delete_range()` with short range instead.
  */
 extern const xi_context_t* xi_nob_datapoint_delete(
-          const xi_context_t* xi, xi_feed_id_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* dp );
 
@@ -454,7 +461,7 @@ extern const xi_context_t* xi_nob_datapoint_delete(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_context_t* xi_nob_datapoint_delete_range(
-          const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+          xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
 #endif // XI_NOB_ENABLED
 

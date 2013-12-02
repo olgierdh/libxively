@@ -29,8 +29,6 @@
 #include "xi_http_layer_data.h"
 #include "xi_csv_layer.h"
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -175,9 +173,10 @@ uint32_t xi_get_network_timeout( void )
 // LAYERS SETTINGS
 //-----------------------------------------------------------------------
 
-#define XI_IO_POSIX 0
-#define XI_IO_DUMMY 1
-#define XI_IO_MBED  2
+#define XI_IO_POSIX           0
+#define XI_IO_DUMMY           1
+#define XI_IO_MBED            2
+#define XI_IO_POSIX_ASYNCH    3
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief The LAYERS_ID enum
@@ -240,17 +239,31 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
                             , &csv_layer_close, &csv_layer_on_close )
     END_LAYER_TYPES_CONF()
 
+#elif XI_IO_LAYER == XI_IO_POSIX_ASYNCH
+    // mbed io layer
+    #include "posix_asynch_io_layer.h"
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    BEGIN_LAYER_TYPES_CONF()
+          LAYER_TYPE( IO_LAYER, &posix_asynch_io_layer_data_ready, &posix_asynch_io_layer_on_data_ready
+                              , &posix_asynch_io_layer_close, &posix_asynch_io_layer_on_close )
+        , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
+                                , &http_layer_close, &http_layer_on_close )
+        , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
+                            , &csv_layer_close, &csv_layer_on_close )
+    END_LAYER_TYPES_CONF()
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN_FACTORY_CONF()
       FACTORY_ENTRY( IO_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                             , &default_layer_stack_alloc, &default_layer_stack_free )
+                             , &default_layer_heap_alloc, &default_layer_heap_free )
     , FACTORY_ENTRY( HTTP_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                               , &default_layer_stack_alloc, &default_layer_stack_free )
+                               , &default_layer_heap_alloc, &default_layer_heap_free )
     , FACTORY_ENTRY( CSV_LAYER, &placement_layer_pass_create, &placement_layer_pass_delete
-                           , &default_layer_stack_alloc, &default_layer_stack_free )
+                           , &default_layer_heap_alloc, &default_layer_heap_free )
 END_FACTORY_CONF()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -748,7 +761,7 @@ extern const xi_context_t* xi_nob_feed_update(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_UPDATE;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_update_feed.feed = value;
+    http_layer_input.http_union_data.xi_update_feed.feed = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -781,13 +794,47 @@ extern const xi_context_t* xi_nob_feed_get(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_get_feed.feed = value;
+    http_layer_input.http_union_data.xi_get_feed.feed = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
 
     return xi;
 }
+
+extern const xi_context_t* xi_nob_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* value )
+{
+    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
+
+    if( io_layer == 0 )
+    {
+        // we are in trouble
+        return 0;
+    }
+
+    // extract the input layer
+    layer_t* input_layer = xi->layer_chain.top;
+
+    // clean the response before writing to it
+    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
+
+    // create the input parameter
+    static http_layer_input_t http_layer_input;
+    memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
+
+    // set the layer input
+    http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET_ALL;
+    http_layer_input.xi_context = xi;
+    http_layer_input.http_union_data.xi_get_feed.feed = value;
+
+    // assign the input parameter so that can be used via the runner
+    xi->input = &http_layer_input;
+
+    return xi;    
+}
+
 
 extern const xi_context_t* xi_nob_datastream_create(
          xi_context_t* xi, xi_feed_id_t feed_id
@@ -815,8 +862,8 @@ extern const xi_context_t* xi_nob_datastream_create(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_CREATE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_create_datastream.datastream    = datastream_id;
-    http_layer_input.http_layer_data.xi_create_datastream.value         = value;
+    http_layer_input.http_union_data.xi_create_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_create_datastream.value         = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -828,40 +875,6 @@ extern const xi_context_t* xi_nob_datastream_update(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id
        , const xi_datapoint_t* value )
-{
-    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
-
-    if( io_layer == 0 )
-    {
-        // we are in trouble
-        return 0;
-    }
-
-    // extract the input layer
-    layer_t* input_layer = xi->layer_chain.top;
-
-    // clean the response before writing to it
-    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
-
-    // create the input parameter
-    static http_layer_input_t http_layer_input;
-    memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
-
-    // set the layer input
-    http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_UPDATE;
-    http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_update_datastream.datastream    = datastream_id;
-    http_layer_input.http_layer_data.xi_update_datastream.value         = value;
-
-    // assign the input parameter so that can be used via the runner
-    xi->input = &http_layer_input;
-
-    return xi;
-}
-
-const xi_context_t* xi_nob_datastream_get(
-         xi_context_t* xi, xi_feed_id_t feed_id
-       , const char * datastream_id, xi_datapoint_t* dp )
 {
     XI_UNUSED( feed_id );
 
@@ -884,10 +897,44 @@ const xi_context_t* xi_nob_datastream_get(
     memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
 
     // set the layer input
+    http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_UPDATE;
+    http_layer_input.xi_context                                         = xi;
+    http_layer_input.http_union_data.xi_update_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_update_datastream.value         = value;
+
+    // assign the input parameter so that can be used via the runner
+    xi->input = &http_layer_input;
+
+    return xi;
+}
+
+const xi_context_t* xi_nob_datastream_get(
+         xi_context_t* xi, xi_feed_id_t feed_id
+       , const char * datastream_id, xi_datapoint_t* dp )
+{
+    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
+
+    if( io_layer == 0 )
+    {
+        // we are in trouble
+        return 0;
+    }
+
+    // extract the input layer
+    layer_t* input_layer = xi->layer_chain.top;
+
+    // clean the response before writing to it
+    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
+
+    // create the input parameter
+    static http_layer_input_t http_layer_input;
+    memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
+
+    // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_DATASTREAM_GET;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_get_datastream.datastream = datastream_id;
-    http_layer_input.http_layer_data.xi_get_datastream.value = dp;
+    http_layer_input.http_union_data.xi_get_datastream.datastream = datastream_id;
+    http_layer_input.http_union_data.xi_get_datastream.value = dp;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -922,7 +969,7 @@ const xi_context_t* xi_nob_datastream_delete(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_DELETE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_delete_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datastream.datastream    = datastream_id;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -931,7 +978,7 @@ const xi_context_t* xi_nob_datastream_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete(
-         const xi_context_t* xi, xi_feed_id_t feed_id
+         xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id
        , const xi_datapoint_t* dp )
 {
@@ -958,8 +1005,8 @@ const xi_context_t* xi_nob_datapoint_delete(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATAPOINT_DELETE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_delete_datapoint.datastream     = datastream_id;
-    http_layer_input.http_layer_data.xi_delete_datapoint.value          = dp;
+    http_layer_input.http_union_data.xi_delete_datapoint.datastream     = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datapoint.value          = dp;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -968,7 +1015,7 @@ const xi_context_t* xi_nob_datapoint_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete_range(
-        const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+        xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
       , const xi_timestamp_t* start, const xi_timestamp_t* end )
 {
     XI_UNUSED( feed_id );
@@ -994,9 +1041,9 @@ const xi_context_t* xi_nob_datapoint_delete_range(
     // set the layer input
     http_layer_input.query_type                                             = HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE;
     http_layer_input.xi_context                                             = xi;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.datastream   = datastream_id;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.value_start  = start;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.value_end    = end;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.datastream   = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.value_start  = start;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.value_end    = end;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
