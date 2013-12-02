@@ -22,11 +22,12 @@ extern "C" {
 typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 
 // there can be only one descriptor cause it's not needed after single use
-extern const_data_descriptor_t __xi_tmp_desc;
+const_data_descriptor_t __xi_tmp_desc;
 
 // holds the len only and it's used to make difference between normal functions
 // and generator once
 #define ENABLE_GENERATOR() \
+    static const_data_descriptor_t __xi_tmp_desc = { 0, 0, 0, 0 }; \
     unsigned char __xi_len = 0; \
     static short __xi_gen_sub_state = 0; \
     const const_data_descriptor_t* __xi_gen_data = 0; \
