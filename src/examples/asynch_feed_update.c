@@ -148,8 +148,7 @@ int main( int argc, const char* argv[] )
                 sent = true;
                 break;
               case LAYER_STATE_ERROR:
-                printf("error in send\r\n");
-                while(1){};
+                printf("error in recv\r\n");
             }
         }
         else
