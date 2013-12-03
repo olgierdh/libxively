@@ -801,6 +801,40 @@ extern const xi_context_t* xi_nob_feed_get(
     return xi;
 }
 
+extern const xi_context_t* xi_nob_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* value )
+{
+    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
+
+    if( io_layer == 0 )
+    {
+        // we are in trouble
+        return 0;
+    }
+
+    // extract the input layer
+    layer_t* input_layer = xi->layer_chain.top;
+
+    // clean the response before writing to it
+    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
+
+    // create the input parameter
+    static http_layer_input_t http_layer_input;
+    memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
+
+    // set the layer input
+    http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET_ALL;
+    http_layer_input.xi_context = xi;
+    http_layer_input.http_layer_data.xi_get_feed.feed = value;
+
+    // assign the input parameter so that can be used via the runner
+    xi->input = &http_layer_input;
+
+    return xi;    
+}
+
+
 extern const xi_context_t* xi_nob_datastream_create(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id
