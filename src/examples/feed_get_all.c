@@ -1,7 +1,7 @@
 // Copyright (c) 2003-2013, LogMeIn, Inc. All rights reserved.
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 /**
- * \brief   Example 007 that shows the basics of the xi synchronious interface
+ * \brief   Example feed get all that shows the basics of the xi synchronious interface
  * \file    main.c
  * \author  Olgierd Humenczuk
  *
@@ -24,7 +24,7 @@ void print_usage()
 {
     static const char usage[] = "This is feed_get_all of xi library\n"
     "to get all feeds values: \n"
-    "example_07 api_key feed_id\n";
+    "feed_get_all api_key feed_id\n";
 
     printf( "%s", usage );
 }
