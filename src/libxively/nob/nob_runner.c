@@ -2,7 +2,6 @@
 #include "layer_api.h"
 #include "xi_coroutine.h"
 
-
 layer_state_t process_xively_nob_step( xi_context_t* xi )
 {
     // PRECONDITION
@@ -25,12 +24,14 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
             YIELD( state, layer_state );
         }
 
-    } while( layer_state != LAYER_STATE_NOT_READY );
+    } while( layer_state == LAYER_STATE_NOT_READY );
 
     if( layer_state == LAYER_STATE_ERROR )
     {
         EXIT( state, layer_state);
     }
+
+    YIELD( state, LAYER_STATE_OK );
 
     // now read the data from the endpoint
     do
@@ -44,7 +45,7 @@ layer_state_t process_xively_nob_step( xi_context_t* xi )
             YIELD( state, layer_state );
         }
 
-    } while( layer_state != LAYER_STATE_NOT_READY );
+    } while( layer_state == LAYER_STATE_NOT_READY );
 
     EXIT( state, layer_state );
 
