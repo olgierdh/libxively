@@ -37,7 +37,7 @@ layer_state_t posix_io_layer_data_ready(
     posix_data_t* posix_data                = ( posix_data_t* ) context->self->user_data;
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
-    xi_debug_logger( "buffer->data_ptr:" );
+    //xi_debug_printf( "buffer->data_ptr:" );
     xi_debug_printf( "%s", buffer->data_ptr );
 
     XI_UNUSED( hint );

@@ -324,7 +324,14 @@ extern const xi_response_t* xi_feed_update(
  */
 extern const xi_response_t* xi_feed_get(
           xi_context_t* xi
-        , xi_feed_t* value );
+        , xi_feed_t* feed );
+
+/**
+ * \brief   Retrieve Xively feed's it takes all feeds assigned to the context
+ */
+extern const xi_response_t* xi_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* feed );
 
 /**
  * \brief   Create a datastream with given value using server timestamp

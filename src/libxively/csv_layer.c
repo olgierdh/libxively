@@ -612,6 +612,7 @@ layer_state_t csv_layer_data_ready(
         case HTTP_LAYER_INPUT_DATAPOINT_DELETE:
         case HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE:
         case HTTP_LAYER_INPUT_FEED_GET:
+        case HTTP_LAYER_INPUT_FEED_GET_ALL:
         case HTTP_LAYER_INPUT_DATASTREAM_GET:
             http_layer_input->payload_generator = 0;
             break;
@@ -653,6 +654,7 @@ layer_state_t csv_layer_on_data_ready(
                             , ( void* ) data
                             , hint
                             , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
+        case HTTP_LAYER_INPUT_FEED_GET_ALL:
         case HTTP_LAYER_INPUT_FEED_GET:
             return csv_layer_parse_feed(
                               csv_layer_data
