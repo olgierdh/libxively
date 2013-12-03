@@ -173,11 +173,11 @@ uint32_t xi_get_network_timeout( void )
 // LAYERS SETTINGS
 //-----------------------------------------------------------------------
 
-#define XI_IO_POSIX 0
-#define XI_IO_DUMMY 1
-#define XI_IO_MBED  2
-#define XI_IO_POSIX_ASYNCH 3
-#define XI_IO_WIZNET 4
+#define XI_IO_POSIX           0
+#define XI_IO_DUMMY           1
+#define XI_IO_MBED            2
+#define XI_IO_POSIX_ASYNCH    3
+#define XI_IO_WIZNET          4
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief The LAYERS_ID enum
@@ -911,8 +911,6 @@ const xi_context_t* xi_nob_datastream_get(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id, xi_datapoint_t* dp )
 {
-    XI_UNUSED( feed_id );
-
     xi_debug_function_entered();
 
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
