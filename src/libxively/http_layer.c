@@ -363,6 +363,56 @@ const void* http_layer_data_generator_feed_get(
 }
 
 /**
+ * \brief http_layer_data_generator_feed_get_all
+ * \param input
+ * \param state
+ * \return
+ */
+const void* http_layer_data_generator_feed_get_all(
+          const void* input
+        , short* state )
+{
+    // unpack the data
+    const http_layer_input_t* const http_layer_input
+            = ( const http_layer_input_t* ) input;
+
+    // PRECONDITIONS
+    assert( http_layer_input->http_layer_data.xi_get_feed.feed != 0 );
+
+    static unsigned char i = 0;
+
+    ENABLE_GENERATOR();
+
+    BEGIN_CORO( *state )
+
+        // after starting coro reset static counter
+        i = 1;
+
+        gen_ptr_text( *state, XI_HTTP_GET );
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
+        gen_ptr_text( *state, XI_CSV_SLASH );
+
+        {
+            memset( buffer_32, 0, 32 );
+            sprintf( buffer_32, "%"PRIu32, ( uint32_t ) http_layer_input->xi_context->feed_id );
+            gen_ptr_text( *state, buffer_32 ); // feed id
+        }
+
+        gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
+
+        // SEND HTTP
+        gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
+        gen_ptr_text( *state, XI_HTTP_CRLF );
+
+        // SEND THE REST THROUGH SUB GENERATOR
+        call_sub_gen_and_exit( *state, input, http_layer_data_generator_query_body );
+
+    END_CORO()
+
+    return 0;
+}
+
+/**
  * \brief http_layer_data_generator_feed_update
  * \param input
  * \param state
@@ -498,9 +548,6 @@ const void* http_layer_data_generator_datapoint_delete(
             gen_ptr_text( *state, buffer_32 );
             gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
         }
-
-
-        //
 
         // SEND HTTP
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_HTTP );
@@ -680,6 +727,11 @@ layer_state_t http_layer_data_ready(
                           context
                         , http_layer_input
                         , &http_layer_data_generator_feed_get );
+        case HTTP_LAYER_INPUT_FEED_GET_ALL:
+            return http_layer_data_ready_gen(
+                          context
+                        , http_layer_input
+                        , &http_layer_data_generator_feed_get_all );            
         case HTTP_LAYER_INPUT_FEED_UPDATE:
             return http_layer_data_ready_gen(
                           context
