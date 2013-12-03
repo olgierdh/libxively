@@ -5,7 +5,6 @@ AR ?= ar
 
 XI_BUILD_TYPE ?= debug
 
-
 ifndef XI_OVERRIDE_CFLAGS
   XI_WARN_CFLAGS ?= -Wall -Wextra
   XI_CFLAGS += -std=gnu99 -Iinclude -fstrict-aliasing
@@ -64,6 +63,16 @@ endif
 
 ifeq ($(XI_IO_LAYER),mbed)
   XI_CONFIG += XI_IO_LAYER=2
+endif
+
+ifeq ($(XI_IO_LAYER),posix_asynch)
+	XI_CFLAGS += -DXI_IO_LAYER=3
+	XI_NOB_ENABLED := true
+endif
+
+ifeq ($(XI_IO_LAYER),wiznet)
+	XI_CFLAGS += -DXI_IO_LAYER=4
+	XI_NOB_ENABLED := true
 endif
 
 ifeq ($(XI_NOB_ENABLED),true)
