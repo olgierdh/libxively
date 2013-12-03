@@ -17,7 +17,6 @@
 #include "xi_helpers.h"
 #include "xi_err.h"
 #include "xi_globals.h"
-
 #include "common.h"
 #include "layer_api.h"
 #include "layer_interface.h"
@@ -28,8 +27,6 @@
 #include "layer_default_allocators.h"
 #include "http_layer.h"
 #include "http_layer_data.h"
-
-
 #include "csv_layer.h"
 
 #ifdef __cplusplus
@@ -176,9 +173,11 @@ uint32_t xi_get_network_timeout( void )
 // LAYERS SETTINGS
 //-----------------------------------------------------------------------
 
-#define XI_IO_POSIX 0
-#define XI_IO_DUMMY 1
-#define XI_IO_MBED  2
+#define XI_IO_POSIX           0
+#define XI_IO_DUMMY           1
+#define XI_IO_MBED            2
+#define XI_IO_POSIX_ASYNCH    3
+#define XI_IO_WIZNET          4
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief The LAYERS_ID enum
@@ -235,6 +234,36 @@ DEFINE_CONNECTION_SCHEME( CONNECTION_SCHEME_1, CONNECTION_SCHEME_1_DATA );
     BEGIN_LAYER_TYPES_CONF()
           LAYER_TYPE( IO_LAYER, &mbed_io_layer_data_ready, &mbed_io_layer_on_data_ready
                               , &mbed_io_layer_close, &mbed_io_layer_on_close )
+        , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
+                                , &http_layer_close, &http_layer_on_close )
+        , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
+                            , &csv_layer_close, &csv_layer_on_close )
+    END_LAYER_TYPES_CONF()
+
+#elif XI_IO_LAYER == XI_IO_POSIX_ASYNCH
+    // mbed io layer
+    #include "posix_asynch_io_layer.h"
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    BEGIN_LAYER_TYPES_CONF()
+          LAYER_TYPE( IO_LAYER, &posix_asynch_io_layer_data_ready, &posix_asynch_io_layer_on_data_ready
+                              , &posix_asynch_io_layer_close, &posix_asynch_io_layer_on_close )
+        , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
+                                , &http_layer_close, &http_layer_on_close )
+        , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
+                            , &csv_layer_close, &csv_layer_on_close )
+    END_LAYER_TYPES_CONF()
+
+#elif XI_IO_LAYER == XI_IO_WIZNET
+    // wiznet io layer
+    #include "wiznet_io_layer.h"
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    BEGIN_LAYER_TYPES_CONF()
+          LAYER_TYPE( IO_LAYER, &wiznet_io_layer_data_ready, &wiznet_io_layer_on_data_ready
+                              , &wiznet_io_layer_close, &wiznet_io_layer_on_close )
         , LAYER_TYPE( HTTP_LAYER, &http_layer_data_ready, &http_layer_on_data_ready
                                 , &http_layer_close, &http_layer_on_close )
         , LAYER_TYPE( CSV_LAYER, &csv_layer_data_ready, &csv_layer_on_data_ready
@@ -773,6 +802,8 @@ extern const xi_context_t* xi_nob_datastream_update(
        , const char * datastream_id
        , const xi_datapoint_t* value )
 {
+    XI_UNUSED( feed_id );
+
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
@@ -807,8 +838,6 @@ const xi_context_t* xi_nob_datastream_get(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id, xi_datapoint_t* dp )
 {
-    XI_UNUSED( feed_id );
-
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
