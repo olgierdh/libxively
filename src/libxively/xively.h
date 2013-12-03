@@ -327,7 +327,7 @@ extern const xi_response_t* xi_feed_get(
         , xi_feed_t* feed );
 
 /**
- * \brief   Retrieve Xively feed's it takes all feeds assigned to the context
+ * \brief   Retrieve Xively feed all datastreams
  */
 extern const xi_response_t* xi_feed_get_all(
           xi_context_t* xi
@@ -402,6 +402,13 @@ extern const xi_context_t* xi_nob_feed_update(
  * \brief   Retrieve Xively feed
  */
 extern const xi_context_t* xi_nob_feed_get(
+          xi_context_t* xi
+        , xi_feed_t* value );
+
+/**
+ * \brief   Retrieve Xively feed all datastreams
+ */
+extern const xi_context_t* xi_nob_feed_get_all(
           xi_context_t* xi
         , xi_feed_t* value );
 
