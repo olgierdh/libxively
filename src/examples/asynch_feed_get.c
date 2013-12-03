@@ -56,9 +56,17 @@ int main( int argc, const char* argv[] )
         return -1;
     }
 
-    xi_datapoint_t ret;
+    xi_feed_t ret;
+    memset( &ret, 0, sizeof( xi_feed_t ) );
 
-    xi_nob_datastream_get( xi_context, atoi( argv[ 2 ] ), argv[ 3 ], &ret );
+    ret.datastream_count = 2;
+    xi_str_copy_untiln( ret.datastreams[ 0 ].datastream_id, sizeof( ret.datastreams[ 0 ].datastream_id ), "0001", '\0' );
+    ret.datastreams[ 0 ].datapoint_count = 1;
+
+    xi_str_copy_untiln( ret.datastreams[ 1 ].datastream_id, sizeof( ret.datastreams[ 1 ].datastream_id ), "0002", '\0' );
+    ret.datastreams[ 1 ].datapoint_count = 1;
+
+    xi_nob_feed_get( xi_context, &ret );
 
     posix_asynch_data_t* posix_data
             = ( posix_asynch_data_t* ) xi_context->layer_chain.bottom->user_data;
@@ -87,6 +95,10 @@ int main( int argc, const char* argv[] )
         {
             if( process_xively_nob_step( xi_context ) != LAYER_STATE_NOT_READY )
             {
+                if( sent == true )
+                {
+                    goto print_data;
+                }
                 break;
             }
         }
@@ -97,9 +109,14 @@ int main( int argc, const char* argv[] )
         }
     }
 
-    printf( "timestamp = %ld.%ld, value = %d\n"
-        , ret.timestamp.timestamp, ret.timestamp.micro
-        , ret.value.i32_value );
+print_data:
+
+    for( size_t i = 0; i < ret.datastream_count; ++i )
+    {
+        printf( "timestamp = %ld.%ld, value = %s\n"
+            , ret.datastreams[ i ].datapoints[ 0 ].timestamp.timestamp, ret.datastreams[ i ].datapoints[ 0 ].timestamp.micro
+            , ret.datastreams[ i ].datapoints[ 0 ].value.str_value );
+    }
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );
