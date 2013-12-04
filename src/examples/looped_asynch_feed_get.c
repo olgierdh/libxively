@@ -62,15 +62,7 @@ int main( int argc, const char* argv[] )
 
 restart:
     memset( &ret, 0, sizeof( xi_feed_t ) );
-
-    ret.datastream_count = 2;
-    xi_str_copy_untiln( ret.datastreams[ 0 ].datastream_id, sizeof( ret.datastreams[ 0 ].datastream_id ), "0001", '\0' );
-    ret.datastreams[ 0 ].datapoint_count = 1;
-
-    xi_str_copy_untiln( ret.datastreams[ 1 ].datastream_id, sizeof( ret.datastreams[ 1 ].datastream_id ), "0002", '\0' );
-    ret.datastreams[ 1 ].datapoint_count = 1;
-
-    xi_nob_feed_get( xi_context, &ret );
+    xi_nob_feed_get_all( xi_context, &ret );
 
     posix_asynch_data_t* posix_data
             = ( posix_asynch_data_t* ) xi_context->layer_chain.bottom->user_data;
