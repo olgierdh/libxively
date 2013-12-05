@@ -838,6 +838,8 @@ const xi_context_t* xi_nob_datastream_get(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id, xi_datapoint_t* dp )
 {
+    XI_UNUSED( feed_id );
+
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
@@ -904,7 +906,7 @@ const xi_context_t* xi_nob_datastream_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete(
-         const xi_context_t* xi, xi_feed_id_t feed_id
+         xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id
        , const xi_datapoint_t* dp )
 {
@@ -941,7 +943,7 @@ const xi_context_t* xi_nob_datapoint_delete(
 }
 
 const xi_context_t* xi_nob_datapoint_delete_range(
-        const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+        xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
       , const xi_timestamp_t* start, const xi_timestamp_t* end )
 {
     XI_UNUSED( feed_id );
