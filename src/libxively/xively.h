@@ -445,7 +445,7 @@ extern const xi_context_t* xi_nob_datastream_delete(
  *          `xi_datapoint_delete_range()` with short range instead.
  */
 extern const xi_context_t* xi_nob_datapoint_delete(
-          const xi_context_t* xi, xi_feed_id_t feed_id
+          xi_context_t* xi, xi_feed_id_t feed_id
         , const char * datastream_id
         , const xi_datapoint_t* dp );
 
@@ -454,7 +454,7 @@ extern const xi_context_t* xi_nob_datapoint_delete(
  * \warning This function destroys the data in Xively and there is no way to restore it!
  */
 extern const xi_context_t* xi_nob_datapoint_delete_range(
-          const xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
+          xi_context_t* xi, xi_feed_id_t feed_id, const char * datastream_id
         , const xi_timestamp_t* start, const xi_timestamp_t* end );
 #endif // XI_NOB_ENABLED
 
