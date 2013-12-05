@@ -911,7 +911,7 @@ const xi_context_t* xi_nob_datastream_get(
          xi_context_t* xi, xi_feed_id_t feed_id
        , const char * datastream_id, xi_datapoint_t* dp )
 {
-    xi_debug_function_entered();
+    XI_UNUSED( feed_id );
 
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
