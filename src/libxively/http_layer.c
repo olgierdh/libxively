@@ -93,7 +93,7 @@ const void* http_layer_data_generator_query_body(
             {
                 while( ret_state != 1 )
                 {
-                    data        = (*http_layer_input->payload_generator)( &http_layer_input->http_layer_data, &ret_state );
+                    data        = (*http_layer_input->payload_generator)( &http_layer_input->http_union_data, &ret_state );
                     cnt_len    += data->real_size;
                 }
 
@@ -124,7 +124,7 @@ const void* http_layer_data_generator_query_body(
             if( http_layer_input->payload_generator )
             {
                 call_sub_gen_and_exit( *state
-                                       , ( const void* ) &http_layer_input->http_layer_data
+                                       , ( const void* ) &http_layer_input->http_union_data
                                        , (*http_layer_input->payload_generator) );
             }
 
@@ -161,7 +161,7 @@ const void* http_layer_data_generator_datastream_body(
         gen_ptr_text( *state, XI_CSV_DATASTREAMS );
         gen_ptr_text( *state, XI_CSV_SLASH );
 
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_datastream.datastream ); // datastream id
+        gen_ptr_text( *state, http_layer_input->http_union_data.xi_get_datastream.datastream ); // datastream id
         gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
 
         // SEND HTTP
@@ -312,7 +312,7 @@ const void* http_layer_data_generator_feed_get(
     static const char* const p1 = ".csv?datastreams=";
 
     // PRECONDITIONS
-    assert( http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count > 0 );
+    assert( http_layer_input->http_union_data.xi_get_feed.feed->datastream_count > 0 );
 
     static unsigned char i = 0;
 
@@ -336,14 +336,14 @@ const void* http_layer_data_generator_feed_get(
         gen_ptr_text( *state, p1 );
 
         // 0 case separated
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ 0 ].datastream_id );
+        gen_ptr_text( *state, http_layer_input->http_union_data.xi_get_feed.feed->datastreams[ 0 ].datastream_id );
 
         // iterate over all datastreams
         {
-            for( ; i < http_layer_input->http_layer_data.xi_get_feed.feed->datastream_count; ++i )
+            for( ; i < http_layer_input->http_union_data.xi_get_feed.feed->datastream_count; ++i )
             {
                 gen_ptr_text( *state, XI_CSV_COMMA );
-                gen_ptr_text( *state, http_layer_input->http_layer_data.xi_get_feed.feed->datastreams[ i ].datastream_id );
+                gen_ptr_text( *state, http_layer_input->http_union_data.xi_get_feed.feed->datastreams[ i ].datastream_id );
             }
         }
 
@@ -377,7 +377,7 @@ const void* http_layer_data_generator_feed_get_all(
             = ( const http_layer_input_t* ) input;
 
     // PRECONDITIONS
-    assert( http_layer_input->http_layer_data.xi_get_feed.feed != 0 );
+    assert( http_layer_input->http_union_data.xi_get_feed.feed != 0 );
 
     static unsigned char i = 0;
 
@@ -480,7 +480,7 @@ const void* http_layer_data_generator_datastream_delete(
         gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
         gen_ptr_text( *state, XI_CSV_SLASH );
 
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datastream.datastream );
+        gen_ptr_text( *state, http_layer_input->http_union_data.xi_delete_datastream.datastream );
         gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
 
         // SEND HTTP
@@ -524,14 +524,14 @@ const void* http_layer_data_generator_datapoint_delete(
         gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
         gen_ptr_text( *state, XI_CSV_SLASH );
 
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint.datastream );
+        gen_ptr_text( *state, http_layer_input->http_union_data.xi_delete_datapoint.datastream );
 
         gen_ptr_text( *state, XI_CSV_SLASH );
         gen_ptr_text( *state, XI_CSV_DATAPOINTS );        
         gen_ptr_text( *state, XI_CSV_SLASH );
 
         {
-            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.timestamp;
+            stamp   = http_layer_input->http_union_data.xi_delete_datapoint.value->timestamp.timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
             memset( buffer_32, 0, 32 );
@@ -543,7 +543,7 @@ const void* http_layer_data_generator_datapoint_delete(
                 , gmtinfo->tm_hour
                 , gmtinfo->tm_min
                 , gmtinfo->tm_sec
-                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint.value->timestamp.micro );
+                , ( int ) http_layer_input->http_union_data.xi_delete_datapoint.value->timestamp.micro );
 
             gen_ptr_text( *state, buffer_32 );
             gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
@@ -592,14 +592,14 @@ const void* http_layer_data_generator_datapoint_delete_range(
         gen_ptr_text( *state, XI_CSV_DATASTREAMS );        
         gen_ptr_text( *state, XI_CSV_SLASH );
 
-        gen_ptr_text( *state, http_layer_input->http_layer_data.xi_delete_datapoint_range.datastream );
+        gen_ptr_text( *state, http_layer_input->http_union_data.xi_delete_datapoint_range.datastream );
 
         gen_ptr_text( *state, XI_CSV_SLASH );
         gen_ptr_text( *state, XI_CSV_DATAPOINTS );        
         gen_ptr_text( *state, p1 );
 
         {
-            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->timestamp;
+            stamp   = http_layer_input->http_union_data.xi_delete_datapoint_range.value_start->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
             memset( buffer_32, 0, 32 );
@@ -611,12 +611,12 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_hour
                 , gmtinfo->tm_min
                 , gmtinfo->tm_sec
-                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_start->micro );
+                , ( int ) http_layer_input->http_union_data.xi_delete_datapoint_range.value_start->micro );
 
             gen_ptr_text( *state, buffer_32 );
             gen_ptr_text( *state, XI_HTTP_AMPERSAND );
 
-            stamp   = http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->timestamp;
+            stamp   = http_layer_input->http_union_data.xi_delete_datapoint_range.value_end->timestamp;
             gmtinfo = xi_gmtime( &stamp );
 
             memset( buffer_32, 0, 32 );
@@ -628,7 +628,7 @@ const void* http_layer_data_generator_datapoint_delete_range(
                 , gmtinfo->tm_hour
                 , gmtinfo->tm_min
                 , gmtinfo->tm_sec
-                , ( int ) http_layer_input->http_layer_data.xi_delete_datapoint_range.value_end->micro );
+                , ( int ) http_layer_input->http_union_data.xi_delete_datapoint_range.value_end->micro );
 
             gen_ptr_text( *state, buffer_32 );
             gen_ptr_text( *state, XI_CSV_DOT_CSV_SPACE );
