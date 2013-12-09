@@ -760,7 +760,7 @@ extern const xi_context_t* xi_nob_feed_update(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_UPDATE;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_update_feed.feed = value;
+    http_layer_input.http_union_data.xi_update_feed.feed = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -793,7 +793,7 @@ extern const xi_context_t* xi_nob_feed_get(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_get_feed.feed = value;
+    http_layer_input.http_union_data.xi_get_feed.feed = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -861,8 +861,8 @@ extern const xi_context_t* xi_nob_datastream_create(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_CREATE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_create_datastream.datastream    = datastream_id;
-    http_layer_input.http_layer_data.xi_create_datastream.value         = value;
+    http_layer_input.http_union_data.xi_create_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_create_datastream.value         = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -898,8 +898,8 @@ extern const xi_context_t* xi_nob_datastream_update(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_UPDATE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_update_datastream.datastream    = datastream_id;
-    http_layer_input.http_layer_data.xi_update_datastream.value         = value;
+    http_layer_input.http_union_data.xi_update_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_update_datastream.value         = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -934,8 +934,8 @@ const xi_context_t* xi_nob_datastream_get(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_DATASTREAM_GET;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_get_datastream.datastream = datastream_id;
-    http_layer_input.http_layer_data.xi_get_datastream.value = dp;
+    http_layer_input.http_union_data.xi_get_datastream.datastream = datastream_id;
+    http_layer_input.http_union_data.xi_get_datastream.value = dp;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -970,7 +970,7 @@ const xi_context_t* xi_nob_datastream_delete(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATASTREAM_DELETE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_delete_datastream.datastream    = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datastream.datastream    = datastream_id;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -1006,8 +1006,8 @@ const xi_context_t* xi_nob_datapoint_delete(
     // set the layer input
     http_layer_input.query_type                                         = HTTP_LAYER_INPUT_DATAPOINT_DELETE;
     http_layer_input.xi_context                                         = xi;
-    http_layer_input.http_layer_data.xi_delete_datapoint.datastream     = datastream_id;
-    http_layer_input.http_layer_data.xi_delete_datapoint.value          = dp;
+    http_layer_input.http_union_data.xi_delete_datapoint.datastream     = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datapoint.value          = dp;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -1042,9 +1042,9 @@ const xi_context_t* xi_nob_datapoint_delete_range(
     // set the layer input
     http_layer_input.query_type                                             = HTTP_LAYER_INPUT_DATAPOINT_DELETE_RANGE;
     http_layer_input.xi_context                                             = xi;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.datastream   = datastream_id;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.value_start  = start;
-    http_layer_input.http_layer_data.xi_delete_datapoint_range.value_end    = end;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.datastream   = datastream_id;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.value_start  = start;
+    http_layer_input.http_union_data.xi_delete_datapoint_range.value_end    = end;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
