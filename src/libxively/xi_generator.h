@@ -22,7 +22,7 @@ extern "C" {
 typedef const void* ( xi_generator_t )( const void* input, short* curr_state );
 
 // there can be only one descriptor cause it's not needed after single use
-const_data_descriptor_t __xi_tmp_desc;
+// const_data_descriptor_t __xi_tmp_desc;
 
 // holds the len only and it's used to make difference between normal functions
 // and generator once
