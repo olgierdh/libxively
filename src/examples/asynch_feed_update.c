@@ -26,9 +26,13 @@
 
 void print_usage()
 {
+#ifdef XI_NOB_ENABLED
     static const char usage[] = "This is example_03 of xi library\n"
     "to view your datastream write: \n"
     "example_04 api_key feed_id datastream_id\n";
+#else
+    static const char usage[] = "Please recompile libxiveley with XI_NOB_ENABLED=true and one of the asynch io layers in order to use that example";
+#endif
 
     printf( "%s", usage );
 }
@@ -41,7 +45,7 @@ int main( int argc, const char* argv[] )
     XI_UNUSED( argc );
     XI_UNUSED( argv );
 
-//#ifdef XI_NOB_ENABLED
+#ifdef XI_NOB_ENABLED
     if( argc < 4 )
     {
         print_usage();
@@ -166,6 +170,8 @@ print_data:
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );
-//#endif
+#else
+    print_usage();
+#endif
     return 0;
 }

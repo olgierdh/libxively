@@ -26,9 +26,14 @@
 
 void print_usage()
 {
+
+#ifdef XI_NOB_ENABLED
     static const char usage[] = "This is looped asynch get of xi library\n"
     "to constantly view your datastream write: \n"
     "looped_asynch_feed_get api_key feed_id\n";
+#else
+    static const char usage[] = "Please recompile libxiveley with XI_NOB_ENABLED=true and one of the asynch io layers in order to use that example";
+#endif
 
     printf( "%s", usage );
 }
@@ -135,6 +140,9 @@ print_data:
 
     // destroy the context cause we don't need it anymore
     xi_delete_context( xi_context );
+#else
+    print_usage();
 #endif
+
     return 0;
 }
