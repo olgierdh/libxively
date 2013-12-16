@@ -37,6 +37,8 @@ void print_usage()
     printf( "%s", usage );
 }
 
+#define REQUIRED_ARGS 3
+
 int main( int argc, const char* argv[] )
 {
 
@@ -62,10 +64,45 @@ int main( int argc, const char* argv[] )
         return -1;
     }
 
-    xi_feed_t ret;
-    memset( &ret, 0, sizeof( xi_feed_t ) );
+    // remember the count for pairs
+    size_t pairs_count = ( argc - REQUIRED_ARGS ) / 2;
 
-    xi_nob_feed_get_all( xi_context, &ret );
+    // create feed
+    xi_feed_t f;
+    memset( &f, 0, sizeof( xi_feed_t ) );
+
+    // set datastream count
+    f.feed_id           = atoi( argv[ 2 ] );
+    f.datastream_count  = pairs_count;
+
+    // for each pair
+    for( size_t i = 0; i < pairs_count; i++ )
+    {
+        // get the datastream pointer
+        xi_datastream_t* d = &f.datastreams[ i ];
+
+        // set the datapoint count
+        d->datapoint_count   = 1;
+
+        int size = sizeof( d->datastream_id );
+        int s = xi_str_copy_untiln( d->datastream_id, size
+            , argv[ REQUIRED_ARGS + ( i * 2 ) ], '\0' );
+
+        if( s >= size )
+        {
+            printf( "datastream id too long: %s\n", argv[ REQUIRED_ARGS + ( i * 2 ) ] );
+        }
+
+        // get the datpoint counter
+        xi_datapoint_t* p = &d->datapoints[ 0 ];
+
+        // set the datapoint
+        xi_set_value_i32( p, atoi( argv[ REQUIRED_ARGS + ( i  * 2 ) + 1 ] ) );
+        p->timestamp.timestamp = 123;
+    }
+
+
+    xi_nob_feed_update( xi_context, &f );
 
     posix_asynch_data_t* posix_data
             = ( posix_asynch_data_t* ) xi_context->layer_chain.bottom->user_data;
@@ -124,11 +161,11 @@ int main( int argc, const char* argv[] )
 
 print_data:
 
-    for( size_t i = 0; i < ret.datastream_count; ++i )
+    for( size_t i = 0; i < f.datastream_count; ++i )
     {
-        printf( "timestamp = %ld.%ld, value = %s\n"
-            , ret.datastreams[ i ].datapoints[ 0 ].timestamp.timestamp, ret.datastreams[ i ].datapoints[ 0 ].timestamp.micro
-            , ret.datastreams[ i ].datapoints[ 0 ].value.str_value );
+        printf( "timestamp = %ld.%ld, value = %d\n"
+            , f.datastreams[ i ].datapoints[ 0 ].timestamp.timestamp, f.datastreams[ i ].datapoints[ 0 ].timestamp.micro
+            , f.datastreams[ i ].datapoints[ 0 ].value.i32_value );
     }
 
     // destroy the context cause we don't need it anymore
