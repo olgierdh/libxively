@@ -377,16 +377,11 @@ const void* http_layer_data_generator_feed_get_all(
             = ( const http_layer_input_t* ) input;
 
     // PRECONDITIONS
-    assert( http_layer_input->http_layer_data.xi_get_feed.feed != 0 );
-
-    static unsigned char i = 0;
+    assert( http_layer_input->http_union_data.xi_get_feed.feed != 0 );
 
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
-
-        // after starting coro reset static counter
-        i = 1;
 
         gen_ptr_text( *state, XI_HTTP_GET );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );

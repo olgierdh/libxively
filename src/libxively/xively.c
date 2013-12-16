@@ -734,7 +734,7 @@ extern const xi_response_t* xi_datapoint_delete_range(
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
 
-#ifdef XI_NOB_ENABLED
+//#ifdef XI_NOB_ENABLED
 extern const xi_context_t* xi_nob_feed_update(
          xi_context_t* xi
        , const xi_feed_t* value )
@@ -826,7 +826,7 @@ extern const xi_context_t* xi_nob_feed_get_all(
     // set the layer input
     http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET_ALL;
     http_layer_input.xi_context = xi;
-    http_layer_input.http_layer_data.xi_get_feed.feed = value;
+    http_layer_input.http_union_data.xi_get_feed.feed = value;
 
     // assign the input parameter so that can be used via the runner
     xi->input = &http_layer_input;
@@ -840,6 +840,8 @@ extern const xi_context_t* xi_nob_datastream_create(
        , const char * datastream_id
        , const xi_datapoint_t* value )
 {
+    XI_UNUSED( feed_id );
+
     layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
 
     if( io_layer == 0 )
@@ -1051,7 +1053,7 @@ const xi_context_t* xi_nob_datapoint_delete_range(
 
     return xi;
 }
-#endif // XI_NOB_ENABLED
+//#endif // XI_NOB_ENABLED
 
 #ifdef __cplusplus
 }
