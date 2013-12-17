@@ -376,8 +376,9 @@ const xi_response_t* xi_feed_get(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -414,8 +415,9 @@ const xi_response_t* xi_feed_update(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -454,8 +456,9 @@ const xi_response_t* xi_datastream_get(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -496,8 +499,9 @@ const xi_response_t* xi_datastream_create(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -537,8 +541,9 @@ const xi_response_t* xi_datastream_update(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -577,8 +582,9 @@ const xi_response_t* xi_datastream_delete(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -618,8 +624,9 @@ const xi_response_t* xi_datapoint_delete(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
@@ -660,8 +667,9 @@ extern const xi_response_t* xi_datapoint_delete_range(
     if( state == LAYER_STATE_OK )
     {
         CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
-        CALL_ON_SELF_CLOSE( input_layer );
     }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
 
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
