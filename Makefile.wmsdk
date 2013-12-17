@@ -13,22 +13,18 @@ INC_DIR := $(SDK_PATH)/src/incl
 include $(SDK_PATH)/build/env/common.mak
 
 XI_USER_AGENT ?= '"libxively-lwip-experimental/0.1.x-detached"'
-XI_IO_LAYER ?= posix
 
-XI_DEBUG_OUTPUT ?= 1
-XI_DEBUG_PRINTF := wmprintf
-## When assertions enabled, we get a linker error:
-##   https://gist.github.com/errordeveloper/4c17921cb2e1a9625ebd
-XI_DEBUG_ASSERT := 0
+XI_USER_CONFIG := 1
+XI_USER_CONFIG_PATH ?= $(SDK_PATH)/external/
 XI_WARN_CFLAGS := -Wall -Wextra -Wno-unused-parameter -Wno-unknown-pragmas
 XI_OPTLEVEL ?= $(filter -O0 -O1 -O2 -O3 -O4 -O5 -Os,$(CFLAGS))
 XI_EXTRA_CFLAGS := $(filter-out -O0 -O1 -O2 -O3 -O4 -O5 -Os,$(CFLAGS)) \
-	-fgnu89-inline \
-	-DXI_ALLOCATOR=1 -DXI_IO_LAYER_POSIX_COMPAT=1 \
-	-DXI_IO_LAYER_POSIX_DISABLE_TIMEOUT
+	-DXI_IO_LAYER_POSIX_COMPAT=1 \
+	-DXI_IO_LAYER_POSIX_DISABLE_TIMEOUT \
+	-fgnu89-inline
 
-export XI_DEBUG_ASSERT XI_DEBUG_OUTPUT XI_DEBUG_PRINTF
-export XI_USER_AGENT XI_IO_LAYER
+export XI_USER_CONFIG XI_USER_CONFIG_PATH
+export XI_USER_AGENT
 export XI_WARN_CFLAGS XI_OPTLEVEL XI_EXTRA_CFLAGS
 export CC AR
 
