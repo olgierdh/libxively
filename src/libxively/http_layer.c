@@ -987,7 +987,7 @@ layer_state_t http_layer_close(
 layer_state_t http_layer_on_close(
     layer_connectivity_t* context )
 {
-    return  CALL_ON_NEXT_CLOSE( context->self );
+    return  CALL_ON_NEXT_ON_CLOSE( context->self );
 }
 
 

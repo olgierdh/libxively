@@ -100,16 +100,21 @@ layer_state_t posix_io_layer_close( layer_connectivity_t* context )
 
     XI_UNUSED( posix_data );
 
-    return LAYER_STATE_OK;
+    return CALL_ON_SELF_ON_CLOSE( context->self );
 }
 
 layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
 {
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
-    XI_UNUSED( posix_data );
+    // cleanup the memory
+    if( posix_data ) 
+    {
+        xi_debug_logger( "Freeing posix_data memory... \n" );
+        XI_SAFE_FREE( posix_data ); 
+    }
 
-    return LAYER_STATE_OK;
+    return CALL_ON_NEXT_ON_CLOSE( context->self );
 }
 
 layer_t* connect_to_endpoint(
