@@ -7,7 +7,7 @@
  *
  */
 
-#include "layer_interface.h"
+#include "xi_layer_interface.h"
 
 #ifdef __cplusplus
 extern "C" {

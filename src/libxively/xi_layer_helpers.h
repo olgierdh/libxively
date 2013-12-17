@@ -1,7 +1,7 @@
 #ifndef __LAYER_HELPERS_H__
 #define __LAYER_HELPERS_H__
 
-#include "common.h"
+#include "xi_common.h"
 
 #ifdef __cplusplus
 extern "C" {

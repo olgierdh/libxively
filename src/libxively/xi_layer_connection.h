@@ -11,10 +11,10 @@
 // local
 #include "xi_macros.h"
 #include "xi_debug.h"
-#include "layer_api.h"
-#include "layer.h"
-#include "layer_type.h"
-#include "layer_factory.h"
+#include "xi_layer_api.h"
+#include "xi_layer.h"
+#include "xi_layer_type.h"
+#include "xi_layer_factory.h"
 
 #ifdef __cplusplus
 extern "C" {

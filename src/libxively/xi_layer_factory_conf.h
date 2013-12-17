@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "layer_factory_interface.h"
+#include "xi_layer_factory_interface.h"
 
 #define BEGIN_FACTORY_CONF() \
 const layer_factory_interface_t FACTORY_ENTRIES[] = {

@@ -10,7 +10,7 @@
 
 
 #include "xively.h"
-#include "layer.h"
+#include "xi_layer.h"
 #include "xi_generator.h"
 
 #ifdef __cplusplus

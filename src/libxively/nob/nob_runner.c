@@ -1,5 +1,5 @@
 #include "nob_runner.h"
-#include "layer_api.h"
+#include "xi_layer_api.h"
 #include "xi_coroutine.h"
 
 layer_state_t process_xively_nob_step( xi_context_t* xi )

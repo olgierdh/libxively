@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 // local
-#include "layer_connectivity.h"
+#include "xi_layer_connectivity.h"
 
 #ifdef __cplusplus
 extern "C" {

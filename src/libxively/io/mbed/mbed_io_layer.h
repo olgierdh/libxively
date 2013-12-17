@@ -11,7 +11,7 @@
 #define __MBED_COMM_H__
 
 // local
-#include "layer.h"
+#include "xi_layer.h"
 
 #ifdef __cplusplus
 extern "C" {

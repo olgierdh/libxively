@@ -7,8 +7,8 @@
 #include "wiznet_io_layer.h"
 #include "wiznet_data.h"
 #include "xi_macros.h"
-#include "layer_api.h"
-#include "common.h"
+#include "xi_layer_api.h"
+#include "xi_common.h"
 #include "xi_user_config.h"
 
 #ifdef __cplusplus

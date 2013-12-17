@@ -14,7 +14,7 @@
 
 #include "xi_config.h"
 #include "xi_time.h"
-#include "layer_connection.h"
+#include "xi_layer_connection.h"
 
 #ifdef __cplusplus
 extern "C" {
