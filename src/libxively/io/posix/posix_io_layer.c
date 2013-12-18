@@ -46,8 +46,16 @@ layer_state_t posix_io_layer_data_ready(
     {
         int len = write( posix_data->socket_fd, buffer->data_ptr, buffer->data_size );
 
+        if( len == 0 )
+        {
+            // socket has been closed
+            CALL_ON_SELF_ON_CLOSE( context->self ); 
+            return LAYER_STATE_ERROR;
+        }
+
         if( len < buffer->data_size )
         {
+            CALL_ON_SELF_ON_CLOSE( context->self );
             return LAYER_STATE_ERROR;
         }
     }
@@ -85,7 +93,23 @@ layer_state_t posix_io_layer_on_data_ready(
     do
     {
         memset( buffer->data_ptr, 0, buffer->data_size );
-        buffer->real_size = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size - 1 );
+
+        int len = read( posix_data->socket_fd, buffer->data_ptr, buffer->data_size - 1 );
+
+        if( len == 0 )
+        {
+            // socket has been closed
+            CALL_ON_SELF_ON_CLOSE( context->self ); 
+            return LAYER_STATE_ERROR;
+        }
+
+        if( len < 0 )
+        {
+            CALL_ON_SELF_ON_CLOSE( context->self ); 
+            return LAYER_STATE_ERROR;
+        }
+
+        buffer->real_size = len;
         buffer->data_ptr[ buffer->real_size ] = '\0'; // put guard
         buffer->curr_pos = 0;
         state = CALL_ON_NEXT_ON_DATA_READY( context->self, ( void* ) buffer, LAYER_HINT_MORE_DATA );
