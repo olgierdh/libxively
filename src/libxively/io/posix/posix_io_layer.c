@@ -107,6 +107,20 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
 {
     posix_data_t* posix_data = ( posix_data_t* ) context->self->user_data;
 
+    // shutdown the communication
+    if( shutdown( posix_data->socket_fd, SHUT_RDWR ) == -1 )
+    {
+        xi_set_err( XI_SOCKET_SHUTDOWN_ERROR );
+        goto err_handling;
+    }
+
+    // close the connection & the socket
+    if( close( posix_data->socket_fd ) == -1 )
+    {
+        xi_set_err( XI_SOCKET_CLOSE_ERROR );
+        goto err_handling;
+    }
+
     // cleanup the memory
     if( posix_data ) 
     {
@@ -115,6 +129,18 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
     }
 
     return CALL_ON_NEXT_ON_CLOSE( context->self );
+
+err_handling:
+    close( posix_data->socket_fd );
+
+    if( posix_data ) 
+    {
+        xi_debug_logger( "Freeing posix_data memory... \n" );
+        XI_SAFE_FREE( posix_data ); 
+    }
+
+    CALL_ON_NEXT_ON_CLOSE( context->self );
+    return LAYER_STATE_ERROR;
 }
 
 layer_t* connect_to_endpoint(
