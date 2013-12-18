@@ -49,13 +49,11 @@ layer_state_t posix_io_layer_data_ready(
         if( len == 0 )
         {
             // socket has been closed
-            CALL_ON_SELF_ON_CLOSE( context->self ); 
             return LAYER_STATE_ERROR;
         }
 
         if( len < buffer->data_size )
         {
-            CALL_ON_SELF_ON_CLOSE( context->self );
             return LAYER_STATE_ERROR;
         }
     }
@@ -99,13 +97,11 @@ layer_state_t posix_io_layer_on_data_ready(
         if( len == 0 )
         {
             // socket has been closed
-            CALL_ON_SELF_ON_CLOSE( context->self ); 
             return LAYER_STATE_ERROR;
         }
 
         if( len < 0 )
         {
-            CALL_ON_SELF_ON_CLOSE( context->self ); 
             return LAYER_STATE_ERROR;
         }
 
@@ -146,10 +142,10 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
     }
 
     // cleanup the memory
-    if( posix_data ) 
+    if( context->self->user_data ) 
     {
         xi_debug_logger( "Freeing posix_data memory... \n" );
-        XI_SAFE_FREE( posix_data ); 
+        XI_SAFE_FREE( context->self->user_data ); 
     }
 
     return CALL_ON_NEXT_ON_CLOSE( context->self );
@@ -157,10 +153,10 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
 err_handling:
     close( posix_data->socket_fd );
 
-    if( posix_data ) 
+    if( context->self->user_data ) 
     {
         xi_debug_logger( "Freeing posix_data memory... \n" );
-        XI_SAFE_FREE( posix_data ); 
+        XI_SAFE_FREE( context->self->user_data ); 
     }
 
     CALL_ON_NEXT_ON_CLOSE( context->self );
