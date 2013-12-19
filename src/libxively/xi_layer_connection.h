@@ -69,16 +69,19 @@ static inline layer_chain_t connect_layers( layer_t* layers[], const size_t leng
     return ret;
 }
 
-
 /**
  * \brief create_and_connect_layers
  * \param layers_ids
  * \param user_datas
  * \return
  */
-static inline layer_chain_t create_and_connect_layers( const layer_type_id_t layers_ids[], void* user_datas[], const size_t length )
+static inline layer_chain_t create_and_connect_layers(
+          const layer_type_id_t layers_ids[]
+        , void* user_datas[]
+        , const size_t length )
 {
     layer_t* layers[ length ];
+    memset( layers, 0, sizeof( layers ) );
 
     for( size_t i = 0; i < length; ++i )
     {
@@ -86,6 +89,38 @@ static inline layer_chain_t create_and_connect_layers( const layer_type_id_t lay
     }
 
     return connect_layers( layers, length );
+}
+
+static inline void destroy_and_disconnect_layers( layer_chain_t* chain, const size_t length )
+{
+    layer_t* layers[ length ];
+    memset( layers, 0, sizeof( layers ) );
+
+    assert( chain != 0 && "layer chain must not be 0!" );
+    assert( chain->bottom->layer_connection.next != 0 && "layer chain must have at least 2 elements!" );
+
+    layer_t* prev   = chain->bottom;
+    layer_t* tmp    = prev->layer_connection.next;
+
+    unsigned char i = 0;
+    layers[ i ]     = prev;
+
+    // disconnect layers
+    while( tmp )
+    {
+        DISCONNECT_LAYERS( prev, tmp );
+
+        prev          = tmp;
+        tmp           = tmp->layer_connection.next;
+
+        layers[ ++i ] = prev;
+    }
+
+    // free and delete
+    for( size_t i = 0; i < length; ++i )
+    {
+        free_destroy_layer( layers[ i ] );
+    }
 }
 
 #ifdef __cplusplus

@@ -37,6 +37,21 @@ extern "C" {
     lp_i->layer_connection.next  = ln_i
 #endif
 
+#ifdef XI_DEBUG_LAYER_API
+#define DISCONNECT_LAYERS( lp_i, ln_i )\
+    ln_i->layer_connection.prev             = 0;\
+    lp_i->layer_connection.next             = 0;\
+    lp_i->debug_info.debug_line_connect     = __LINE__;\
+    lp_i->debug_info.debug_file_connect     = __FILE__;\
+    ln_i->debug_info.debug_line_connect     = __LINE__;\
+    ln_i->debug_info.debug_file_connect     = __FILE__;
+#else
+#define DISCONNECT_LAYERS( lp_i, ln_i )\
+    ln_i->layer_connection.prev  = 0;\
+    lp_i->layer_connection.next  = 0
+#endif
+
+
 #define LAYER_GET_CONTEXT_PTR( instance )\
     &instance->layer_connection
 

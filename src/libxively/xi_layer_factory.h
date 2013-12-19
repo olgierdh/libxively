@@ -30,6 +30,12 @@ static inline layer_t* alloc_layer( const layer_type_id_t layer_type_id )
     return FACTORY_ENTRIES[ layer_type_id ].alloc( layer_type );
 }
 
+static inline void free_layer( layer_t* layer )
+{
+    const layer_type_t* layer_type = &LAYER_TYPES[ layer->layer_type_id ];
+    return FACTORY_ENTRIES[ layer->layer_type_id ].free( layer_type, layer );
+}
+
 /**
  * \brief create_layer
  * \param layer
@@ -44,7 +50,25 @@ static inline layer_t* create_layer( layer_t* layer, void* user_data )
     return FACTORY_ENTRIES[ layer->layer_type_id ].placement_create( layer, user_data );
 }
 
+/**
+ * \brief destroy_layer
+ * \param layer
+ * \return
+ */
+static inline void destroy_layer( layer_t* layer )
+{
+    // PRECONDITION
+    assert( layer != 0 );
 
+    FACTORY_ENTRIES[ layer->layer_type_id ].placement_delete( layer );
+}
+
+/**
+ * \brief alloc_create_layer
+ * \param layer_type_id
+ * \param user_data
+ * \return
+ */
 static inline layer_t* alloc_create_layer( const layer_type_id_t layer_type_id, void* user_data )
 {
     layer_t* ret = alloc_layer( layer_type_id );
@@ -56,6 +80,17 @@ static inline layer_t* alloc_create_layer( const layer_type_id_t layer_type_id, 
 err_handling:
     return 0;
 }
+
+/**
+ * \brief free_destroy_layer
+ * \param layer
+ */
+static inline void free_destroy_layer( layer_t* layer )
+{
+    destroy_layer( layer );
+    free_layer( layer );
+}
+
 
 #ifdef __cplusplus
 }
