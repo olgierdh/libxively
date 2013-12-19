@@ -233,7 +233,8 @@ layer_t* connect_to_endpoint(
 
 err_handling:
     // cleanup the memory
-    if( posix_data ) { XI_SAFE_FREE( posix_data ); }
+    if( posix_data ) { close( posix_data->socket_fd ); }
+    if( layer->user_data ) { XI_SAFE_FREE( layer->user_data ); }
 
     return 0;
 }
