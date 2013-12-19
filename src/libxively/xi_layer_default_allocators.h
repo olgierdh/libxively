@@ -46,7 +46,7 @@ err_handling:
  * \param type
  * \param layer
  */
-static inline void default_layer_heap_free( layer_type_t* type, layer_t* layer )
+static inline void default_layer_heap_free( const layer_type_t* type, layer_t* layer )
 {
     XI_UNUSED( type );
     xi_free( layer );

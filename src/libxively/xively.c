@@ -366,10 +366,19 @@ err_handling:
 
 void xi_delete_context( xi_context_t* context )
 {
-    if( context )
+    assert( context != 0 && "context must not be null!" );
+
+    switch( context->protocol )
     {
-        XI_SAFE_FREE( context->api_key );
+        case XI_HTTP:
+            destroy_and_disconnect_layers( &( context->layer_chain ), CONNECTION_SCHEME_LENGTH( CONNECTION_SCHEME_1 ) );
+            break;
+        default:
+            assert( 0 && "not yet implemented!" );
+            break;
     }
+
+    XI_SAFE_FREE( context->api_key );
     XI_SAFE_FREE( context );
 }
 
