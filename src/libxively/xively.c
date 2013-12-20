@@ -449,6 +449,45 @@ const xi_response_t* xi_feed_get_all(
     return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
 }
 
+const xi_response_t* xi_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* feed )
+{
+    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
+
+    if( io_layer == 0 )
+    {
+        // we are in trouble
+        return 0;
+    }
+
+    // extract the input layer
+    layer_t* input_layer    = xi->layer_chain.top;
+
+    // clean the response before writing to it
+    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
+
+    // create the input parameter
+    http_layer_input_t http_layer_input =
+    {
+          HTTP_LAYER_INPUT_FEED_GET_ALL
+        , xi
+        , 0
+        , { .xi_get_feed = { .feed = feed } }
+    };
+
+    layer_state_t state = CALL_ON_SELF_DATA_READY( input_layer, ( void *) &http_layer_input, LAYER_HINT_NONE );
+
+    if( state == LAYER_STATE_OK )
+    {
+        CALL_ON_SELF_ON_DATA_READY( io_layer, ( void *) 0, LAYER_HINT_NONE );
+    }
+    
+    CALL_ON_SELF_CLOSE( input_layer );
+
+    return ( ( csv_layer_data_t* ) input_layer->user_data )->response;
+}
+
 
 const xi_response_t* xi_feed_update(
           xi_context_t* xi
@@ -800,6 +839,40 @@ extern const xi_context_t* xi_nob_feed_get(
 
     return xi;
 }
+
+extern const xi_context_t* xi_nob_feed_get_all(
+          xi_context_t* xi
+        , xi_feed_t* value )
+{
+    layer_t* io_layer = connect_to_endpoint( xi->layer_chain.bottom, XI_HOST, XI_PORT );
+
+    if( io_layer == 0 )
+    {
+        // we are in trouble
+        return 0;
+    }
+
+    // extract the input layer
+    layer_t* input_layer = xi->layer_chain.top;
+
+    // clean the response before writing to it
+    memset( ( ( csv_layer_data_t* ) input_layer->user_data )->response, 0, sizeof( xi_response_t ) );
+
+    // create the input parameter
+    static http_layer_input_t http_layer_input;
+    memset( &http_layer_input, 0, sizeof( http_layer_input_t ) );
+
+    // set the layer input
+    http_layer_input.query_type = HTTP_LAYER_INPUT_FEED_GET_ALL;
+    http_layer_input.xi_context = xi;
+    http_layer_input.http_union_data.xi_get_feed.feed = value;
+
+    // assign the input parameter so that can be used via the runner
+    xi->input = &http_layer_input;
+
+    return xi;    
+}
+
 
 extern const xi_context_t* xi_nob_feed_get_all(
           xi_context_t* xi
