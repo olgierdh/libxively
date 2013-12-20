@@ -377,7 +377,7 @@ const void* http_layer_data_generator_feed_get_all(
             = ( const http_layer_input_t* ) input;
 
     // PRECONDITIONS
-    assert( http_layer_input->http_layer_data.xi_get_feed.feed != 0 );
+    assert( http_layer_input->http_union_data.xi_get_feed.feed != 0 );
 
     static unsigned char i = 0;
 
