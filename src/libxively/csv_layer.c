@@ -268,7 +268,7 @@ const void* csv_layer_data_generator_datapoint(
         , short* state )
 {
     // we expect input to be datapoint
-    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+    const union http_union_data_t* ld   = ( const union http_union_data_t* ) input;
     const xi_datapoint_t* dp            = ( const xi_datapoint_t* ) ld->xi_get_datastream.value;
 
     // tmp
@@ -322,7 +322,7 @@ const void* csv_layer_data_generator_datastream(
         , short* state )
 {
     // we expect input to be datapoint
-    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+    const union http_union_data_t* ld   = ( const union http_union_data_t* ) input;
 
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
@@ -352,16 +352,16 @@ const void* csv_layer_data_generator_feed(
         , short* state )
 {
     // we expect input to be datapoint
-    const union http_layer_data_t* ld   = ( const union http_layer_data_t* ) input;
+    const union http_union_data_t* ld   = ( const union http_union_data_t* ) input;
     const xi_feed_t* feed               = ( const xi_feed_t* ) ld->xi_get_feed.feed;
     static unsigned char i              = 0;                                            // local global index required to be static cause used via the persistent for
                                                                                         // 
-    static union http_layer_data_t tmp_http_data;
+    static union http_union_data_t tmp_http_data;
 
     ENABLE_GENERATOR();
     BEGIN_CORO( *state )
 
-        memset( &tmp_http_data, 0, sizeof( union http_layer_data_t ) );
+        memset( &tmp_http_data, 0, sizeof( union http_union_data_t ) );
 
         i = 0;
 
@@ -653,13 +653,13 @@ layer_state_t csv_layer_on_data_ready(
                               csv_layer_data
                             , ( void* ) data
                             , hint
-                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_datastream.value );
+                            , csv_layer_data->http_layer_input->http_union_data.xi_get_datastream.value );
         case HTTP_LAYER_INPUT_FEED_GET_ALL:
         case HTTP_LAYER_INPUT_FEED_GET:
             return csv_layer_parse_feed(
                               csv_layer_data
                             , ( void* ) data, hint
-                            , csv_layer_data->http_layer_input->http_layer_data.xi_get_feed.feed );
+                            , csv_layer_data->http_layer_input->http_union_data.xi_get_feed.feed );
         default:
             break;
     }
