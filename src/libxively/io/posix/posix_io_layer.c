@@ -22,8 +22,8 @@
 #include "xi_macros.h"
 #include "xi_debug.h"
 
-#include "layer_api.h"
-#include "common.h"
+#include "xi_layer_api.h"
+#include "xi_common.h"
 
 #ifdef __cplusplus
 extern "C" {

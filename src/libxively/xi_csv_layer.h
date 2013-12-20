@@ -2,10 +2,10 @@
 #define __CSV_LAYER_H__
 
 // local
-#include "layer.h"
-#include "common.h"
+#include "xi_layer.h"
+#include "xi_common.h"
 #include "xively.h"
-#include "csv_layer_data.h"
+#include "xi_csv_layer_data.h"
 
 #ifdef __cplusplus
 extern "C" {

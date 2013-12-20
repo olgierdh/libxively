@@ -8,9 +8,9 @@
  *          included within alloc and create pair of methods that can be fairly simple implementation
  */
 
-#include "layer.h"
-#include "layer_interface.h"
-#include "layer_factory_interface.h"
+#include "xi_layer.h"
+#include "xi_layer_interface.h"
+#include "xi_layer_factory_interface.h"
 
 #ifdef __cplusplus
 extern "C" {

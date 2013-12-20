@@ -1,7 +1,7 @@
 #ifndef __XI_STATED_SSCANF_HELPERS_H__
 #define __XI_STATED_SSCANF_HELPERS_H__
 
-#include "common.h"
+#include "xi_common.h"
 
 #ifdef __cplusplus
 extern "C" {

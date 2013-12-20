@@ -1,7 +1,7 @@
 #ifndef __LAYER_FACTORY_INTERFACE_H__
 #define __LAYER_FACTORY_INTERFACE_H__
 
-#include "layer.h"
+#include "xi_layer.h"
 #include "xi_macros.h"
 
 #ifdef __cplusplus

@@ -2,8 +2,8 @@
 #define __HTTP_LAYER_H__
 
 // local
-#include "layer.h"
-#include "http_layer_input.h"
+#include "xi_layer.h"
+#include "xi_http_layer_input.h"
 
 #ifdef __cplusplus
 extern "C" {

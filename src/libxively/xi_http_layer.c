@@ -1,14 +1,14 @@
-#include "layer_api.h"
-#include "common.h"
-#include "http_layer.h"
-#include "http_layer_constants.h"
-#include "http_layer_input.h"
-#include "http_layer_data.h"
+#include "xi_layer_api.h"
+#include "xi_common.h"
+#include "xi_http_layer.h"
+#include "xi_http_layer_constants.h"
+#include "xi_http_layer_input.h"
+#include "xi_http_layer_data.h"
 #include "xi_macros.h"
 #include "xi_debug.h"
 #include "xi_stated_sscanf.h"
 #include "xi_coroutine.h"
-#include "layer_helpers.h"
+#include "xi_layer_helpers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -379,14 +379,9 @@ const void* http_layer_data_generator_feed_get_all(
     // PRECONDITIONS
     assert( http_layer_input->http_union_data.xi_get_feed.feed != 0 );
 
-    static unsigned char i = 0;
-
     ENABLE_GENERATOR();
 
     BEGIN_CORO( *state )
-
-        // after starting coro reset static counter
-        i = 1;
 
         gen_ptr_text( *state, XI_HTTP_GET );
         gen_ptr_text( *state, XI_HTTP_TEMPLATE_FEED );
@@ -660,27 +655,34 @@ static inline layer_state_t http_layer_data_ready_gen(
     , xi_generator_t* gen )
 {
     // generator state
-    short gstate = 0;
+    static short gstate         = 0;
+    static short local_state    = 0;
 
-    // send the data through the next layer
-    while( gstate != 1 )
-    {
-        const const_data_descriptor_t* ret
-                = ( const const_data_descriptor_t* ) ( *gen )( input, &gstate );
+    BEGIN_CORO( local_state )
 
-        layer_state_t state
-                = CALL_ON_PREV_DATA_READY(
-                      context->self
-                    , ( const void* ) ret
-                    , ( gstate != 1 ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
+        gstate = 0;
 
-        if( state != LAYER_STATE_OK )
+        // send the data through the next layer
+        while( gstate != 1 )
         {
-            return state;
-        }
-    }
+            const const_data_descriptor_t* ret
+                    = ( const const_data_descriptor_t* ) ( *gen )( input, &gstate );
 
-    return LAYER_STATE_OK;
+            layer_state_t state
+                    = CALL_ON_PREV_DATA_READY(
+                          context->self
+                        , ( const void* ) ret
+                        , ( gstate != 1 ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
+
+            if( state != LAYER_STATE_OK )
+            {
+                YIELD( local_state, state );
+            }
+        }
+
+        EXIT( local_state, LAYER_STATE_OK )
+
+    END_CORO()
 }
 
 /**
@@ -694,6 +696,7 @@ layer_state_t http_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
+    //xi_debug_function_entered();
 
     // unpack the data
     const http_layer_input_t* http_layer_input = ( const http_layer_input_t* ) data;
@@ -984,7 +987,7 @@ layer_state_t http_layer_close(
 layer_state_t http_layer_on_close(
     layer_connectivity_t* context )
 {
-    return  CALL_ON_NEXT_CLOSE( context->self );
+    return  CALL_ON_NEXT_ON_CLOSE( context->self );
 }
 
 

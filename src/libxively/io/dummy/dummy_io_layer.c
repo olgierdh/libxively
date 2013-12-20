@@ -19,8 +19,8 @@
 #include "xi_macros.h"
 #include "xi_debug.h"
 
-#include "layer_api.h"
-#include "common.h"
+#include "xi_layer_api.h"
+#include "xi_common.h"
 
 layer_state_t dummy_io_layer_data_ready(
       layer_connectivity_t* context

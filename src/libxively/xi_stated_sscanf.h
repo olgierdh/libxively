@@ -2,7 +2,7 @@
 #define __XI_STATED_SSCANF_H__
 
 #include "xi_stated_sscanf_state.h"
-#include "common.h"
+#include "xi_common.h"
 
 #ifdef __cplusplus
 extern "C" {

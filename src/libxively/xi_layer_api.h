@@ -1,7 +1,7 @@
 #ifndef __LAYER_API_H__
 #define __LAYER_API_H__
 
-#include "layer.h"
+#include "xi_layer.h"
 
 #ifdef __cplusplus
 extern "C" {

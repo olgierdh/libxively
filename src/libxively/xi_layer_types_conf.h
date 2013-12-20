@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-#include "layer_type.h"
+#include "xi_layer_type.h"
 
 #define BEGIN_LAYER_TYPES_CONF() \
     const layer_type_t LAYER_TYPES[] = {
