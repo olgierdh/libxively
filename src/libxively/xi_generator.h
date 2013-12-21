@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "xi_coroutine.h"
-#include "common.h"
+#include "xi_common.h"
 
 #ifdef __cplusplus
 extern "C" {

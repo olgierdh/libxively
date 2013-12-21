@@ -22,8 +22,8 @@
 #include "xi_err.h"
 #include "xi_macros.h"
 #include "xi_globals.h"
-#include "layer_api.h"
-#include "common.h"
+#include "xi_layer_api.h"
+#include "xi_common.h"
 
 extern "C" {
 

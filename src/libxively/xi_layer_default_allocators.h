@@ -9,8 +9,8 @@
  *          strategies to adjust to fulfill different requirements
  */
 
-#include "layer.h"
-#include "layer_type.h"
+#include "xi_layer.h"
+#include "xi_layer_type.h"
 #include "xi_allocator.h"
 #include "xi_macros.h"
 

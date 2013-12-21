@@ -1,4 +1,4 @@
-#include "csv_layer.h"
+#include "xi_csv_layer.h"
 #include "xively.h"
 
 // xi
@@ -8,12 +8,11 @@
 #include "xi_generator.h"
 #include "xi_stated_csv_decode_value_state.h"
 #include "xi_stated_sscanf.h"
-#include "http_layer_constants.h"
-
-#include "csv_layer_data.h"
-#include "layer_api.h"
-#include "http_layer_input.h"
-#include "layer_helpers.h"
+#include "xi_http_layer_constants.h"
+#include "xi_csv_layer_data.h"
+#include "xi_layer_api.h"
+#include "xi_http_layer_input.h"
+#include "xi_layer_helpers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -596,6 +595,7 @@ layer_state_t csv_layer_data_ready(
     XI_UNUSED( context );
     XI_UNUSED( data );
     XI_UNUSED( hint );
+    //xi_debug_function_entered();
 
     // unpack the data, changing the constiness to avoid copying cause
     // these layers shares the same data and the generator suppose to be the only
@@ -653,13 +653,13 @@ layer_state_t csv_layer_on_data_ready(
                               csv_layer_data
                             , ( void* ) data
                             , hint
-                            , csv_layer_data->http_layer_input->http_union_data.xi_get_datastream.value );
+                            , ( xi_datapoint_t* ) csv_layer_data->http_layer_input->http_union_data.xi_get_datastream.value );
         case HTTP_LAYER_INPUT_FEED_GET_ALL:
         case HTTP_LAYER_INPUT_FEED_GET:
             return csv_layer_parse_feed(
                               csv_layer_data
                             , ( void* ) data, hint
-                            , csv_layer_data->http_layer_input->http_union_data.xi_get_feed.feed );
+                            , ( xi_feed_t* ) csv_layer_data->http_layer_input->http_union_data.xi_get_feed.feed );
         default:
             break;
     }

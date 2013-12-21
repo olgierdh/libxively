@@ -5,7 +5,7 @@
 #define __DUMMY_IO_LAYER_H__
 
 // local
-#include "layer.h"
+#include "xi_layer.h"
 
 #ifdef __cplusplus
 extern "C" {

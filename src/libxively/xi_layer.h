@@ -12,10 +12,10 @@ extern "C" {
 #endif
 
 // local
-#include "layer_connectivity.h"
-#include "layer_debug_info.h"
-#include "layer_interface.h"
-#include "layer_type.h"
+#include "xi_layer_connectivity.h"
+#include "xi_layer_debug_info.h"
+#include "xi_layer_interface.h"
+#include "xi_layer_type.h"
 
 /**
  * \brief The layer struct that makes the access to the generated types possible

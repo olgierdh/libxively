@@ -17,20 +17,19 @@
 #include "xi_helpers.h"
 #include "xi_err.h"
 #include "xi_globals.h"
+#include "xi_common.h"
+#include "xi_layer_api.h"
+#include "xi_layer_interface.h"
+#include "xi_layer_connection.h"
+#include "xi_layer_types_conf.h"
+#include "xi_layer_factory.h"
+#include "xi_layer_factory_conf.h"
+#include "xi_layer_default_allocators.h"
+#include "xi_http_layer.h"
+#include "xi_http_layer_data.h"
+#include "xi_csv_layer.h"
 
-#include "common.h"
-#include "layer_api.h"
-#include "layer_interface.h"
-#include "layer_connection.h"
-#include "layer_types_conf.h"
-#include "layer_factory.h"
-#include "layer_factory_conf.h"
-#include "layer_default_allocators.h"
-#include "http_layer.h"
-#include "http_layer_data.h"
 
-
-#include "csv_layer.h"
 
 #ifdef __cplusplus
 extern "C" {
