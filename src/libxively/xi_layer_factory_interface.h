@@ -32,7 +32,7 @@ typedef struct
     layer_t* ( *alloc )            ( const layer_type_t* type );
 
     /** \brief strict deallocation of layer's memory */
-    void ( *free )                 ( layer_type_t* type
+    void ( *free )                 ( const layer_type_t* type
                                    , layer_t* layer );
 } layer_factory_interface_t;
 
