@@ -120,7 +120,7 @@ layer_state_t posix_io_layer_close( layer_connectivity_t* context )
 
     XI_UNUSED( posix_data );
 
-    return LAYER_STATE_OK;
+    return CALL_ON_SELF_ON_CLOSE( context->self );
 }
 
 layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
@@ -148,7 +148,7 @@ layer_state_t posix_io_layer_on_close( layer_connectivity_t* context )
         XI_SAFE_FREE( context->self->user_data );
     }
 
-    return LAYER_STATE_OK;
+    return CALL_ON_NEXT_ON_CLOSE( context->self );
 
 err_handling:
     close( posix_data->socket_fd );
