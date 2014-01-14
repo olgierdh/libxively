@@ -28,6 +28,13 @@ export XI_USER_AGENT
 export XI_WARN_CFLAGS XI_OPTLEVEL XI_EXTRA_CFLAGS
 export CC AR
 
+ifneq ($(OS), Linux)
+# On Cygwin, CodeSourcery toolchain doesn't use the header files from
+# the 'current' directory, but instead picks the header files from the
+# directory where the C file resides, hence this workaround
+XI_EXTRA_CFLAGS += -I.
+endif
+
 all:
 	@echo " [sub] libxively"
 	$(AT)$(MAKE) -C src/ libxively
