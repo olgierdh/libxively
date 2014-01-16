@@ -1,8 +1,13 @@
 # These are the most generic rules we use, let's define it here.
 
+os:=${shell uname -s}
+
 $(XI_OBJDIR)/%.o : %.c
 	@-mkdir -p $(dir $@)
 	$(CC) $(XI_CFLAGS) -c $< -o $@
+ifneq ($(findstring CYGWIN, ${os}), )
+	sed -i -e 's/\t/ /;s/ \([a-zA-Z]\):/ \/cygdrive\/\1/g;s/^\([a-zA-Z]\):/\/cygdrive\/\1/g' ${@:.o=.d}
+endif
 
 $(XI_OBJDIR)/%.o : %.cpp
 	@-mkdir -p $(dir $@)
@@ -11,6 +16,9 @@ $(XI_OBJDIR)/%.o : %.cpp
 $(XI_OBJDIR)/%.d : %.c
 	@-mkdir -p $(dir $@)
 	@$(CC) $(XI_CFLAGS) -MM $< -MF $@ -MT $(@:.d=.o)
+ifneq ($(findstring CYGWIN, ${os}), )
+	sed -i -e 's/\t/ /;s/ \([a-zA-Z]\):/ \/cygdrive\/\1/g;s/^\([a-zA-Z]\):/\/cygdrive\/\1/g' $@
+endif
 
 $(XI_OBJDIR)/%.d : %.cpp
 	@-mkdir -p $(dir $@)
