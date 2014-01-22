@@ -7,8 +7,8 @@
 #include "msp430_data.h"
 
 // local
-#include "common.h"
-#include "layer_api.h"
+#include "xi_common.h"
+#include "xi_layer_api.h"
 #include "xi_helpers.h"
 #include "xi_allocator.h"
 #include "xi_debug.h"
