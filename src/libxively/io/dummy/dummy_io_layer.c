@@ -1,17 +1,10 @@
-// Copyright (c) 2003-2013, LogMeIn, Inc. All rights reserved.
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- * \file    dummy_io_layer.c
- * \author  Olgierd Humenczuk
- * \brief   Implements DUMMY _io layer_ abstraction interface [see layer.h]
- */
-// c
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 
-// local
 #include "dummy_io_layer.h"
 #include "dummy_data.h"
 #include "xi_allocator.h"

@@ -1,4 +1,6 @@
-// c
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
 #include <stdio.h>
 #if (!defined(XI_IO_LAYER_POSIX_COMPAT)) || (XI_IO_LAYER_POSIX_COMPAT == 0)
 #include <netdb.h>
@@ -14,7 +16,6 @@
 #include <string.h>
 #include <stdint.h>
 
-// local
 #include "posix_io_layer.h"
 #include "posix_data.h"
 #include "xi_allocator.h"

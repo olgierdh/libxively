@@ -1,11 +1,8 @@
-#ifndef __LAYER_TYPE_H__
-#define __LAYER_TYPE_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- * \file    layer_type.h
- * \brief   containes definition of the layer type
- *
- */
+#ifndef __XI_LAYER_TYPE_H__
+#define __XI_LAYER_TYPE_H__
 
 #include "xi_layer_interface.h"
 
@@ -13,14 +10,8 @@
 extern "C" {
 #endif
 
-/**
- * \brief   layer_type_id_t
- */
 typedef unsigned char layer_type_id_t;
 
-/**
- * \brief   layer type definition
- */
 typedef struct
 {
     layer_type_id_t     layer_type_id;
@@ -35,4 +26,4 @@ typedef struct
 }
 #endif
 
-#endif
+#endif // __XI_LAYER_TYPE_H__

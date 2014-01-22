@@ -1,7 +1,9 @@
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
 #include "xi_csv_layer.h"
 #include "xively.h"
 
-// xi
 #include "xi_macros.h"
 #include "xi_debug.h"
 #include "xi_coroutine.h"
@@ -130,14 +132,6 @@ static const short states[][6][2] =
     { { XI_CHAR_MINUS     , XI_STATE_MINUS   }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  }, { XI_CHAR_MINUS     , XI_STATE_STRING  } }
 };
 
-/**
- * @brief xi_stated_csv_decode_value
- * @param st
- * @param source
- * @param p
- * @param hint
- * @return
- */
 signed char xi_stated_csv_decode_value(
           xi_stated_csv_decode_value_state_t* st
         , const_data_descriptor_t* source
@@ -256,12 +250,6 @@ data_ready:
     return 1;
 }
 
-/**
- * @brief csv_layer_data_generator_datapoint generates the data related to the datapoint
- * @param input
- * @param state
- * @return
- */
 const void* csv_layer_data_generator_datapoint(
           const void* input
         , short* state )
@@ -310,12 +298,6 @@ const void* csv_layer_data_generator_datapoint(
     END_CORO()
 }
 
-/**
- * @brief csv_layer_data_generator_datastream
- * @param input
- * @param state
- * @return
- */
 const void* csv_layer_data_generator_datastream(
           const void* input
         , short* state )
@@ -340,12 +322,6 @@ const void* csv_layer_data_generator_datastream(
 
 }
 
-/**
- * @brief csv_layer_data_generator_feed
- * @param input
- * @param state
- * @return
- */
 const void* csv_layer_data_generator_feed(
           const void* input
         , short* state )
@@ -384,15 +360,7 @@ const void* csv_layer_data_generator_feed(
 }
 
 
-/**
- * @brief csv_layer_parse_datastream helper function that parses the one level of the data which is the datastream itself
- *        this function suppose to parse the timestamp and the value and save it within the proper datastream field
- *
- * @param context
- * @param data
- * @param hint
- * @return
- */
+// parse the timestamp and the value and save it within the proper datastream field
 layer_state_t csv_layer_parse_datastream(
         csv_layer_data_t* csv_layer_data
       , const_data_descriptor_t* data
@@ -494,14 +462,6 @@ layer_state_t csv_layer_parse_datastream(
     //return LAYER_STATE_OK;
 }
 
-/**
- * @brief csv_layer_parse_feed
- * @param csv_layer_data
- * @param data
- * @param hint
- * @param dp
- * @return
- */
 layer_state_t csv_layer_parse_feed(
         csv_layer_data_t* csv_layer_data
       , const_data_descriptor_t* data
@@ -631,7 +591,6 @@ layer_state_t csv_layer_data_ready(
 
     return CALL_ON_PREV_DATA_READY( context->self, ( void* ) http_layer_input, hint );
 }
-
 
 layer_state_t csv_layer_on_data_ready(
       layer_connectivity_t* context

@@ -1,13 +1,8 @@
-#ifndef __HTTP_LAYER_INPUT_H__
-#define __HTTP_LAYER_INPUT_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- *\file     http_layer_input.h
- *\author   Olgierd Humenczuk
- *\brief    File contains declaration of the http layer data structure which is used
- *          within the between layer communication process.
- */
-
+#ifndef __XI_HTTP_LAYER_INPUT_H__
+#define __XI_HTTP_LAYER_INPUT_H__
 
 #include "xively.h"
 #include "xi_layer.h"
@@ -17,9 +12,6 @@
 extern "C" {
 #endif
 
-/**
- * \enum describes the xi http layer api input function types
- */
 typedef enum
 {
       HTTP_LAYER_INPUT_DATASTREAM_GET = 0
@@ -33,19 +25,11 @@ typedef enum
     , HTTP_LAYER_INPUT_FEED_GET_ALL
 } xi_query_type_t;
 
-
-/**
- *\brief    Contains the data related to creation the transport for any payload
- *          that we shall send over network.
- *
- *\note     Version of that structure is specialized for communication with RESTful xively API
- *          so it is not fully functional generic implementation of the HTTP protocol.
- */
 typedef struct
 {
-    xi_query_type_t         query_type;             //!< pass the information about the type of the query that is constructed
-    xi_context_t*           xi_context;             //!< the pointer to the context of the xi library
-    xi_generator_t*         payload_generator;      //!< the pointer to the payload generator, used via the http layer to construct the payload
+    xi_query_type_t         query_type;
+    xi_context_t*           xi_context;
+    xi_generator_t*         payload_generator;
 
     union http_union_data_t
     {
@@ -94,7 +78,7 @@ typedef struct
         {
             xi_feed_t*      feed;
         } xi_update_feed;
-    } http_union_data;                              //!< the union suppose to contain different combinations of data used in queries
+    } http_union_data;
 
 } http_layer_input_t;
 
@@ -102,4 +86,4 @@ typedef struct
 }
 #endif
 
-#endif // __HTTP_LAYER_INPUT_H__
+#endif // __XI_HTTP_LAYER_INPUT_H__

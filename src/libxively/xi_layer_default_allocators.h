@@ -1,13 +1,8 @@
-#ifndef __LAYER_DEFAULT_ALLOCATORS_H__
-#define __LAYER_DEFAULT_ALLOCATORS_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- * \file    layer_default_allocators.h
- * \author  Olgierd Humenczuk
- * \brief   containes the basic set of allocators that can be used across the whole layer system
- *          to allocate/free the memory for the new layers, this set containes different allocation / free
- *          strategies to adjust to fulfill different requirements
- */
+#ifndef __XI_LAYER_DEFAULT_ALLOCATORS_H__
+#define __XI_LAYER_DEFAULT_ALLOCATORS_H__
 
 #include "xi_layer.h"
 #include "xi_layer_type.h"
@@ -18,11 +13,6 @@
 extern "C" {
 #endif
 
-/**
- * \brief   default_layer_heap_alloc
- * \param   type simple pointer to type structure
- * \return  pointer to allocated layer_t structure
- */
 static inline layer_t* default_layer_heap_alloc( const layer_type_t* type )
 {
     layer_t* ret = ( layer_t* ) xi_alloc( sizeof( layer_t ) );
@@ -41,29 +31,16 @@ err_handling:
     return 0;
 }
 
-/**
- * \brief default_layer_heap_free
- * \param type
- * \param layer
- */
 static inline void default_layer_heap_free( const layer_type_t* type, layer_t* layer )
 {
     XI_UNUSED( type );
     xi_free( layer );
 }
 
-/**
- * @brief stack_counter counts the layers on a stack
- */
 static unsigned char stack_counter = 0;
 
 #define MAX_LAYERS_ON_STACK 4
 
-/**
- * \brief   default_layer_stack_alloc
- * \param   type simple pointer to type structure
- * \return  pointer to allocated layer_t structure
- */
 static inline layer_t* default_layer_stack_alloc( const layer_type_t* type )
 {
     static layer_t layers_stack[ MAX_LAYERS_ON_STACK ];
@@ -79,11 +56,6 @@ static inline layer_t* default_layer_stack_alloc( const layer_type_t* type )
     return &layers_stack[ stack_counter - 1 ];
 }
 
-/**
- * \brief default_layer_heap_free
- * \param type
- * \param layer
- */
 static inline void default_layer_stack_free( layer_type_t* type, layer_t* layer )
 {
     XI_UNUSED( type );
@@ -96,4 +68,4 @@ static inline void default_layer_stack_free( layer_type_t* type, layer_t* layer 
 }
 #endif
 
-#endif // __LAYER_DEFAULT_ALLOCATORS_H__
+#endif // __XI_LAYER_DEFAULT_ALLOCATORS_H__

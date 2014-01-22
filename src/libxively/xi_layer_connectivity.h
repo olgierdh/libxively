@@ -1,16 +1,15 @@
-#ifndef __LAYER_CONNECTIVITY_H__
-#define __LAYER_CONNECTIVITY_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
+#ifndef __XI_LAYER_CONNECTIVITY_H__
+#define __XI_LAYER_CONNECTIVITY_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// forward declaration
 struct layer;
 
-/**
- * \brief   allows to seek for the next call context
- */
 typedef struct layer_connectivity
 {
     struct layer* self;
@@ -22,4 +21,4 @@ typedef struct layer_connectivity
 }
 #endif
 
-#endif // __LAYER_CONNECTIVITY_H__
+#endif // __XI_LAYER_CONNECTIVITY_H__

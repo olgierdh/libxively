@@ -1,3 +1,6 @@
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
 #ifndef __XI_STATED_SSCANF_HELPERS_H__
 #define __XI_STATED_SSCANF_HELPERS_H__
 
@@ -56,13 +59,11 @@ static inline void to_unsigned_char( xi_stated_sscanf_state_t* s, unsigned char*
     }
 }
 
-
 static inline unsigned char pass_all( const char c )
 {
     ( void ) c;
     return 1;
 }
-
 
 static inline signed char safe_until_copier(
           unsigned char* dst_i

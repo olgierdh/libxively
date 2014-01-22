@@ -1,7 +1,9 @@
-#ifndef __CSV_LAYER_H__
-#define __CSV_LAYER_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-// local
+#ifndef __XI_CSV_LAYER_H__
+#define __XI_CSV_LAYER_H__
+
 #include "xi_layer.h"
 #include "xi_common.h"
 #include "xively.h"
@@ -11,37 +13,19 @@
 extern "C" {
 #endif
 
-/**
- * \file   csv_layer.h
- * \author Olgierd Humenczuk
- * \brief  File that containes the declaration of the csv layer functions
- */
-
-/**
- * \brief   see the layer_interface for details
- */
 layer_state_t csv_layer_data_ready(
       layer_connectivity_t* context
     , const void* data
     , const layer_hint_t hint );
 
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t csv_layer_on_data_ready(
       layer_connectivity_t* context
     , const void* data
     , const layer_hint_t hint );
 
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t csv_layer_close(
     layer_connectivity_t* context );
 
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t csv_layer_on_close(
     layer_connectivity_t* context );
 
@@ -57,7 +41,6 @@ layer_state_t csv_layer_parse_feed(
       , const layer_hint_t hint
       , xi_feed_t* dp );
 
-
 const void* csv_layer_data_generator_datastream_get(
           const void* input
         , short* state );
@@ -70,4 +53,4 @@ const void* csv_layer_data_generator_datapoint(
 }
 #endif
 
-#endif // __CSV_LAYER_H__
+#endif // __XI_CSV_LAYER_H__

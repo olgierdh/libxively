@@ -1,25 +1,18 @@
-#ifndef __LAYER_H__
-#define __LAYER_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- * \file    layer.h
- * \author  Olgierd Humenczuk
- * \brief   the layer type definition used across the whole layer system
- */
+#ifndef __XI_LAYER_H__
+#define __XI_LAYER_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// local
 #include "xi_layer_connectivity.h"
 #include "xi_layer_debug_info.h"
 #include "xi_layer_interface.h"
 #include "xi_layer_type.h"
 
-/**
- * \brief The layer struct that makes the access to the generated types possible
- */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct layer
 {
     const layer_interface_t*    layer_functions;
@@ -37,4 +30,4 @@ typedef struct layer
 }
 #endif
 
-#endif // __LAYER_H__
+#endif // __XI_LAYER_H__

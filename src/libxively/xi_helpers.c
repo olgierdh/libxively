@@ -1,14 +1,8 @@
-// Copyright (c) 2003-2013, LogMeIn, Inc. All rights reserved.
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
 // This file also containes code from MINIX C library, which is under MINIX license
 // Copyright (c) 1987, 1997, 2006, Vrije Universiteit, Amsterdam, The Netherlands
-
-/**
- * \file    xi_helpers.c
- * \author  Olgierd Humenczuk
- * \brief   General helpers used by the library [see xi_helpers.h]
- */
 
 #include <string.h>
 
