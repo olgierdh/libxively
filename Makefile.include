@@ -87,8 +87,9 @@ XI_BINDIR := $(XI_OUTPUT)/bin
 
 XI ?= $(XI_OBJDIR)/libxively.a
 
-XI_OBJECTS = $(XI_SOURCES:.c=.o)
-XI_DEPENDS = $(XI_SOURCES:.c=.d)
+XI_OBJECTS = $(filter-out $(XI_SOURCES), $(XI_SOURCES:.c=.o) $(XI_SOURCES:.cpp=.o))
+XI_DEPENDS = $(filter-out $(XI_SOURCES), $(XI_SOURCES:.c=.d) $(XI_SOURCES:.cpp=.d))
+
 
 XI_OBJS = $(addprefix $(XI_OBJDIR)/,$(XI_OBJECTS))
 XI_DEPS = $(addprefix $(XI_OBJDIR)/,$(XI_DEPENDS))

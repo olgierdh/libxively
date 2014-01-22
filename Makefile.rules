@@ -4,9 +4,17 @@ $(XI_OBJDIR)/%.o : %.c
 	@-mkdir -p $(dir $@)
 	$(CC) $(XI_CFLAGS) -c $< -o $@
 
+$(XI_OBJDIR)/%.o : %.cpp
+	@-mkdir -p $(dir $@)
+	$(CXX) $(XI_CFLAGS) -c $< -o $@
+
 $(XI_OBJDIR)/%.d : %.c
 	@-mkdir -p $(dir $@)
 	@$(CC) $(XI_CFLAGS) -MM $< -MF $@ -MT $(@:.d=.o)
+
+$(XI_OBJDIR)/%.d : %.cpp
+	@-mkdir -p $(dir $@)
+	@$(CXX) $(XI_CFLAGS) -MM $< -MF $@ -MT $(@:.d=.o)
 
 clean:
 	$(RM) -rf $(XI_BINDIR)

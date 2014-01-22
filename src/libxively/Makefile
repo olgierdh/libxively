@@ -12,6 +12,7 @@ XI_CFLAGS += -I./ \
 
 XI_SOURCES = $(wildcard *.c) \
 	$(wildcard io/$(XI_IO_LAYER)/*.c) \
+	$(wildcard io/$(XI_IO_LAYER)/*.cpp)
 
 ifeq ($(XI_NOB_ENABLED),true)
     XI_SOURCES += $(wildcard nob/*.c)
