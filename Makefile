@@ -22,6 +22,17 @@ ci_avr:
 		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
 		XI_IO_LAYER=dummy
 
+ENERGIA_PREFIX ?= /Users/ilya/Library/Local/Energia/Energia-0101E0010.app/Contents/Resources/Java
+test_energia:
+	$(MAKE) -C src clean
+	$(MAKE) -C src libxively \
+		CC=$(ENERGIA_PREFIX)/hardware/tools/msp430/bin/msp430-gcc \
+		CXX=$(ENERGIA_PREFIX)/hardware/tools/msp430/bin/msp430-g++ \
+		AR=$(ENERGIA_PREFIX)/hardware/tools/msp430/bin/msp430-ar \
+		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
+		XI_EXTRA_CFLAGS='-Datof=atoi -I$(ENERGIA_PREFIX)/hardware/msp430/cores/msp430/ -I$(ENERGIA_PREFIX)/hardware/msp430/libraries/' \
+		XI_IO_LAYER=energia
+
 MBED_HEAD ?= HEAD
 MBED_TEMP ?= mbed_mercurial
 MBED_USER ?= xively
