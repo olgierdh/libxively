@@ -1,12 +1,11 @@
 #ifndef __MSP430_DATA_H__
 #define __MSP430_DATA_H__
 
+#include "SimplelinkWifi/TCPclient.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "SimplelinkWifi/wifi.h" 
-//#include "SimplelinkWifi/TCPclient.h"
 
 typedef struct
 {
