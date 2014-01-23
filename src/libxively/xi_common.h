@@ -1,5 +1,8 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
+#ifndef __XI_COMMON_H__
+#define __XI_COMMON_H__
 
 #include <stdlib.h>
 #include <inttypes.h>
@@ -10,22 +13,6 @@
 extern "C" {
 #endif
 
-/**
- * \brief the structure that describes the buffer for storing/passing
- * within the program the structure can be easly manipulated using the 
- * module functions
- */
-typedef struct
-{
-    char*   data_buffer;
-    size_t  buffer_capacity;    //!< the maximum capacity of the buffer
-    size_t  buffer_size;        //!< the actual used size of the buffer 
-} data_buffer_t;
-
-/**
- * \brief the structure that describes the simple char* with the size so it's easier to
- * pass this as a paremeter
- */
 typedef struct
 {
     char*           data_ptr;
@@ -46,5 +33,4 @@ typedef struct
 }
 #endif
 
-
-#endif
+#endif // __XI_COMMON_H__

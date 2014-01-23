@@ -1,15 +1,5 @@
-// Copyright (c) 2003-2013, LogMeIn, Inc. All rights reserved.
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
 // This is part of Xively C library, it is under the BSD 3-Clause license.
-
-/**
- * \file    xi_config.h
- * \author  Olgierd Humenczuk
- * \brief   Constants that user may wish to override based on their needs
- *
- * \warning The meaning of each of these constants below is undocumented,
- *          so the user actually goes to read the source code and figure
- *          out what exactly they are doing.
- */
 
 #ifndef __XI_CONFIG_H__
 #define __XI_CONFIG_H__

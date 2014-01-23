@@ -1,5 +1,8 @@
-#ifndef __LAYER_HELPERS_H__
-#define __LAYER_HELPERS_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
+#ifndef __XI_LAYER_HELPERS_H__
+#define __XI_LAYER_HELPERS_H__
 
 #include "xi_common.h"
 
@@ -7,10 +10,7 @@
 extern "C" {
 #endif
 
-/**
- * \brief layer_sender little helper to encapsulate
- *        error handling over sending data between layers
- */
+// little helper to encapsulate error handling
 static inline layer_state_t layer_sender(
           layer_connectivity_t* context
         , const char* const data
@@ -21,9 +21,7 @@ static inline layer_state_t layer_sender(
     return CALL_ON_PREV_DATA_READY( context->self, ( const void* ) &tmp_data, hint );
 }
 
-/**
- * \brief wrapper around the layer_sender just some syntactic sugar on top
- */
+// wrapper around layer_sender() to add some syntactic sugar
 #define send_through( context, data, hint ) \
     { \
         layer_state_t ret = LAYER_STATE_OK; \
@@ -34,4 +32,4 @@ static inline layer_state_t layer_sender(
 }
 #endif
 
-#endif // __LAYER_HELPERS_H__
+#endif // __XI_LAYER_HELPERS_H__

@@ -1,21 +1,13 @@
-// Copyright (c) 2003-2013, LogMeIn, Inc. All rights reserved.
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
 // This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- * \file    mbed_comm.cpp
- * \author  Olgierd Humenczuk
- * \brief   Implements mbed _communication layer_ abstraction interface using [TCPSocketConnection](http://mbed.org/users/mbed_official/code/Socket/docs/tip/classTCPSocketConnection.html) [see comm_layer.h]
- */
- 
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 
-// mbed
 #include "mbed_io_layer.h"
 #include "mbed_data.h"
 
-// local
 #include "xi_helpers.h"
 #include "xi_allocator.h"
 #include "xi_debug.h"

@@ -1,11 +1,8 @@
-#ifndef __LAYER_TYPES_CONF_H__
-#define __LAYER_TYPES_CONF_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- *\file     layer_types_conf.h
- *\author   Olgierd Humenczuk
- *\brief    containes set of macros required to create the layers types configuration
- */
+#ifndef __XI_LAYER_TYPES_CONF_H__
+#define __XI_LAYER_TYPES_CONF_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,9 +19,8 @@ extern "C" {
 #define END_LAYER_TYPES_CONF() \
     };
 
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif // __LAYER_TYPES_CONF_H__
+#endif // __XI_LAYER_TYPES_CONF_H__

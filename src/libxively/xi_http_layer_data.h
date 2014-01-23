@@ -1,12 +1,8 @@
-#ifndef __HTTP_LAYER_DATA_H__
-#define __HTTP_LAYER_DATA_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- *\file     http_layer_data.h
- *\author   Olgierd Humenczuk
- *\brief    containes the structure related to the internal layer data that shall be used over the lifecycle of each instance
- *          to process the queries and parse the responses.
- */
+#ifndef __XI_HTTP_LAYER_DATA_H__
+#define __XI_HTTP_LAYER_DATA_H__
 
 #include "xi_stated_sscanf_state.h"
 #include "xively.h"
@@ -15,16 +11,13 @@
 extern "C" {
 #endif
 
-/**
- *\brief    shall contain the data needed via parsing and constructing queries
- */
 typedef struct
 {
-    char                        parser_state;          //!< represents the state of the http layer parser parsing header, state, payload etc, etc.
-    unsigned char               last_char_marker;      //!< the marker that it's used to point to the last char in the buffer
+    char                        parser_state;
+    unsigned char               last_char_marker;
     xi_stated_sscanf_state_t    xi_stated_sscanf_state;
-    short                       counter;               //!< multiple purposes counter
-    short                       content_length;        //!< size of the payload
+    short                       counter;
+    short                       content_length;
     xi_response_t*              response;
 } http_layer_data_t;
 
@@ -32,4 +25,4 @@ typedef struct
 }
 #endif
 
-#endif // __HTTP_LAYER_DATA_H__
+#endif // __XI_HTTP_LAYER_DATA_H__

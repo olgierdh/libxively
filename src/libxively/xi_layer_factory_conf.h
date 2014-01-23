@@ -1,12 +1,8 @@
-#ifndef __FACTORY_CONF_H__
-#define __FACTORY_CONF_H__
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
 
-/**
- *\file     layer_factory_conf.h
- *\author   Olgierd Humenczuk
- *\brief    containes macros that will be used to create the configuration of the layer factory
- *          policies
- */
+#ifndef __XI_FACTORY_CONF_H__
+#define __XI_FACTORY_CONF_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +22,4 @@ const layer_factory_interface_t FACTORY_ENTRIES[] = {
 }
 #endif
 
-#endif // __FACTORY_CONF_H__
+#endif // __XI_FACTORY_CONF_H__

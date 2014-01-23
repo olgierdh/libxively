@@ -1,3 +1,6 @@
+// Copyright (c) 2003-2014, LogMeIn, Inc. All rights reserved.
+// This is part of Xively C library, it is under the BSD 3-Clause license.
+
 #include "xi_layer_api.h"
 #include "xi_common.h"
 #include "xi_http_layer.h"
@@ -14,7 +17,6 @@
 extern "C" {
 #endif
 
-
 // static array of recognizable http headers
 static const char* XI_HTTP_TOKEN_NAMES[ XI_HTTP_HEADERS_COUNT ] =
     {
@@ -29,11 +31,6 @@ static const char* XI_HTTP_TOKEN_NAMES[ XI_HTTP_HEADERS_COUNT ] =
         , "unknown"         // XI_HTTP_HEADER_UNKNOWN, //!< !!!! this must be always on the last position
     };
 
-/**
- * \brief   classify_header function that finds a proper type for a given http header name
- * \param   header header name to be classified
- * \return  classified http header type
- */
 static inline http_header_type_t classify_header( const char* header )
 {
     for( unsigned short i = 0; i < XI_HTTP_HEADER_COUNT - 1; ++i )
@@ -45,12 +42,6 @@ static inline http_header_type_t classify_header( const char* header )
     return XI_HTTP_HEADER_UNKNOWN;
 }
 
-/**
- * @brief http_layer_data_generator_query_body
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_query_body(
           const void* input
         , short* state )
@@ -133,12 +124,6 @@ const void* http_layer_data_generator_query_body(
     return 0;
 }
 
-/**
- * @brief http_layer_data_generator_datastream_body
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_datastream_body(
           const void* input
         , short* state )
@@ -176,12 +161,6 @@ const void* http_layer_data_generator_datastream_body(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_datastream_get
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_datastream_get(
           const void* input
         , short* state )
@@ -202,12 +181,6 @@ const void* http_layer_data_generator_datastream_get(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_datastream_update
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_datastream_update(
           const void* input
         , short* state )
@@ -228,12 +201,6 @@ const void* http_layer_data_generator_datastream_update(
     return 0;
 }
 
-/**
- * @brief http_layer_data_generator_datastream_create_body
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_datastream_create_body(
           const void* input
         , short* state )
@@ -268,12 +235,6 @@ const void* http_layer_data_generator_datastream_create_body(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_datastream_create
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_datastream_create(
           const void* input
         , short* state )
@@ -294,12 +255,6 @@ const void* http_layer_data_generator_datastream_create(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_feed_get
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_feed_get(
           const void* input
         , short* state )
@@ -362,12 +317,6 @@ const void* http_layer_data_generator_feed_get(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_feed_get_all
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_feed_get_all(
           const void* input
         , short* state )
@@ -407,12 +356,6 @@ const void* http_layer_data_generator_feed_get_all(
     return 0;
 }
 
-/**
- * \brief http_layer_data_generator_feed_update
- * \param input
- * \param state
- * \return
- */
 const void* http_layer_data_generator_feed_update(
           const void* input
         , short* state )
@@ -449,12 +392,6 @@ const void* http_layer_data_generator_feed_update(
     return 0;
 }
 
-/**
- * @brief http_layer_data_generator_datastream_delete
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_datastream_delete(
           const void* input
         , short* state )
@@ -490,12 +427,6 @@ const void* http_layer_data_generator_datastream_delete(
     return 0;
 }
 
-/**
- * @brief http_layer_data_generator_datapoint_delete
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_datapoint_delete(
           const void* input
         , short* state )
@@ -556,12 +487,6 @@ const void* http_layer_data_generator_datapoint_delete(
     return 0;
 }
 
-/**
- * @brief http_layer_data_generator_datapoint_delete_range
- * @param input
- * @param state
- * @return
- */
 const void* http_layer_data_generator_datapoint_delete_range(
           const void* input
         , short* state )
@@ -644,11 +569,6 @@ const void* http_layer_data_generator_datapoint_delete_range(
     return 0;
 }
 
-
-
-/**
- * \brief  see the layer_interface for details
- */
 static inline layer_state_t http_layer_data_ready_gen(
       layer_connectivity_t* context
     , const http_layer_input_t* input
@@ -685,9 +605,6 @@ static inline layer_state_t http_layer_data_ready_gen(
     END_CORO()
 }
 
-/**
- * \brief   see the layer_interface for details
- */
 layer_state_t http_layer_data_ready(
       layer_connectivity_t* context
     , const void* data
@@ -753,11 +670,6 @@ layer_state_t http_layer_data_ready(
     };
 }
 
-
-
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t http_layer_on_data_ready(
       layer_connectivity_t* context
     , const void* data
@@ -972,30 +884,18 @@ layer_state_t http_layer_on_data_ready(
 }
 
 
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t http_layer_close(
     layer_connectivity_t* context )
 {
     return CALL_ON_PREV_CLOSE( context->self );
 }
 
-/**
- * \brief  see the layer_interface for details
- */
 layer_state_t http_layer_on_close(
     layer_connectivity_t* context )
 {
     return  CALL_ON_NEXT_ON_CLOSE( context->self );
 }
 
-
-/**
- * \brief connect_to_endpoint
- * \param layer
- * \return
- */
 layer_t* init_http_layer(
       layer_t* layer )
 {
