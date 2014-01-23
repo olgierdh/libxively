@@ -1,4 +1,3 @@
-// c
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -6,7 +5,6 @@
 #include "msp430_io_layer.h"
 #include "msp430_data.h"
 
-// local
 #include "xi_common.h"
 #include "xi_layer_api.h"
 #include "xi_helpers.h"
@@ -15,14 +13,6 @@
 #include "xi_err.h"
 #include "xi_macros.h"
 #include "xi_globals.h"
-
-#include "SimplelinkWifi/wifi.h" 
-#include "SimplelinkWifi/TCPclient.h"
-#include "SimplelinkWifi/SimplelinkWifi.h" 
-
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
 
 
 layer_state_t msp430_io_layer_data_ready(
@@ -33,6 +23,7 @@ layer_state_t msp430_io_layer_data_ready(
     msp430_data_t* msp430_data                = ( msp430_data_t* ) context->self->user_data;
     const const_data_descriptor_t* buffer   = ( const const_data_descriptor_t* ) data;
 
+    XI_UNUSED( hint );
 
     if( buffer != 0 && buffer->data_size > 0 )
     {
@@ -149,7 +140,7 @@ layer_t* connect_to_endpoint(
 
     // allocation of the socket connector
     WiFiClient* socket_ptr = new WiFiClient();
-    XI_CHECK_MEMORY( socket_ptr );
+    //XI_CHECK_MEMORY( socket_ptr );
 
     // set the timeout for blocking operations
     //socket_ptr->set_blocking( false, xi_globals.network_timeout );
@@ -157,7 +148,7 @@ layer_t* connect_to_endpoint(
     // allocate memory for the mbed data specific structure
     msp430_data = ( msp430_data_t* )
             xi_alloc( sizeof( msp430_data_t ) );
-    XI_CHECK_MEMORY( msp430_data );
+    //XI_CHECK_MEMORY( msp430_data );
 
     { // to prevent the skip initializtion warning
         msp430_data->socket_ptr = socket_ptr;
@@ -193,7 +184,3 @@ err_handling:
 
     return 0;*/
 }
-
-//#ifdef __cplusplus
-//}
-//#endif

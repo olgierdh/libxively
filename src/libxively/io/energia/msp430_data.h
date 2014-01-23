@@ -1,7 +1,7 @@
 #ifndef __MSP430_DATA_H__
 #define __MSP430_DATA_H__
 
-#include "SimplelinkWifi/TCPclient.h"
+#include "SimplelinkWifi/WiFi.h"
 
 #ifdef __cplusplus
 extern "C" {
