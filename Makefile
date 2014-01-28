@@ -23,7 +23,8 @@ ci_avr:
 		XI_IO_LAYER=dummy
 
 ENERGIA_PREFIX ?= /Users/ilya/Library/Local/Energia/Energia-0101E0011.app/Contents/Resources/Java
-test_energia:
+
+test_energia_msp430:
 	$(MAKE) -C src clean
 	$(MAKE) -C src libxively \
 		CC=$(ENERGIA_PREFIX)/hardware/tools/msp430/bin/msp430-gcc \
@@ -31,6 +32,16 @@ test_energia:
 		AR=$(ENERGIA_PREFIX)/hardware/tools/msp430/bin/msp430-ar \
 		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
 		XI_EXTRA_CFLAGS='-Datof=atoi -I$(ENERGIA_PREFIX)/hardware/msp430/cores/msp430/ -I$(ENERGIA_PREFIX)/hardware/msp430/libraries/' \
+		XI_IO_LAYER=energia
+
+test_energia_lm4f:
+	$(MAKE) -C src clean
+	$(MAKE) -C src libxively \
+		CC=$(ENERGIA_PREFIX)/hardware/tools/lm4f/bin/arm-none-eabi-gcc \
+		CXX=$(ENERGIA_PREFIX)/hardware/tools/lm4f/bin/arm-none-eabi-g++ \
+		AR=$(ENERGIA_PREFIX)/hardware/tools/lm4f/bin/arm-none-eabi-ar \
+		XI_DEBUG_ASSERT=0 XI_DEBUG_OUTPUT=0 \
+		XI_EXTRA_CFLAGS='-I$(ENERGIA_PREFIX)/hardware/lm4f/cores/lm4f/ -I$(ENERGIA_PREFIX)/hardware/lm4f/libraries/' \
 		XI_IO_LAYER=energia
 
 MBED_HEAD ?= HEAD
