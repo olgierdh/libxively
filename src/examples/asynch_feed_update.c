@@ -110,7 +110,7 @@ int main( int argc, const char* argv[] )
     fd_set rfds;
     struct timeval tv;
     int retval = 0, i;
-    bool sent = false;
+    int sent = 0;
 
     /* Watch stdin (fd 0) to see when it has input. */
     FD_ZERO( &rfds );
@@ -145,7 +145,7 @@ int main( int argc, const char* argv[] )
                 {
                     goto print_data;
                 }
-                sent = true;
+                sent = 1;
                 break;
               case LAYER_STATE_ERROR:
                 printf("error in send\r\n");
