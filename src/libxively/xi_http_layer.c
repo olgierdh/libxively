@@ -719,7 +719,15 @@ layer_state_t http_layer_on_data_ready(
         
     const char status_pattern4[]       = "\r\n";
     const const_data_descriptor_t v4   = { status_pattern4, sizeof( status_pattern4 ) - 1, sizeof( status_pattern4 ) - 1, 0 };
-    
+
+    const char status_pattern5[]       = "%" XI_STR( XI_HTTP_HEADER_VALUE_MAX_SIZE ) "B";
+    const const_data_descriptor_t v5   = { status_pattern5, sizeof( status_pattern5 ) - 1, sizeof( status_pattern5 ) - 1, 0 };
+    void*                  pv5[]       =
+    {
+        ( void* ) http_layer_data->response->http.http_headers[ XI_HTTP_HEADER_UNKNOWN ].value
+    };
+
+
     BEGIN_CORO( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ] )
 
     memset( xi_stated_state, 0, sizeof( xi_stated_sscanf_state_t ) );
@@ -751,6 +759,9 @@ layer_state_t http_layer_on_data_ready(
             }
         }
     }    
+
+    //
+    xi_debug_format( "HTTP STATUS: %d", http_layer_data->response->http.http_status );
 
     // STAGE 02 reading headers
     {
@@ -862,13 +873,31 @@ layer_state_t http_layer_on_data_ready(
 
             xi_debug_printf( "%s", ( ( const_data_descriptor_t* ) data )->data_ptr + ( ( const_data_descriptor_t* ) data )->curr_pos );
 
-            state = CALL_ON_NEXT_ON_DATA_READY( context->self
-                                        , ( const void* ) data
-                                        , ( http_layer_data->counter < http_layer_data->content_length ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
-
-            if( state == LAYER_STATE_MORE_DATA && http_layer_data->counter < http_layer_data->content_length )
+            if( http_layer_data->response->http.http_status == 200 )
             {
-                YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA );
+                state = CALL_ON_NEXT_ON_DATA_READY( context->self
+                                            , ( const void* ) data
+                                            , ( http_layer_data->counter < http_layer_data->content_length ) ? LAYER_HINT_MORE_DATA : LAYER_HINT_NONE );
+
+                if( state == LAYER_STATE_MORE_DATA && http_layer_data->counter < http_layer_data->content_length )
+                {
+                    YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA );
+                }
+            }
+            else
+            {
+                sscanf_state = 0;
+
+                sscanf_state = xi_stated_sscanf(
+                              xi_stated_state
+                            , ( const_data_descriptor_t* ) &v5
+                            , ( const_data_descriptor_t* ) data
+                            , pv5 );
+
+                if( sscanf_state == 0 )
+                {
+                    YIELD( context->self->layer_states[ FUNCTION_ID_ON_DATA_READY ], LAYER_STATE_MORE_DATA );
+                }
             }
         }
     }
