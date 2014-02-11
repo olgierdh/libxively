@@ -53,25 +53,21 @@ else
   $(warning "Overriden XI_ARFLAGS with $(XI_OVERRIDE_ARFLAGS)")
 endif # XI_OVERRIDE_ARFLAGS
 
-ifeq ($(XI_IO_LAYER),posix)
-  XI_CONFIG += XI_IO_LAYER=0
-endif
+#CALCULATIONS OF THE PROPER ID OF PICKED IO_LAYER
+layers += posix dummy mbed posix_asynch
+asynch_layers += posix_asynch
 
-ifeq ($(XI_IO_LAYER),dummy)
-  XI_CONFIG += XI_IO_LAYER=1
-endif
+define plus
+	$(shell echo $1 + $2 | bc)
+endef
 
-ifeq ($(XI_IO_LAYER),mbed)
-  XI_CONFIG += XI_IO_LAYER=2
-endif
+i:=0
+counter = $(i)$(eval i:=$(call plus,$(i),1))
 
-ifeq ($(XI_IO_LAYER),posix_asynch)
-	XI_CFLAGS += -DXI_IO_LAYER=3
-	XI_NOB_ENABLED := true
-endif
+$(foreach c, $(layers), $(if $(filter $(XI_IO_LAYER), $(c)), $(eval XI_CONFIG += XI_IO_LAYER=$(counter)), $($(counter)) ) )
 
-ifeq ($(XI_NOB_ENABLED),true)
-  XI_CONFIG += XI_NOB_ENABLED
+ifneq (,$(findstring asynch,$(XI_IO_LAYER)))
+	XI_CONFIG += XI_NOB_ENABLED
 endif
 
 ifndef XI_USER_CONFIG
@@ -84,6 +80,8 @@ else
     XI_CFLAGS += -I$(XI_USER_CONFIG_PATH)
   endif
 endif
+
+$(info $(XI_CONFIG))
 
 XI_OUTPUT ?= $(LIBXIVELY)/
 XI_OBJDIR := $(XI_OUTPUT)/obj
