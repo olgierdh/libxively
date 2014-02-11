@@ -81,8 +81,6 @@ else
   endif
 endif
 
-$(info $(XI_CONFIG))
-
 XI_OUTPUT ?= $(LIBXIVELY)/
 XI_OBJDIR := $(XI_OUTPUT)/obj
 XI_BINDIR := $(XI_OUTPUT)/bin
