@@ -54,7 +54,7 @@ else
 endif # XI_OVERRIDE_ARFLAGS
 
 #CALCULATIONS OF THE PROPER ID OF PICKED IO_LAYER
-layers += posix dummy mbed posix_asynch
+layers += posix dummy mbed posix_asynch posix_ssl_asynch
 asynch_layers += posix_asynch
 
 define plus
